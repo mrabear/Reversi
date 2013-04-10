@@ -23,3 +23,13 @@ D:\Projects\Reversi\obj\Debug\Reversi.csproj.GenerateResource.Cache
 D:\Projects\Reversi\obj\Debug\Reversi.exe
 D:\Projects\Reversi\obj\Debug\Reversi.pdb
 D:\Projects\Reversi\obj\Debug\Reversi.csprojResolveAssemblyReference.cache
+C:\Users\Brian\Desktop\Reversi-master\obj\Debug\Reversi.exe
+C:\Users\Brian\Desktop\Reversi-master\obj\Debug\Reversi.pdb
+C:\Users\Brian\Desktop\Reversi-master\bin\Debug\Reversi.exe
+C:\Users\Brian\Desktop\Reversi-master\bin\Debug\Reversi.pdb
+C:\Users\Brian\Desktop\Reversi-master\obj\Debug\Reversi.csprojResolveAssemblyReference.cache
+C:\Users\Brian\Desktop\Reversi-master\obj\Debug\Reversi.Properties.Resources.resources
+C:\Users\Brian\Desktop\Reversi-master\obj\Debug\Reversi.ReversiForm.resources
+C:\Users\Brian\Desktop\Reversi-master\obj\Debug\Reversi.csproj.GenerateResource.Cache
+C:\Users\Brian\Desktop\Reversi-master\bin\Debug\Reversi.exe.config
+D:\Projects\Reversi\bin\Debug\Reversi.exe.config

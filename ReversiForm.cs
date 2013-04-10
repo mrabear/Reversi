@@ -12,9 +12,9 @@ namespace Reversi
 {
 	public class ReversiForm : System.Windows.Forms.Form
 	{
-        public const int BLACK = 2;
-        public const int WHITE = 1;
-        public const int EMPTY = 0;
+        public static int BLACK = Properties.Settings.Default.BLACK;
+        public static int WHITE = Properties.Settings.Default.WHITE;
+        public static int EMPTY = Properties.Settings.Default.EMPTY;
 
         private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
         private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
