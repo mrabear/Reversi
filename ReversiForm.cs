@@ -1,3 +1,5 @@
+// Reversi
+
 using System;
 using System.Drawing;
 using System.Collections;
@@ -8,11 +10,6 @@ using System.Data;
 
 namespace Reversi
 {
-	/// <summary>
-	/// Summary description for Form Reversi.
-	/// </summary>
-	/// 
-
 	public class ReversiForm : System.Windows.Forms.Form
 	{
         public const int BLACK = 2;

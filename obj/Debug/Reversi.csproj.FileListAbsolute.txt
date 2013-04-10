@@ -15,12 +15,11 @@ D:\Backup\Old Projects\Reversi\obj\Debug\Reversi.ReversiForm.resources
 D:\Backup\Old Projects\Reversi\obj\Debug\GenerateResource.read.1.tlog
 D:\Backup\Old Projects\Reversi\obj\Debug\GenerateResource.write.1.tlog
 D:\Backup\Old Projects\Reversi\obj\Debug\Reversi.Properties.Resources.resources
-D:\Projects\Reversi\obj\Debug\Reversi.exe
-D:\Projects\Reversi\obj\Debug\Reversi.pdb
 D:\Projects\Reversi\bin\Debug\Reversi.exe
 D:\Projects\Reversi\bin\Debug\Reversi.pdb
-D:\Projects\Reversi\obj\Debug\ResolveAssemblyReference.cache
 D:\Projects\Reversi\obj\Debug\Reversi.Properties.Resources.resources
 D:\Projects\Reversi\obj\Debug\Reversi.ReversiForm.resources
-D:\Projects\Reversi\obj\Debug\GenerateResource.read.1.tlog
-D:\Projects\Reversi\obj\Debug\GenerateResource.write.1.tlog
+D:\Projects\Reversi\obj\Debug\Reversi.csproj.GenerateResource.Cache
+D:\Projects\Reversi\obj\Debug\Reversi.exe
+D:\Projects\Reversi\obj\Debug\Reversi.pdb
+D:\Projects\Reversi\obj\Debug\Reversi.csprojResolveAssemblyReference.cache
