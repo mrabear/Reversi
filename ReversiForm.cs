@@ -584,6 +584,7 @@ namespace Reversi
             this.RAMUsageBar.Step = 1;
             this.RAMUsageBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.RAMUsageBar.TabIndex = 22;
+            this.RAMUsageBar.Tag = "";
             this.RAMUsageBar.Visible = false;
             // 
             // RAMCheckTimer
@@ -1899,7 +1900,6 @@ namespace Reversi
             CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
         }
 
-
         // Cancels any of the background jobs that are currently running
         private void cancelButton_Click(object sender, EventArgs e)
         {
@@ -1963,9 +1963,15 @@ namespace Reversi
             RAMCheckTimer.Enabled = true;
             RAMUsageBar.Visible = true;
             RAMLabel.Visible = true;
+            UpdateRAMprogress();
         }
 
         private void RAMCheckTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateRAMprogress();
+        }
+
+        private void UpdateRAMprogress()
         {
             ObjectQuery wql = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(wql);
@@ -1989,9 +1995,13 @@ namespace Reversi
                 DebugText.Text += "#####   DB Build Aborted: Memory floor reached (" + RAMUsageBar.Value.ToString("0,0.") + " KB free)  #####";
             }
 
-            RAMUsageBar.CreateGraphics().DrawString(RAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.Black, new PointF(120, 2));
+            Graphics RAMGfx = RAMUsageBar.CreateGraphics();
+            int MemoryAbortLine = Convert.ToInt32(RAMUsageBar.Width * Properties.Settings.Default.MemoryFloor);
 
-            //DebugText.Text = "Ping\n";
+            RAMGfx.DrawString(RAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.Black, new PointF(120, 2));
+            RAMGfx.DrawLine(new Pen(Color.Red, 2), MemoryAbortLine, 0, MemoryAbortLine, RAMUsageBar.Height);      
+            RAMGfx.DrawString("Abort   Line", new Font("Arial", (float)8, FontStyle.Regular), Brushes.Red, new PointF(MemoryAbortLine - 34, 4));
+
         }
 
         #endregion
