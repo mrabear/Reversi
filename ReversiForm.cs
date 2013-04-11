@@ -8,993 +8,62 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Data;
+using System.Threading;
 
 namespace Reversi
 {
 	public class ReversiForm : System.Windows.Forms.Form
 	{
-        public static int BLACK = Properties.Settings.Default.BLACK;
-        public static int WHITE = Properties.Settings.Default.WHITE;
-        public static int EMPTY = Properties.Settings.Default.EMPTY;
-
-        private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
-        private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
-        private static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
-
-		private class Board
-		{
-			private Piece[,] BoardPieces;
-
-            public int BoardSize;
-
-			public string DebugMovesAvailable;
-
-			public Board( )
-			{
-                this.BoardSize = 8;
-                BoardPieces = new Piece[BoardSize, BoardSize];
-                ClearBoard();
-                PlaceStartingPieces();
-			}
-
-            // Create an NxN board (min size 4)
-            public Board(int SourceSize)
+        #region Windows Form Designer generated code
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                BoardSize = Math.Max( 4, SourceSize );
-                BoardPieces = new Piece[BoardSize, BoardSize];
-                ClearBoard();
-                PlaceStartingPieces();
-            }
-
-            public Board(Board SourceBoard)
-            {
-                BoardSize = SourceBoard.BoardSize;
-                BoardPieces = new Piece[BoardSize, BoardSize];
-                this.CopyBoard(SourceBoard);
-            }
-
-			public Boolean InBounds( int x, int y )
-			{
-                if ((x > BoardSize - 1) || (y > BoardSize - 1) || (x < 0) || (y < 0)) 
-				{
-					return false;
-				}
-				else
-				{
-					return true;
-				}
-			}
-
-			public void CopyBoard( Board SourceBoard )
-			{
-                for (int olc = 0; olc < BoardSize; olc++)
-				{
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-					{
-						BoardPieces[ilc,olc] = new Piece( SourceBoard.PieceAt( ilc, olc ).color, SourceBoard.PieceAt( ilc, olc ).GetX(), SourceBoard.PieceAt( ilc, olc ).GetY() ) ;
-					}				
-				}
-			}
-
-			public override String ToString()
-			{
-				string boardString = "";
-                for (int olc = 0; olc < BoardSize; olc++)
-				{
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-					{
-						boardString += PieceAt( ilc, olc ).color;
-					}
-					boardString += "\n";
-				}
-
-				return boardString;
-			}
-
-            // Returns a unique identifier for a specific board state and turn
-            public String GetID(int CurrentTurn)
-            {
-                return (CurrentTurn + this.GetID());
-            }
-
-
-            // Returns a unique identifier for a specific board state irrespective of turn
-            public String GetID()
-            {
-                string boardString = "";
-                for (int olc = 0; olc < BoardSize; olc++)
+                if (components != null)
                 {
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-                    {
-                        boardString += PieceAt(ilc, olc).color;
-                    }
-                }
-
-                return boardString;
-            }
-
-			public Piece PieceAt( int x, int y )
-			{
-                if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
-				{
-					return null;
-				}
-				return( BoardPieces[x,y] );
-			}
-
-           /* public Boolean MakeMove(Game CurrentGamex, int x, int y, int color, Boolean ProcessMove)
-            {
-                return( MakeMove(x, y, color, ProcessMove ));
-            }*/
-
-			public Boolean MakeMove( int x, int y, int color, Boolean ProcessMove )
-			{
-
-				int CurrentTurn = color ;
-				int NextTurn;
-				if ( CurrentTurn == WHITE )
-				{
-					NextTurn = BLACK;
-				} 
-				else 
-				{
-					NextTurn = WHITE;
-				}
-
-				// Check for already existing piece
-				if( PieceAt( x, y ).color != 0 )
-				{
-					//DebugText.Text = "A piece is already on that space";
-					return false;
-				}
-
-				Boolean findStatus = false;
-				Boolean takeStatus = false;
-			
-				//DebugText.Text = "Current Game Turn: " + CurrentGame.CurrentTurn + "\nNext Game Turn: " + CurrentGame.NextTurn + "\n\n";
-                for (int olc = Math.Max(y - 1, 0); olc <= Math.Min(y + 1, BoardSize - 1); olc++)
-				{
-                    for (int ilc = Math.Max(x - 1, 0); ilc <= Math.Min(x + 1, BoardSize - 1); ilc++)
-					{
-						// If the piece is placed next to an enemy piece, track it
-						if( PieceAt( ilc, olc ).color == ( NextTurn ) )
-						{
-							//DebugText.Text += "Found adjacent opponent piece at " + ilc + "," + olc + " (" + MainBoard.PieceAt( ilc, olc ).color + "=" + CurrentGame.NextTurn + ")\n";
-						
-							findStatus = true;
-
-							int newX = ilc;
-							int newY = olc;
-							int dirX = ilc - x;
-							int dirY = olc - y;
-
-							Board TempBoard = new Board( this );
-							//TempBoard.CopyBoard( this );
-
-							//DebugText.Text += "Direction X: " + dirX + "\nDirection Y: " + dirY + "\n    Start Trace From: " + newX + "," + newY + "\n";
-							while( TempBoard.PieceAt( newX, newY ).color == NextTurn )
-							{
-								TempBoard.PutPiece( newX, newY, CurrentTurn );
-								newX += dirX;
-								newY += dirY;
-								//DebugText.Text += "    Next piece is: " + newX + "," + newY + "\n";
-							
-								if ( !TempBoard.InBounds( newX, newY ) )
-								{
-									break;
-								}
-							}
-							if ( TempBoard.InBounds( newX, newY ) )
-							{
-								if( TempBoard.PieceAt( newX, newY ).color == CurrentTurn )
-								{
-									//DebugText.Text += "\nPieces taken, mainboard updated\n";
-                                    if ( ProcessMove )
-									{
-										TempBoard.PutPiece( x, y, color );
-										this.CopyBoard( TempBoard );
-									}
-									//MainBoard.RefreshPieces( BoardPicture.CreateGraphics() );
-									takeStatus = true;
-								}
-							}
-						} 
-						else 
-						{
-							//DebugText.Text += "Checked " + ilc + "," + olc + " (color=" + MainBoard.PieceAt( ilc, olc ).color + ")\n";
-						}
-					}
-				}
-
-                if (( !findStatus ) && ( ProcessMove ))
-				{
-					//DebugText.Text = "You must place your piece adjacent to an opponents piece.";
-				}
-                if (( !takeStatus ) && ( ProcessMove ))
-				{
-					//DebugText.Text = "You must place capture at least one piece on each turn.";
-				}
-
-				return takeStatus;
-			}
-
-           /* public Point[] AvailableMoves( Game CurrentGame )
-            {
-                return( AvailableMoves( CurrentGame.CurrentTurn ));
-            }*/
-
-			public Point[] AvailableMoves( int CurrentTurn )
-			{
-				Point[] Moves = new Point[64];
-				int foundMoves = 0;
-                for (int olc = 0; olc < BoardSize; olc++)
-				{
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-					{
-						if( PieceAt( ilc, olc ).color == 0 )
-						{
-							if( MakeMove( ilc, olc, CurrentTurn, false ) )
-							{
-								Moves[ foundMoves ] = new Point( ilc, olc ); 
-								foundMoves++;
-							}
-						}
-					}
-				}
-
-				Point[] FinalMoves = new Point[ foundMoves ];
-				for( int lc = 0 ; lc < FinalMoves.Length ; lc++ )
-				{
-					FinalMoves[ lc ] = Moves[ lc ];
-				}
-
-				return FinalMoves;				
-			}
-
-			public Boolean MovePossible( int color )
-			{
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{	
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-						if( PieceAt( ilc, olc ).color == 0 )
-						{
-							if( MakeMove( ilc, olc, color, false ) )
-							{
-								DebugMovesAvailable = "(" + ilc + "," + olc + ")" ;
-								return true;
-							}
-						}
-					}
-				}
-
-				return false;
-			}
-
-            public void DrawPiece(int x, int y, Graphics BoardGfx )
-			{
-				Piece CurrentPiece = PieceAt( x, y );
-                Image PieceImage = WhitePieceImage;
-
-				if( CurrentPiece.color == BLACK )
-				{
-					PieceImage = BlackPieceImage;
-				}
-
-				BoardGfx.DrawImage( PieceImage, x * 40 + 1, y * 40 + 1, PieceImage.Width, PieceImage.Height );
-			}
-
-			public Piece PutPiece( int x, int y, int color )
-			{
-				if ( ( color == WHITE ) || ( color == BLACK ) || ( color == EMPTY ) )
-				{
-					BoardPieces[x,y] = new Piece( color, x, y );
-					return( BoardPieces[x,y] );
-				}
-
-				return( null );
-			}
-
-			public void ClearBoard()
-			{
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-						BoardPieces[olc,ilc] = new Piece( 0 );
-					}				
-				}
-			}
-
-            public void PlaceStartingPieces()
-            {
-                if (BoardSize == 8)
-                {
-                    PutPiece(3, 3, WHITE);
-                    PutPiece(4, 4, WHITE);
-                    PutPiece(3, 4, BLACK);
-                    PutPiece(4, 3, BLACK);
-                }
-                else if (BoardSize == 6)
-                {
-                    PutPiece(2, 2, WHITE);
-                    PutPiece(3, 3, WHITE);
-                    PutPiece(2, 3, BLACK);
-                    PutPiece(3, 2, BLACK);
-                }
-                else
-                {
-                    PutPiece(1, 1, WHITE);
-                    PutPiece(2, 2, WHITE);
-                    PutPiece(1, 2, BLACK);
-                    PutPiece(2, 1, BLACK);
+                    components.Dispose();
                 }
             }
+            base.Dispose(disposing);
+        }
 
-			public void RefreshPieces( Graphics g )
-			{
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{	
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-						if( PieceAt( ilc, olc ).color != 0 )
-						{
-							DrawPiece( ilc, olc, g );
-						}
-					}
-				}
-			}
+        #region Form Designer Variables
 
-			public int FindScore( int color )
-			{
-				int score = 0;
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{	
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-						if( PieceAt( ilc, olc ).color == color )
-						{
-							score++;
-						}
-					}
-				}
-				return score ;
-			}
-			
-		}
-
-		private class AI
-		{
-			public string AIDebug = "";
-			public int color;
-
-            //Dictionary<string, int> WhiteMoves = new Dictionary<string, int>();
-            public Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
-
-            // Represents a sinlge game state with N-number of connections to and from the tree of all possible game states
-            public class SimulationNode
-            {
-                public String   NodeID;                 // The unique identifier of this node
-
-                public Point[]  AvailableMoves;         // The list available moves that haven't been simulated yet
-
-                public Boolean  isLeaf;                 // TRUE if the node represnts a game end state
-                public Boolean  isTrunk;                // TRUE if the node is the initial game starting position
-                public Boolean  isPassTurn;             // TRUE if the node represents a game board where the current player has to pass
-
-                public Board    GameBoard;              // The board state that this node was generated from
-
-                public int      Turn;                   // The player who is moving in this node
-
-                public int      WhiteWins;              // The potential number of White victory states that this node can lead to
-                public int      BlackWins;              // The potential number of Black victory states that this node can lead to
-
-                public List<String>    ChildNodes;      // The list of game nodes that can be created from the current one (i.e. player moves from the current state to one of the children)
-                public List<String>    ParentNodes;     // The list of game nodes that can create the current one (i.e. player moves from one of the parent states to the current state)
-
-                public SimulationNode( Board SourceBoard, int SourceTurn, Boolean SetTrunk = false, Boolean SetLeaf = false )
-                {
-                    // Initialize variable defaults
-                    this.Initialize();
-
-                    // Map constructor inputs to variables
-                    Turn = SourceTurn;
-                    GameBoard  = new Board( SourceBoard );
-                    isTrunk = SetTrunk;
-                    isLeaf = SetLeaf;
-
-                    // Generate a list of all possible moves for the given player
-                    AvailableMoves = GameBoard.AvailableMoves(Turn);
-
-                    // Generate a unique ID for the node
-                    NodeID = GameBoard.GetID(Turn);
-                }
-
-                public void AddParentNode(String NodeID)
-                {
-                    ParentNodes.Add(NodeID);
-                }
-
-                public void AddChildNode(String NodeID)
-                {
-                    ChildNodes.Add(NodeID);
-                }
-
-                public Boolean ContainsChild(String NodeID)
-                {
-                    return( ChildNodes.Contains(NodeID) );
-                }
-
-                public Boolean ContainsParent(String NodeID)
-                {
-                    return (ParentNodes.Contains(NodeID));
-                }
-
-                public void ClearMoves()
-                {
-                    AvailableMoves = new Point[0];
-                }
-
-                public void Initialize()
-                {
-                    BlackWins = 0;
-                    WhiteWins = 0;
-                    ChildNodes = new List<String>();
-                    ParentNodes = new List<String>();
-                    isLeaf = false;
-                    isTrunk = false;
-                }
-            }
-
-            public Board SimulationBoard;
-
-            public Dictionary<string, SimulationNode> NodeMasterList = new Dictionary<string, SimulationNode>();
-
-            //List<String> WorkNodes = new List<String>();
-            public Queue<String> WorkNodes = new Queue<String>();
-            public Queue<String> LeafNodes = new Queue<String>();
-
-            //public Queue<String> WorkNodes = new Queue<String>();
-            //public Queue<String> LeafNodes = new Queue<String>();
-
-            public int SimulationCycles = 0;
-            public int SimulationDepth = 0;
-            public int WinnerTotal = 0;
-            public int WhiteWinnerTotal = 0;
-            public int BlackWinnerTotal = 0;
-            public int TieTotal = 0;
-            public int LoserTotal = 0;
-            public int LeafTotal = 0;
-
-			public AI( int AIcolor )
-			{		
-				color = AIcolor;	
-			}
-
-			public Point Move( Game CurrentGame )
-			{
-				AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " + 
-					      CurrentGame.GetTurnString( color ) + "\n" +
-					      "AI is set to difficulty level " + CurrentGame.Difficulty + "\n" +
-					      "\nInherited Game Board:\n" + CurrentGame.GameBoard.ToString() + "\n";
-
-				Point[] PossibleMoves = CurrentGame.GameBoard.AvailableMoves( CurrentGame.CurrentTurn );
-
-				AIDebug += "\nPossible Moves:\n";
-				for( int lc = 0 ; lc < PossibleMoves.Length ; lc++ )
-				{
-					AIDebug += "(" + PossibleMoves[ lc ].X + "," + PossibleMoves[ lc ].Y + ")\n";
-				}
-	
-				AIDebug += "\nTotal Possible Moves: " + PossibleMoves.Length + "\n";
-				if( PossibleMoves.Length < 1 )
-				{
-					return new Point( -1, -1 );
-				}
-				
-				// This is just a gameplay hack to get by...all the AI is doing at this point is
-				// gathering a list of all possible moves and then picking the first move off of
-				// that list.  This line should be replaced with algorithims to determine which
-				// of the available moves is best.
-           		Point ChosenMove = PossibleMoves[0];
-
-				AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
-
-				return ChosenMove;
-			}
-
-            public String DumpSimulationInfo()
-            {
-                return( "============================\n" +
-                        "Dumping AI DB Info\n" + 
-                        "============================\n" +
-                        "Total Nodes: " + NodeMasterList.Count + "\n" +
-                        "Total Leaf Nodes: " + LeafTotal + "\n" +
-                        "Total Black Winners: " + BlackWinnerTotal + "\n" +
-                        "Total White Winners: " + WhiteWinnerTotal + "\n" );
-            }
-
-            public void BuildAIDatabase(BackgroundWorker WorkerThread, int BoardSize = 8, Boolean VisualizeResults = false, Graphics VisualizationBoard = null, RichTextBox DebugTextBox = null, Boolean DisplayDebug = true)
-            {
-                /////////////////////////////////////////////////////////////
-                //DEBUG BULLSHIT
-                /////////////////////////////////////////////////////////////
-                SimulationDepth = 0;
-                SimulationCycles = 0;
-                
-                DateTime SimulationClock = DateTime.Now;
-
-                if (DisplayDebug)
-                {
-                    Console.WriteLine("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")");
-                    //DebugTextBox.Text += "===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n";
-                    WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n");
-                }
-
-                //Game SimulatedGame   = new Game();
-                //int finishedGameTotal = SimulateGameMove(SimulatedGame.GameBoard, SimulatedGame.CurrentTurn);
-                /////////////////////////////////////////////////////////////
-
-                // Reset the database and work queues
-                LeafNodes = new Queue<String>();
-                WorkNodes = new Queue<String>();
-                NodeMasterList = new Dictionary<string, SimulationNode>();
-
-                //Board CurrentBoard = new Board();
-                int ParentTurn = WHITE;
-                SimulationNode ParentNode = new SimulationNode(new Board(BoardSize), ParentTurn);
-                String ParentNodeID = ParentNode.NodeID;
-                String RootNodeID = ParentNode.NodeID;
-
-                int ChildTurn = BLACK;
-                //String ChildNodeID;
-                Board  ChildBoard;
-                SimulationNode ChildNode;
-
-                // Seed the master node list with the the root node that contains the default game positions and settings
-                NodeMasterList.Add(RootNodeID, ParentNode);
-                
-                // Seed the work list with the root node
-                WorkNodes.Enqueue(RootNodeID);
-
-                while( WorkNodes.Count > 0 )
-                {
-
-                    /////////////////////////////////////////////////////////////
-                    //DEBUG BULLSHIT
-                    /////////////////////////////////////////////////////////////
-                    SimulationCycles++;
-
-                    if( DisplayDebug ){
-                        if (NodeMasterList.Count % 500 == 0)
-                            Console.WriteLine("(" + NodeMasterList.Count + ") (" + WorkNodes.Count + " queued) (" + LeafTotal + " end states)"); 
-                        /*if (NodeMasterList.Count % 750 == 0)
-                            DebugTextBox.Text += "(" + NodeMasterList.Count + ") (" + WorkNodes.Count + " queued) (" + LeafTotal + " end states)\n"; */
-                    }
-
-                    // If the BackgroundWorker.CancellationPending property is true, cancel
-                    if (WorkerThread.CancellationPending)
-                    {
-                        Console.WriteLine("#####Database Build has been cancelled#####");
-                        break;
-                    }
-
-                    if (SimulationCycles % 75 == 0)
-                        WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "");  
-
-                    // Grab the next node ID off of the work queue
-                    ParentNodeID = WorkNodes.Dequeue();
-
-                    // Fetch the current game node from the master list
-                    ParentNode = NodeMasterList[ParentNodeID];
-
-                    // Set the child turn to be the next player
-                    ChildTurn = ( ParentNode.Turn == WHITE ) ? BLACK : WHITE;
-
-                    //if (NodeMasterList.Count % 10 == 0)
-                    //Console.WriteLine("Turn " + (ParentNode.Turn == WHITE ? "White" : "Black") + "\nScore: B-" + ParentNode.Board.FindScore(BLACK) + " W-" + ParentNode.Board.FindScore(WHITE)  + "\n======================\n" + ParentNode.Board.ToString() );
-
-                    // Update the game board visual
-                    if( VisualizeResults )
-                        ParentNode.GameBoard.RefreshPieces( VisualizationBoard );
-
-                    if (ParentNode.AvailableMoves.Length == 0)
-                    {
-                        ParentNode.isPassTurn = true;
-
-                        ChildNode = new SimulationNode(ParentNode.GameBoard, ChildTurn);
-
-                        if (ChildNode.AvailableMoves.Length > 0)
-                        {
-
-                            if (NodeMasterList.ContainsKey(ChildNode.NodeID))
-                            {
-                                // Since the node already exists, just add the current parent to it's parent node list
-                                if (!NodeMasterList[ChildNode.NodeID].ContainsParent(ParentNode.NodeID))
-                                    NodeMasterList[ChildNode.NodeID].AddParentNode(ParentNode.NodeID);
-                            }
-                            else
-                            {
-                                // Add the new node to the master list
-                                NodeMasterList.Add(ChildNode.NodeID, ChildNode);
-
-                                // Add the new node to the work list for eventual processing
-                                WorkNodes.Enqueue(ChildNode.NodeID);
-                            }
-
-                            // Add this child to the parent's child node list
-                            if (!ParentNode.ContainsChild(ChildNode.NodeID))
-                                ParentNode.AddChildNode(ChildNode.NodeID);
-
-                            // Add the new node to the work list for eventual processing
-                            WorkNodes.Enqueue(ChildNode.NodeID);
-                        }
-                        else
-                        {
-                            ParentNode.isLeaf = true;
-                            LeafTotal++;
-
-                            if (ParentNode.GameBoard.FindScore(BLACK) > ParentNode.GameBoard.FindScore(WHITE))
-                            {
-                                ParentNode.BlackWins++;
-                                BlackWinnerTotal++;
-                            }
-                            else if (ParentNode.GameBoard.FindScore(BLACK) < ParentNode.GameBoard.FindScore(WHITE))
-                            {
-                                ParentNode.WhiteWins++;
-                                WhiteWinnerTotal++;
-                            }
-                            else
-                            {
-                                TieTotal++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (Point CurrentMove in ParentNode.AvailableMoves)
-                        {
-                            ChildBoard = new Board(ParentNode.GameBoard);
-                            ChildBoard.PutPiece(CurrentMove.X, CurrentMove.Y, ChildTurn);
-                            ChildNode = new SimulationNode(ChildBoard, ChildTurn);
-
-                            // Add this child to the parent's child node list
-                            if (!ParentNode.ContainsChild(ChildNode.NodeID))
-                                ParentNode.AddChildNode(ChildNode.NodeID);
-
-                            if (NodeMasterList.ContainsKey(ChildNode.NodeID))
-                            {
-                                // Since the node already exists, just add the current parent to it's parent node list
-                                if (!NodeMasterList[ChildNode.NodeID].ContainsParent(ParentNode.NodeID))
-                                    NodeMasterList[ChildNode.NodeID].AddParentNode(ParentNode.NodeID);
-                            }
-                            else
-                            {
-                                // Add the new node to the master list
-                                NodeMasterList.Add(ChildNode.NodeID, ChildNode);
-
-                                // Add the new node to the work list for eventual processing
-                                WorkNodes.Enqueue(ChildNode.NodeID);
-                            }
-                        }
-                    }
-                    // Clear all of the moves from the nodes working list
-                    ParentNode.ClearMoves();
-                }
-
-                /////////////////////////////////////////////////////////////
-                //DEBUG BULLSHIT
-                /////////////////////////////////////////////////////////////
-                if (DisplayDebug)
-                {
-                    TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                    Console.WriteLine("===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
-                    //DebugTextBox.Text += "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo();
-                    WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
-                }
-            }
-
-            public void AnalyzeAIDatabase(BackgroundWorker WorkerThread, Boolean VisualizeResults = false, Graphics VisualizationBoard = null, RichTextBox DebugTextBox = null, Boolean DisplayDebug = true)
-            {
-
-                /////////////////////////////////////////////////////////////
-                //DEBUG BULLSHIT
-                /////////////////////////////////////////////////////////////
-                DateTime SimulationClock = DateTime.Now;
-
-                if (DisplayDebug)
-                {
-                    Console.WriteLine("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")");
-                   // DebugTextBox.Text += "===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")\n";
-                }
-                /////////////////////////////////////////////////////////////
-
-                // Reset all previous analysis values and queue all of the leaf nodes to process
-                LeafNodes = new Queue<String>();
-                WorkNodes = new Queue<String>();
-
-                foreach (String CurrentNodeID in NodeMasterList.Keys)
-                {
-                    if (NodeMasterList[ CurrentNodeID ].isLeaf)
-                        LeafNodes.Enqueue(NodeMasterList[ CurrentNodeID ].NodeID);
-
-                    NodeMasterList[CurrentNodeID].BlackWins = 0;
-                    NodeMasterList[CurrentNodeID].WhiteWins = 0;
-                }
-
-                /////////////////////////////////////////////////////////////
-                //DEBUG BULLSHIT
-                /////////////////////////////////////////////////////////////
-                if (DisplayDebug)
-                {
-                    TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                    Console.WriteLine("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)");
-                    //DebugTextBox.Text += "(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)\n";
-                }
-                /////////////////////////////////////////////////////////////
-
-                SimulationNode CurrentLeafNode;
-                String CurrentWorkNodeID;
-                int WinningColor;
-
-                while (LeafNodes.Count > 0)
-                {
-                    // If the BackgroundWorker.CancellationPending property is true, cancel
-                    if (WorkerThread.CancellationPending)
-                    {
-                        Console.WriteLine("#####Database Analysis has been cancelled#####");
-                        break;
-                    }
-
-                    // Grab the next leaf node from the leaf queue
-                    CurrentLeafNode = NodeMasterList[LeafNodes.Dequeue()];
-
-                    // Update the game board visual
-                    if (VisualizeResults)
-                        CurrentLeafNode.GameBoard.RefreshPieces(VisualizationBoard);
-
-                    // Find who the winner of the leaf node is
-                    if (CurrentLeafNode.GameBoard.FindScore(WHITE) > CurrentLeafNode.GameBoard.FindScore(BLACK))
-                        WinningColor = WHITE;
-                    else if (CurrentLeafNode.GameBoard.FindScore(WHITE) < CurrentLeafNode.GameBoard.FindScore(BLACK))
-                        WinningColor = BLACK;
-                    else
-                        WinningColor = -1;
-
-                    // If this is a tie, there is no reason to process it
-                    if ( ( WinningColor == BLACK ) || ( WinningColor == WHITE ) )
-                    {
-                        // Seed the work list with the leaf
-                        WorkNodes.Enqueue(LeafNodes.Dequeue());
-
-                        while (WorkNodes.Count > 0)
-                        {
-                            CurrentWorkNodeID = WorkNodes.Dequeue();
-
-                            if( WinningColor == BLACK )
-                                NodeMasterList[ CurrentWorkNodeID ].BlackWins++;
-                            else
-                                NodeMasterList[ CurrentWorkNodeID ].WhiteWins++;
-
-                            foreach (String ParentNode in NodeMasterList[CurrentWorkNodeID].ParentNodes)
-                                WorkNodes.Enqueue(ParentNode);
-                        }
-                    }
-                }
-
-                /////////////////////////////////////////////////////////////
-                //DEBUG BULLSHIT
-                /////////////////////////////////////////////////////////////
-                if (DisplayDebug)
-                {
-                    TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                    Console.WriteLine("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n");
-                    //DebugTextBox.Text += "===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n";
-                }
-                /////////////////////////////////////////////////////////////
-            }
-
-            private int SimulateGameMove(Board CurrentBoard, int Turn )
-            {
-                SimulationCycles++;
-                SimulationDepth++;
-
-                if( SimulationCycles % 5000 == 0 )
-                    Console.WriteLine(SimulationCycles + " Sim cycles in: " + WinnerTotal + " winners / " + LoserTotal + " losers" );
-
-                if (!BlackMoves.ContainsKey(CurrentBoard.GetID()))
-                {
-                    BlackMoves.Add(CurrentBoard.GetID(), 0);
-                }
-
-                // If there are still moves left for the current player, start a new simulation for each of them
-                if ( CurrentBoard.MovePossible( Turn ) )
-                {
-                    Point[] PossibleMoves = CurrentBoard.AvailableMoves( Turn );
-
-                    for (int lc = 0; lc < PossibleMoves.Length; lc++)
-                    {
-                        // Make a copy of the current board
-                        SimulationBoard = new Board(CurrentBoard);
-
-                        // Place the current move on the new board
-                        SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
-
-                        if (!BlackMoves.ContainsKey(SimulationBoard.GetID()))
-                        {
-                            BlackMoves.Add(SimulationBoard.GetID(), 0);
-                        }
-
-                        //Console.WriteLine( (Turn == WHITE ? "White" : "Black" ) + " moved to (" + PossibleMoves[lc].X + "," + PossibleMoves[lc].Y + ")");
-
-                        // Start a simulation for the next player with the updated board
-                        BlackMoves[CurrentBoard.GetID()] += SimulateGameMove(SimulationBoard, Turn == WHITE ? BLACK : WHITE);
-                    }
-
-                    SimulationDepth--;
-                    return (BlackMoves[CurrentBoard.GetID()]);
-                }
-
-                // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
-                else if (CurrentBoard.MovePossible( Turn == WHITE ? BLACK : WHITE)) 
-                {
-                    //Console.WriteLine( (Turn == WHITE ? "White" : "Black") + " cannot move, passing");
-
-                    BlackMoves[CurrentBoard.GetID()] += SimulateGameMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE);
-
-                    SimulationDepth--;
-                    return ( BlackMoves[CurrentBoard.GetID()] ) ;
-                }
-                // If there are no moves left in the game, collapse the simulation
-                else
-                {
-                    if (CurrentBoard.FindScore(BLACK) > CurrentBoard.FindScore(WHITE))
-                    {
-                        //Console.WriteLine(" ### Black Wins");
-                        BlackMoves[CurrentBoard.GetID()] += 1;
-                        SimulationDepth--;
-                        WinnerTotal++;
-                        return (1);
-                    }
-                    else
-                    {
-                        //Console.WriteLine(" ### Black Loses");
-                        SimulationDepth--;
-                        LoserTotal++;
-                        return (0);
-                    }
-                }
-            }
-		}
-
-		private class Piece
-		{
-			
-			public int color = new int();
-			private int x = -1;
-			private int y = -1;
-
-			public Piece( int PieceColor )
-			{
-				color = PieceColor;
-			}
-
-			public Piece( int PieceColor, int pX, int pY )
-			{
-                color = PieceColor;
-				x = pX;
-				y = pY;
-			}
-
-			public int GetX() { return x; }
-			public int GetY() { return y; }
-		}
-
-		private static Boolean PvC = true;
-		private static int AIDifficulty = 1;
-
-		private class Game
-		{
-			public int CurrentTurn;
-			public int NextTurn;
-			public int Difficulty;
-			public Boolean VsComputer = false;
-			public Board GameBoard;
-			public int Winner;
-			public Boolean IsComplete = false;
-			public Boolean ProcessMoves = true;
-			public AI AI;
-
-           /* public Game(Board SourceBoard)
-            {
-                CurrentTurn = WHITE;
-                NextTurn = BLACK;
-                Difficulty = AIDifficulty;
-                VsComputer = PvC;
-                GameBoard.CopyBoard(SourceBoard); 
-                IsComplete = false;
-                AI = new AI(BLACK);
-            }*/
-
-			public Game( int BoardSize = 8 )
-			{
-				CurrentTurn = WHITE;
-				NextTurn = BLACK;
-				Difficulty = AIDifficulty;
-				VsComputer = PvC;
-				GameBoard = new Board( BoardSize );
-				IsComplete = false;
-				AI = new AI( BLACK );
-			}
-
-			public void SwitchTurn()
-			{
-				if( CurrentTurn == WHITE ) 
-				{
-					CurrentTurn = BLACK;
-					NextTurn = WHITE;
-				} 
-				else 
-				{
-					CurrentTurn = WHITE;
-					NextTurn = BLACK;
-				}
-			}
-
-			public string GetTurnString( int color )
-			{
-				if( color == WHITE ) 
-				{
-					return( "White" );
-				} 
-				else if ( color == BLACK )
-				{
-					return( "Black" );
-				} 
-				else 
-				{
-					return( "Illegal Color!" );
-				}
-			}
-		}
-
-
-		#region Form Designer Variables
-
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
         private System.Windows.Forms.Label Title;
         private PictureBox BoardPicture;
         private IContainer components;
-		private System.Windows.Forms.Label TurnLabel;
-		private System.Windows.Forms.MainMenu mainMenu1;
-		private System.Windows.Forms.MenuItem menuItem1;
-		private System.Windows.Forms.MenuItem menuItem2;
-		private System.Windows.Forms.MenuItem menuItem8;
-		private System.Windows.Forms.MenuItem DiffMenu_Easy;
-		private System.Windows.Forms.MenuItem DiffMenu_Normal;
-		private System.Windows.Forms.MenuItem DiffMenu_Hard;
-		private System.Windows.Forms.MenuItem DiffMenu_VeryHard;
-		private System.Windows.Forms.MenuItem menuItem9;
-		private System.Windows.Forms.MenuItem PvPMenu;
-		private System.Windows.Forms.MenuItem PvCMenu;
-		private System.Windows.Forms.MenuItem ExitMenu;
-		private System.Windows.Forms.MenuItem NewGameMenu;
-		private System.Windows.Forms.MenuItem menuItem3;
-		private System.Windows.Forms.MenuItem DebugSkip;
-		private System.Windows.Forms.MenuItem DebugProcess;
+        public System.Windows.Forms.Timer NewGameTimer;
+        private System.Windows.Forms.Label TurnLabel;
+        private System.Windows.Forms.MainMenu mainMenu1;
+        private System.Windows.Forms.MenuItem menuItem1;
+        private System.Windows.Forms.MenuItem menuItem2;
+        private System.Windows.Forms.MenuItem menuItem8;
+        private System.Windows.Forms.MenuItem DiffMenu_Easy;
+        private System.Windows.Forms.MenuItem DiffMenu_Normal;
+        private System.Windows.Forms.MenuItem DiffMenu_Hard;
+        private System.Windows.Forms.MenuItem DiffMenu_VeryHard;
+        private System.Windows.Forms.MenuItem menuItem9;
+        private System.Windows.Forms.MenuItem PvPMenu;
+        private System.Windows.Forms.MenuItem PvCMenu;
+        private System.Windows.Forms.MenuItem ExitMenu;
+        private System.Windows.Forms.MenuItem NewGameMenu;
+        private System.Windows.Forms.MenuItem menuItem3;
+        private System.Windows.Forms.MenuItem DebugSkip;
+        private System.Windows.Forms.MenuItem DebugProcess;
         private System.Windows.Forms.Label ScoreText;
         public RichTextBox DebugAITrace;
-		private System.Windows.Forms.Label AITraceLabel;
-		#endregion
-		private System.Windows.Forms.MenuItem menuItem4;
-		private System.Windows.Forms.MenuItem DebugScenario_NoWhite;
-		private System.Windows.Forms.MenuItem DebugScenario_NoBlack;
-		private System.Windows.Forms.MenuItem DebugScenario_TieGame;
-        private MenuItem AIDataMenu;
-        private MenuItem BuildDataObjectMenuItem;
-        private MenuItem ExportDataObjectMenuItem;
+        private System.Windows.Forms.Label AITraceLabel;
+
+        private System.Windows.Forms.MenuItem menuItem4;
+        private System.Windows.Forms.MenuItem DebugScenario_NoWhite;
+        private System.Windows.Forms.MenuItem DebugScenario_NoBlack;
+        private System.Windows.Forms.MenuItem DebugScenario_TieGame;
         private Button BuildAIDBButton;
         private CheckBox visualizeCheckbox;
         private GroupBox groupBox1;
@@ -1016,46 +85,14 @@ namespace Reversi
         private Label victoryCounter;
         private PictureBox blackPieceImg;
         private PictureBox whitePieceImg;
-		
-		// The Global Game Object
-		private Game CurrentGame;
+        #endregion
 
-		public ReversiForm()
-		{
-			InitializeComponent();
-			
-			CurrentGame = new Game();
-            //CurrentGame.GameBoard.ClearBoard();
-
-            simTimerLabel.Text = "";
-            gridSizeDropDown.SelectedIndex = 4;
-            unusedGrid.SendToBack();
-
-			//TurnLabel.Text = "Current Turn: " + CurrentGame.GetTurnString( CurrentGame.CurrentTurn ) + "\n" ;
-		}
-
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose( bool disposing )
-		{
-			if( disposing )
-			{
-				if (components != null) 
-				{
-					components.Dispose();
-				}
-			}
-			base.Dispose( disposing );
-		}
-
-		#region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
             this.BoardPicture = new System.Windows.Forms.PictureBox();
@@ -1081,9 +118,6 @@ namespace Reversi
             this.DebugScenario_NoWhite = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoBlack = new System.Windows.Forms.MenuItem();
             this.DebugScenario_TieGame = new System.Windows.Forms.MenuItem();
-            this.AIDataMenu = new System.Windows.Forms.MenuItem();
-            this.BuildDataObjectMenuItem = new System.Windows.Forms.MenuItem();
-            this.ExportDataObjectMenuItem = new System.Windows.Forms.MenuItem();
             this.ScoreText = new System.Windows.Forms.Label();
             this.DebugAITrace = new System.Windows.Forms.RichTextBox();
             this.AITraceLabel = new System.Windows.Forms.Label();
@@ -1108,6 +142,7 @@ namespace Reversi
             this.victoryCounter = new System.Windows.Forms.Label();
             this.blackPieceImg = new System.Windows.Forms.PictureBox();
             this.whitePieceImg = new System.Windows.Forms.PictureBox();
+            this.NewGameTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -1123,8 +158,7 @@ namespace Reversi
             this.BoardPicture.Size = new System.Drawing.Size(320, 320);
             this.BoardPicture.TabIndex = 0;
             this.BoardPicture.TabStop = false;
-            this.BoardPicture.Paint += new System.Windows.Forms.PaintEventHandler(this.BoardPaint);
-            this.BoardPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.BoardPicture_MouseUp);
+            this.BoardPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PlaceUserPiece);
             // 
             // Title
             // 
@@ -1135,7 +169,6 @@ namespace Reversi
             this.Title.TabIndex = 1;
             this.Title.Text = "Reversi";
             this.Title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.Title.Click += new System.EventHandler(this.Title_Click);
             // 
             // TurnLabel
             // 
@@ -1242,8 +275,7 @@ namespace Reversi
             this.menuItem3.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.DebugSkip,
             this.DebugProcess,
-            this.menuItem4,
-            this.AIDataMenu});
+            this.menuItem4});
             this.menuItem3.Text = "Debug";
             // 
             // DebugSkip
@@ -1284,25 +316,6 @@ namespace Reversi
             this.DebugScenario_TieGame.Index = 2;
             this.DebugScenario_TieGame.Text = "Tie Game";
             // 
-            // AIDataMenu
-            // 
-            this.AIDataMenu.Index = 3;
-            this.AIDataMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.BuildDataObjectMenuItem,
-            this.ExportDataObjectMenuItem});
-            this.AIDataMenu.Text = "AI Data";
-            // 
-            // BuildDataObjectMenuItem
-            // 
-            this.BuildDataObjectMenuItem.Index = 0;
-            this.BuildDataObjectMenuItem.Text = "Build Data Object";
-            this.BuildDataObjectMenuItem.Click += new System.EventHandler(this.BuildDataObjectMenuItem_Click);
-            // 
-            // ExportDataObjectMenuItem
-            // 
-            this.ExportDataObjectMenuItem.Index = 1;
-            this.ExportDataObjectMenuItem.Text = "Export Data Object to File";
-            // 
             // ScoreText
             // 
             this.ScoreText.Location = new System.Drawing.Point(31, 388);
@@ -1318,7 +331,6 @@ namespace Reversi
             this.DebugAITrace.Size = new System.Drawing.Size(329, 210);
             this.DebugAITrace.TabIndex = 5;
             this.DebugAITrace.Text = "";
-            this.DebugAITrace.TextChanged += new System.EventHandler(this.DebugAITrace_TextChanged);
             // 
             // AITraceLabel
             // 
@@ -1472,9 +484,9 @@ namespace Reversi
             // nodeCounter
             // 
             this.nodeCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nodeCounter.Location = new System.Drawing.Point(373, 147);
+            this.nodeCounter.Location = new System.Drawing.Point(364, 147);
             this.nodeCounter.Name = "nodeCounter";
-            this.nodeCounter.Size = new System.Drawing.Size(106, 32);
+            this.nodeCounter.Size = new System.Drawing.Size(124, 32);
             this.nodeCounter.TabIndex = 13;
             this.nodeCounter.Text = "0";
             this.nodeCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1484,7 +496,7 @@ namespace Reversi
             this.workCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.workCounter.Location = new System.Drawing.Point(608, 147);
             this.workCounter.Name = "workCounter";
-            this.workCounter.Size = new System.Drawing.Size(90, 32);
+            this.workCounter.Size = new System.Drawing.Size(113, 32);
             this.workCounter.TabIndex = 14;
             this.workCounter.Text = "0";
             this.workCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1522,9 +534,9 @@ namespace Reversi
             // victoryCounter
             // 
             this.victoryCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.victoryCounter.Location = new System.Drawing.Point(491, 147);
+            this.victoryCounter.Location = new System.Drawing.Point(479, 147);
             this.victoryCounter.Name = "victoryCounter";
-            this.victoryCounter.Size = new System.Drawing.Size(101, 32);
+            this.victoryCounter.Size = new System.Drawing.Size(123, 32);
             this.victoryCounter.TabIndex = 18;
             this.victoryCounter.Text = "0";
             this.victoryCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -1533,7 +545,7 @@ namespace Reversi
             // 
             this.blackPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("blackPieceImg.Image")));
             this.blackPieceImg.InitialImage = null;
-            this.blackPieceImg.Location = new System.Drawing.Point(25, 316);
+            this.blackPieceImg.Location = new System.Drawing.Point(140, 176);
             this.blackPieceImg.Name = "blackPieceImg";
             this.blackPieceImg.Size = new System.Drawing.Size(38, 38);
             this.blackPieceImg.TabIndex = 20;
@@ -1544,12 +556,17 @@ namespace Reversi
             // 
             this.whitePieceImg.Image = ((System.Drawing.Image)(resources.GetObject("whitePieceImg.Image")));
             this.whitePieceImg.InitialImage = null;
-            this.whitePieceImg.Location = new System.Drawing.Point(93, 316);
+            this.whitePieceImg.Location = new System.Drawing.Point(180, 217);
             this.whitePieceImg.Name = "whitePieceImg";
             this.whitePieceImg.Size = new System.Drawing.Size(38, 38);
             this.whitePieceImg.TabIndex = 21;
             this.whitePieceImg.TabStop = false;
             this.whitePieceImg.Visible = false;
+            // 
+            // NewGameTimer
+            // 
+            this.NewGameTimer.Enabled = true;
+            this.NewGameTimer.Tick += new System.EventHandler(this.NewGameTimer_Tick);
             // 
             // ReversiForm
             // 
@@ -1564,7 +581,6 @@ namespace Reversi
             this.Controls.Add(this.workCounter);
             this.Controls.Add(this.nodeCounter);
             this.Controls.Add(this.simTimerLabel);
-            this.Controls.Add(this.unusedGrid);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.AITraceLabel);
@@ -1573,6 +589,8 @@ namespace Reversi
             this.Controls.Add(this.TurnLabel);
             this.Controls.Add(this.Title);
             this.Controls.Add(this.BoardPicture);
+            this.Controls.Add(this.unusedGrid);
+            this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "ReversiForm";
             this.Text = "Reversi";
@@ -1585,149 +603,1137 @@ namespace Reversi
             this.ResumeLayout(false);
             this.PerformLayout();
 
-		}
-		#endregion
+        }
 
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
-		static void Main() 
-		{
-			Application.Run(new ReversiForm());
-		}
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
+        {
+            Application.Run(new ReversiForm());
+        }
+        #endregion
 
-		private void ProcessTurn( Game CurrentGame, int x, int y )
+        // The main form constructor
+        public ReversiForm()
+        {
+            InitializeComponent();
+            BoardGFX = BoardPicture.CreateGraphics();
+
+            DebugText = DebugAITrace;
+            TurnLabelText = TurnLabel;
+            simTimerLabel.Text = "";
+            gridSizeDropDown.SelectedIndex = 4;
+            unusedGrid.SendToBack();
+        }
+
+        #region Global Variables
+
+        // Color constants
+        public static int BLACK = Properties.Settings.Default.BLACK;
+        public static int WHITE = Properties.Settings.Default.WHITE;
+        public static int EMPTY = Properties.Settings.Default.EMPTY;
+
+        // Static handles to graphical assets
+        private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
+        private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
+        private static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
+        private static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
+
+        // Static handles to form objects
+        private static Label TurnLabelText = new Label();
+        private static RichTextBox DebugText = new RichTextBox();
+        private static Graphics BoardGFX;
+
+        // The board used to track what has been drawn on the screen
+        private static Board LastDrawnBoard = new Board();
+
+        // The Global Game Object
+        private static Game CurrentGame;
+
+        // Flags that determine who is playing (ai or human)
+        private static Boolean PvC = true;
+        private static int AIDifficulty = 1;
+
+        #endregion
+
+        // Class:       Piece
+        // Description: Stores location and color information for a spot on the board
+        private class Piece
+        {
+
+            public int color = EMPTY;
+            public int X = -1;
+            public int Y = -1;
+
+            public Piece(int PieceColor)
+            {
+                color = PieceColor;
+            }
+
+            public Piece(int PieceColor, int pX, int pY)
+            {
+                color = PieceColor;
+                X = pX;
+                Y = pY;
+            }
+
+            public int GetX() { return X; }
+            public int GetY() { return Y; }
+        }
+
+        // Class:       Board
+        // Description: Stores the game board and all of the methods to manipulate it
+        private class Board
 		{
-			if( !CurrentGame.IsComplete )
+			public Piece[,] BoardPieces;
+
+            public int BoardSize;
+
+			public string DebugMovesAvailable;
+
+			public Board( )
 			{
-				if( !( ( CurrentGame.VsComputer ) && ( CurrentGame.CurrentTurn == CurrentGame.AI.color ) ) )
-				{
-					if ( CurrentGame.GameBoard.MovePossible( CurrentGame.CurrentTurn ) ) 
-					{
-						if( CurrentGame.GameBoard.MakeMove( x, y, CurrentGame.CurrentTurn, CurrentGame.ProcessMoves ) )
-						{
-							CurrentGame.SwitchTurn();
-						}
-					} 
-					else
-					{
-						CurrentGame.SwitchTurn();
-					}
-				}
-
-				if( ( CurrentGame.VsComputer ) && ( CurrentGame.CurrentTurn == CurrentGame.AI.color ) )
-				{
-					while( CurrentGame.GameBoard.MovePossible( CurrentGame.AI.color ) )
-					{
-					
-						Point AIMove = CurrentGame.AI.Move( CurrentGame );
-
-						DebugAITrace.Text = CurrentGame.AI.AIDebug;
-						DebugAITrace.Text += "\nOutside class...\nPlacing " + CurrentGame.GetTurnString( CurrentGame.CurrentTurn ) + " AI piece at (" + AIMove.X + "," + AIMove.Y + ")\n";
-
-						CurrentGame.GameBoard.MakeMove( AIMove.X, AIMove.Y, CurrentGame.CurrentTurn, CurrentGame.ProcessMoves );
-
-						DebugAITrace.Text += "\nResult Board:\n" + CurrentGame.GameBoard.ToString() + "\n\n" ;
-
-						if( CurrentGame.GameBoard.MovePossible( CurrentGame.NextTurn ) )
-						{
-							DebugAITrace.Text += "------------\n" + CurrentGame.GetTurnString( CurrentGame.NextTurn ) + " can move to space " + CurrentGame.GameBoard.DebugMovesAvailable + "...ending ai turn\n------------\n";
-							CurrentGame.SwitchTurn();
-							break;
-						} 
-						else 
-						{
-							DebugAITrace.Text += "------------\n" + CurrentGame.NextTurn + " CANNOT MOVE!  AI moving again\n------------\n";
-							//CurrentGame.SwitchTurn();
-							CurrentGame.GameBoard.RefreshPieces( BoardPicture.CreateGraphics() );
-						}
-					}
-					DebugAITrace.Text += "------------\nAI " + CurrentGame.GetTurnString( CurrentGame.AI.color ) + " turn over!  allowing human player to move\n############\n";
-				}
-
-				CurrentGame.GameBoard.RefreshPieces( BoardPicture.CreateGraphics() );
-
-				DetermineWinner( CurrentGame );
+                this.BoardSize = 8;
+                BoardPieces = new Piece[BoardSize, BoardSize];
+                ClearBoard();
+                PlaceStartingPieces();
 			}
-			
-			if( CurrentGame.IsComplete )
+
+            // Create an NxN board (min size 4)
+            public Board(int SourceSize)
+            {
+                BoardSize = Math.Max( 4, SourceSize );
+                BoardPieces = new Piece[BoardSize, BoardSize];
+                ClearBoard();
+                PlaceStartingPieces();
+            }
+
+            public Board(ref Board SourceBoard)
+            {
+                BoardSize = SourceBoard.BoardSize;
+                BoardPieces = new Piece[BoardSize, BoardSize];
+                this.CopyBoard(ref SourceBoard);
+            }
+
+            public Board(Board SourceBoard)
+            {
+                BoardSize = SourceBoard.BoardSize;
+                BoardPieces = new Piece[BoardSize, BoardSize];
+                this.CopyBoard(ref SourceBoard);
+            }
+
+			public Boolean InBounds( int x, int y )
 			{
-				if( CurrentGame.Winner == 0 ) 
+                if ((x > BoardSize - 1) || (y > BoardSize - 1) || (x < 0) || (y < 0)) 
 				{
-					TurnLabel.Text = "The game ended in a tie!!!";
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+
+            public void CopyBoard( ref Piece[,] NewBoardPieces)
+            {
+                Array.Copy( NewBoardPieces, BoardPieces, NewBoardPieces.Length );
+            }
+
+			public void CopyBoard( ref Board SourceBoard )
+			{
+                CopyBoard( ref SourceBoard.BoardPieces );
+
+                /*for (int olc = 0; olc < BoardSize; olc++)
+				{
+                    for (int ilc = 0; ilc < BoardSize; ilc++)
+					{
+						BoardPieces[ilc,olc] = new Piece( SourceBoard.PieceAt( ilc, olc ).color, SourceBoard.PieceAt( ilc, olc ).X, SourceBoard.PieceAt( ilc, olc ).Y ) ;
+					}				
+				}*/
+			}
+
+			public override String ToString()
+			{
+				string boardString = "";
+                for (int olc = 0; olc < BoardSize; olc++)
+				{
+                    for (int ilc = 0; ilc < BoardSize; ilc++)
+					{
+						boardString += PieceAt( ilc, olc ).color;
+					}
+					boardString += "\n";
+				}
+
+				return boardString;
+			}
+
+            // Returns a unique identifier for a specific board state and turn
+            public String GetID(int CurrentTurn)
+            {
+                return (CurrentTurn + this.GetID());
+            }
+
+
+            // Returns a unique identifier for a specific board state irrespective of turn
+            public String GetID()
+            {
+                string boardString = "";
+                for (int olc = 0; olc < BoardSize; olc++)
+                {
+                    for (int ilc = 0; ilc < BoardSize; ilc++)
+                    {
+                        boardString += PieceAt(ilc, olc).color;
+                    }
+                }
+
+                return boardString;
+            }
+
+			public Piece PieceAt( int x, int y )
+			{
+                if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
+				{
+					return null;
+				}
+				return( BoardPieces[x,y] );
+			}
+
+           /* public Boolean MakeMove(Game CurrentGamex, int x, int y, int color, Boolean ProcessMove)
+            {
+                return( MakeMove(x, y, color, ProcessMove ));
+            }*/
+
+			public Boolean MakeMove( int x, int y, int color, Boolean ProcessMove = true )
+			{
+
+				int CurrentTurn = color ;
+				int NextTurn;
+				if ( CurrentTurn == WHITE )
+				{
+					NextTurn = BLACK;
 				} 
 				else 
 				{
-                    TurnLabel.Text = CurrentGame.GetTurnString(CurrentGame.Winner) + " is the winner!!!";
-				}
-			}
-			
-			TurnLabel.Text = "Current Turn: " + CurrentGame.GetTurnString( CurrentGame.CurrentTurn ) + "\n" ;
-		}
-
-		private Boolean DetermineWinner( Game CurrentGame )
-		{
-			int WhiteScore = CurrentGame.GameBoard.FindScore( WHITE );
-			int BlackScore = CurrentGame.GameBoard.FindScore( BLACK );
-
-			ScoreText.Text = "Current Score:\n" + " White: " + WhiteScore + "\n Black: " + BlackScore;
-
-			if( WhiteScore == 0 )
-			{
-				CurrentGame.IsComplete = true;
-				CurrentGame.Winner = BLACK;
-			}
-			else if ( BlackScore == 0 )
-			{
-				CurrentGame.IsComplete = true;
-				CurrentGame.Winner = WHITE;
-			} 
-			else if ( ( ( WhiteScore + BlackScore ) == 64 ) || 
-				( ( !CurrentGame.GameBoard.MovePossible( CurrentGame.CurrentTurn ) ) && ( !CurrentGame.GameBoard.MovePossible( CurrentGame.NextTurn ) ) ) ) 
-			{
-				CurrentGame.IsComplete = true;
-				if ( BlackScore > WhiteScore ) 
-				{
-					CurrentGame.Winner = BLACK;
-				} 
-				else if ( BlackScore < WhiteScore )
-				{
-					CurrentGame.Winner = WHITE;
-				} 
-				else
-				{
-					CurrentGame.Winner = EMPTY;
+					NextTurn = WHITE;
 				}
 
+				// Check for already existing piece
+				if( PieceAt( x, y ).color != EMPTY )
+				{
+					//DebugText.Text = "A piece is already on that space";
+					return false;
+				}
+
+				Boolean findStatus = false;
+				Boolean takeStatus = false;
+			
+				//DebugText.Text = "Current Game Turn: " + CurrentGame.CurrentTurn + "\nNext Game Turn: " + CurrentGame.NextTurn + "\n\n";
+                for (int olc = Math.Max(y - 1, 0); olc <= Math.Min(y + 1, BoardSize - 1); olc++)
+				{
+                    for (int ilc = Math.Max(x - 1, 0); ilc <= Math.Min(x + 1, BoardSize - 1); ilc++)
+					{
+						// If the piece is placed next to an enemy piece, track it
+						if( PieceAt( ilc, olc ).color == ( NextTurn ) )
+						{
+							//DebugText.Text += "Found adjacent opponent piece at " + ilc + "," + olc + " (" + MainBoard.PieceAt( ilc, olc ).color + "=" + CurrentGame.NextTurn + ")\n";
+						
+							findStatus = true;
+
+							int newX = ilc;
+							int newY = olc;
+							int dirX = ilc - x;
+							int dirY = olc - y;
+
+							Board TempBoard = new Board( this );
+							//TempBoard.CopyBoard( this );
+
+							//DebugText.Text += "Direction X: " + dirX + "\nDirection Y: " + dirY + "\n    Start Trace From: " + newX + "," + newY + "\n";
+							while( TempBoard.PieceAt( newX, newY ).color == NextTurn )
+							{
+								TempBoard.PutPiece( newX, newY, CurrentTurn );
+								newX += dirX;
+								newY += dirY;
+								//DebugText.Text += "    Next piece is: " + newX + "," + newY + "\n";
+							
+								if ( !TempBoard.InBounds( newX, newY ) )
+								{
+									break;
+								}
+							}
+							if ( TempBoard.InBounds( newX, newY ) )
+							{
+								if( TempBoard.PieceAt( newX, newY ).color == CurrentTurn )
+								{
+									//DebugText.Text += "\nPieces taken, mainboard updated\n";
+                                    if ( ProcessMove )
+									{
+										TempBoard.PutPiece( x, y, color );
+										CopyBoard( ref TempBoard );
+									}
+									//MainBoard.RefreshPieces( ref BoardGFX );
+									takeStatus = true;
+								}
+							}
+						} 
+						else 
+						{
+							//DebugText.Text += "Checked " + ilc + "," + olc + " (color=" + MainBoard.PieceAt( ilc, olc ).color + ")\n";
+						}
+					}
+				}
+
+                if (( !findStatus ) && ( ProcessMove ))
+				{
+					//DebugText.Text = "You must place your piece adjacent to an opponents piece.";
+				}
+                if (( !takeStatus ) && ( ProcessMove ))
+				{
+					//DebugText.Text = "You must place capture at least one piece on each turn.";
+				}
+
+				return takeStatus;
 			}
 
-			return( CurrentGame.IsComplete );
-		}
+           /* public Point[] AvailableMoves( Game CurrentGame )
+            {
+                return( AvailableMoves( CurrentGame.CurrentTurn ));
+            }*/
 
-		private void BoardPicture_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
-		{
-			int x = (e.X + 1)/40;
-			int y = (e.Y + 1)/40;
-			
-			ProcessTurn( CurrentGame, x, y );
-			
-			//DebugText.Text = CurrentGame.GameBoard.ToString();
-		}
-
-		private void BoardPaint(object sender, System.Windows.Forms.PaintEventArgs e)
-		{
-			Graphics g = e.Graphics;
-
-			base.OnPaint(e);
-			
-			if ( CurrentGame.GameBoard != null ) 
+			public Point[] AvailableMoves( int CurrentTurn )
 			{
-				CurrentGame.GameBoard.RefreshPieces( g );	
+				Point[] Moves = new Point[64];
+				int foundMoves = 0;
+                for (int olc = 0; olc < BoardSize; olc++)
+				{
+                    for (int ilc = 0; ilc < BoardSize; ilc++)
+					{
+						if( PieceAt( ilc, olc ).color == EMPTY )
+						{
+							if( MakeMove( ilc, olc, CurrentTurn, false ) )
+							{
+								Moves[ foundMoves ] = new Point( ilc, olc ); 
+								foundMoves++;
+							}
+						}
+					}
+				}
+
+				Point[] FinalMoves = new Point[ foundMoves ];
+				for( int lc = 0 ; lc < FinalMoves.Length ; lc++ )
+				{
+					FinalMoves[ lc ] = Moves[ lc ];
+				}
+
+				return FinalMoves;				
+			}
+
+			public Boolean MovePossible( int color )
+			{
+				for( int olc = 0; olc < BoardSize; olc++ )
+				{	
+					for( int ilc = 0; ilc < BoardSize; ilc++ )
+					{
+						if( PieceAt( ilc, olc ).color == EMPTY )
+						{
+							if( MakeMove( ilc, olc, color, false ) )
+							{
+								DebugMovesAvailable = "(" + ilc + "," + olc + ")" ;
+								return true;
+							}
+						}
+					}
+				}
+
+				return false;
+			}
+
+            public void DrawPiece( ref Piece CurrentPiece )
+			{
+                Image PieceImage = WhitePieceImage;
+
+                if (CurrentPiece.color == BLACK)
+				{
+					PieceImage = BlackPieceImage;
+				}
+
+                //Board Temp = new Board(LastDrawnBoard);
+
+                // Draw the new piece
+                if ( LastDrawnBoard.PieceAt(CurrentPiece.X, CurrentPiece.Y).color != CurrentPiece.color)
+                    BoardGFX.DrawImage(PieceImage, CurrentPiece.X * 40 + 1, CurrentPiece.Y * 40 + 1, PieceImage.Width, PieceImage.Height);
+			}
+
+			public Piece PutPiece( int x, int y, int color )
+			{
+				if ( ( color == WHITE ) || ( color == BLACK ) || ( color == EMPTY ) )
+				{
+					BoardPieces[x,y] = new Piece( color, x, y );
+					return( BoardPieces[x,y] );
+				}
+
+				return( null );
+			}
+
+			public void ClearBoard()
+			{
+				for( int olc = 0; olc < BoardSize; olc++ )
+				{
+					for( int ilc = 0; ilc < BoardSize; ilc++ )
+					{
+						BoardPieces[olc,ilc] = new Piece( 0 );
+					}				
+				}
+			}
+
+            public void PlaceStartingPieces()
+            {
+                if (BoardSize == 8)
+                {
+                    PutPiece(3, 3, WHITE);
+                    PutPiece(4, 4, WHITE);
+                    PutPiece(3, 4, BLACK);
+                    PutPiece(4, 3, BLACK);
+                }
+                else if (BoardSize == 6)
+                {
+                    PutPiece(2, 2, WHITE);
+                    PutPiece(3, 3, WHITE);
+                    PutPiece(2, 3, BLACK);
+                    PutPiece(3, 2, BLACK);
+                }
+                else
+                {
+                    PutPiece(1, 1, WHITE);
+                    PutPiece(2, 2, WHITE);
+                    PutPiece(1, 2, BLACK);
+                    PutPiece(2, 1, BLACK);
+                }
+            }
+
+			public void RefreshPieces()
+			{
+                //Board lastdrawn = new Board(LastDrawnBoard);
+                Image PieceImage = WhitePieceImage;
+                Piece CurrentPiece = new Piece( EMPTY );
+
+				for( int olc = 0; olc < BoardSize; olc++ )
+				{	
+					for( int ilc = 0; ilc < BoardSize; ilc++ )
+					{
+                        CurrentPiece = PieceAt(ilc, olc);
+
+                        if( CurrentPiece.color != EMPTY )
+                            if (LastDrawnBoard.PieceAt(CurrentPiece.X, CurrentPiece.Y).color != CurrentPiece.color)
+                            {
+                                // Choose the piece image
+                                if (CurrentPiece.color == BLACK)
+                                    PieceImage = BlackPieceImage;
+                                else
+                                    PieceImage = WhitePieceImage;
+
+                                // Draw the new piece
+                                BoardGFX.DrawImage(PieceImage, CurrentPiece.X * 40 + 1, CurrentPiece.Y * 40 + 1, PieceImage.Width, PieceImage.Height);
+                            }
+					}
+				}
+
+                LastDrawnBoard.CopyBoard( ref BoardPieces );
+			}
+
+			public int FindScore( int colorToCheck )
+			{
+				int score = 0;
+				for( int olc = 0; olc < BoardSize; olc++ )
+				{	
+					for( int ilc = 0; ilc < BoardSize; ilc++ )
+					{
+                        if (PieceAt(ilc, olc).color == colorToCheck)
+							score++;
+					}
+				}
+				return score ;
+			}
+			
+		}
+
+        // Class:       AI
+        // Description: Stores the game simulation code used by the AI opponent to play the game
+		private class AI
+		{
+			public string AIDebug = "";
+			public int color;
+
+            //Dictionary<string, int> WhiteMoves = new Dictionary<string, int>();
+            public Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
+
+            // Represents a sinlge game state with N-number of connections to and from the tree of all possible game states
+            public class SimulationNode
+            {
+                public String   NodeID;                 // The unique identifier of this node
+
+                public Point[]  AvailableMoves;         // The list available moves that haven't been simulated yet
+
+                public Boolean  isLeaf;                 // TRUE if the node represnts a game end state
+                public Boolean  isTrunk;                // TRUE if the node is the initial game starting position
+                public Boolean  isPassTurn;             // TRUE if the node represents a game board where the current player has to pass
+
+                public Board    GameBoard;              // The board state that this node was generated from
+
+                public int      Turn;                   // The player who is moving in this node
+
+                public int      WhiteWins;              // The potential number of White victory states that this node can lead to
+                public int      BlackWins;              // The potential number of Black victory states that this node can lead to
+
+                public List<String>    ChildNodes;      // The list of game nodes that can be created from the current one (i.e. player moves from the current state to one of the children)
+                public List<String>    ParentNodes;     // The list of game nodes that can create the current one (i.e. player moves from one of the parent states to the current state)
+
+                public SimulationNode( Board SourceBoard, int SourceTurn, Boolean SetTrunk = false, Boolean SetLeaf = false )
+                {
+                    // Initialize variable defaults
+                    this.Initialize();
+
+                    // Map constructor inputs to variables
+                    Turn = SourceTurn;
+                    GameBoard  = new Board( ref SourceBoard );
+                    isTrunk = SetTrunk;
+                    isLeaf = SetLeaf;
+
+                    // Generate a list of all possible moves for the given player
+                    AvailableMoves = GameBoard.AvailableMoves(Turn);
+
+                    // Generate a unique ID for the node
+                    NodeID = GameBoard.GetID(Turn);
+                }
+
+                public void AddParentNode(String NodeID)
+                {
+                    ParentNodes.Add(NodeID);
+                }
+
+                public void AddChildNode(String NodeID)
+                {
+                    ChildNodes.Add(NodeID);
+                }
+
+                public Boolean ContainsChild(String NodeID)
+                {
+                    return( ChildNodes.Contains(NodeID) );
+                }
+
+                public Boolean ContainsParent(String NodeID)
+                {
+                    return (ParentNodes.Contains(NodeID));
+                }
+
+                public void ClearMoves()
+                {
+                    AvailableMoves = new Point[0];
+                }
+
+                public void Initialize()
+                {
+                    BlackWins = 0;
+                    WhiteWins = 0;
+                    ChildNodes = new List<String>();
+                    ParentNodes = new List<String>();
+                    isLeaf = false;
+                    isTrunk = false;
+                }
+            }
+
+            public Board SimulationBoard;
+
+            public Dictionary<string, SimulationNode> NodeMasterList = new Dictionary<string, SimulationNode>();
+
+            public Queue<String> WorkNodes = new Queue<String>();
+            public Queue<String> LeafNodes = new Queue<String>();
+
+            public int SimulationCycles = 0;
+            public int SimulationDepth = 0;
+            public int WinnerTotal = 0;
+            public int WhiteWinnerTotal = 0;
+            public int BlackWinnerTotal = 0;
+            public int TieTotal = 0;
+            public int LoserTotal = 0;
+            public int LeafTotal = 0;
+
+			public AI( int AIcolor )
+			{		
+				color = AIcolor;	
+			}
+
+			public Point Move( ref Game SourceGame )
+			{
+				AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
+                          SourceGame.GetTurnString(color) + "\n" +
+                          "AI is set to difficulty level " + SourceGame.Difficulty + "\n" +
+                          "\nInherited Game Board:\n" + SourceGame.GameBoard.ToString() + "\n";
+
+                Point[] PossibleMoves = SourceGame.GameBoard.AvailableMoves(SourceGame.CurrentTurn);
+
+				AIDebug += "\nPossible Moves:\n";
+				for( int lc = 0 ; lc < PossibleMoves.Length ; lc++ )
+				{
+					AIDebug += "(" + PossibleMoves[ lc ].X + "," + PossibleMoves[ lc ].Y + ")\n";
+				}
+	
+				AIDebug += "\nTotal Possible Moves: " + PossibleMoves.Length + "\n";
+				if( PossibleMoves.Length < 1 )
+				{
+					return new Point( -1, -1 );
+				}
+				
+				// This is just a gameplay hack to get by...all the AI is doing at this point is
+				// gathering a list of all possible moves and then picking the first move off of
+				// that list.  This line should be replaced with algorithims to determine which
+				// of the available moves is best.
+           		Point ChosenMove = PossibleMoves[0];
+
+				AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
+
+				return ChosenMove;
+			}
+
+            public String DumpSimulationInfo()
+            {
+                return( "============================\n" +
+                        "Dumping AI DB Info\n" + 
+                        "============================\n" +
+                        "Total Nodes: " + NodeMasterList.Count + "\n" +
+                        "Total Leaf Nodes: " + LeafTotal + "\n" +
+                        "Total Black Winners: " + BlackWinnerTotal + "\n" +
+                        "Total White Winners: " + WhiteWinnerTotal + "\n" );
+            }
+
+            public void BuildAIDatabase(BackgroundWorker WorkerThread, int BoardSize = 8, Boolean VisualizeResults = false, Boolean DisplayDebug = true)
+            {
+                /////////////////////////////////////////////////////////////
+                //DEBUG BULLSHIT
+                /////////////////////////////////////////////////////////////
+                SimulationDepth = 0;
+                SimulationCycles = 0;
+                
+                DateTime SimulationClock = DateTime.Now;
+
+                if (DisplayDebug)
+                {
+                    Console.WriteLine("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")");
+                    WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n");
+                }
+                /////////////////////////////////////////////////////////////
+
+                // Reset the database and work queues
+                LeafNodes = new Queue<String>();
+                WorkNodes = new Queue<String>();
+                NodeMasterList = new Dictionary<string, SimulationNode>();
+
+                //Board CurrentBoard = new Board();
+                int ParentTurn = WHITE;
+                SimulationNode ParentNode = new SimulationNode(new Board(BoardSize), ParentTurn);
+                String ParentNodeID = ParentNode.NodeID;
+                String RootNodeID = ParentNode.NodeID;
+
+                int ChildTurn = BLACK;
+                //String ChildNodeID;
+                Board  ChildBoard;
+                SimulationNode ChildNode;
+
+                // Seed the master node list with the the root node that contains the default game positions and settings
+                NodeMasterList.Add(RootNodeID, ParentNode);
+                
+                // Seed the work list with the root node
+                WorkNodes.Enqueue(RootNodeID);
+
+                while( WorkNodes.Count > 0 )
+                {
+
+                    /////////////////////////////////////////////////////////////
+                    //DEBUG BULLSHIT
+                    /////////////////////////////////////////////////////////////
+                    SimulationCycles++;
+
+                    if( DisplayDebug ){
+                        //if (NodeMasterList.Count % 25000 == 0)
+                        //    Console.WriteLine("(" + NodeMasterList.Count + ") (" + WorkNodes.Count + " queued) (" + LeafTotal + " end states)"); 
+                    }
+
+                    // If the BackgroundWorker.CancellationPending property is true, cancel
+                    if (WorkerThread.CancellationPending)
+                    {
+                        Console.WriteLine("#####Database Build has been cancelled#####");
+                        break;
+                    }
+
+                    if (SimulationCycles % 75 == 0)
+                        WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "");  
+
+                    // Grab the next node ID off of the work queue
+                    ParentNodeID = WorkNodes.Dequeue();
+
+                    // Fetch the current game node from the master list
+                    ParentNode = NodeMasterList[ParentNodeID];
+
+                    // Set the child turn to be the next player
+                    ChildTurn = ( ParentNode.Turn == WHITE ) ? BLACK : WHITE;
+
+                    //if (NodeMasterList.Count % 10 == 0)
+                    //Console.WriteLine("Turn " + (ParentNode.Turn == WHITE ? "White" : "Black") + "\nScore: B-" + ParentNode.Board.FindScore(BLACK) + " W-" + ParentNode.Board.FindScore(WHITE)  + "\n======================\n" + ParentNode.Board.ToString() );
+
+                    // Update the game board visual
+                    if( VisualizeResults )
+                        ParentNode.GameBoard.RefreshPieces();
+
+                    if (ParentNode.AvailableMoves.Length == 0)
+                    {
+                        ParentNode.isPassTurn = true;
+
+                        ChildNode = new SimulationNode(ParentNode.GameBoard, ChildTurn);
+
+                        if (ChildNode.AvailableMoves.Length > 0)
+                        {
+
+                            if (NodeMasterList.ContainsKey(ChildNode.NodeID))
+                            {
+                                // Since the node already exists, just add the current parent to it's parent node list
+                                if (!NodeMasterList[ChildNode.NodeID].ContainsParent(ParentNode.NodeID))
+                                    NodeMasterList[ChildNode.NodeID].AddParentNode(ParentNode.NodeID);
+                            }
+                            else
+                            {
+                                // Add the new node to the master list
+                                NodeMasterList.Add(ChildNode.NodeID, ChildNode);
+
+                                // Add the new node to the work list for eventual processing
+                                WorkNodes.Enqueue(ChildNode.NodeID);
+                            }
+
+                            // Add this child to the parent's child node list
+                            if (!ParentNode.ContainsChild(ChildNode.NodeID))
+                                ParentNode.AddChildNode(ChildNode.NodeID);
+
+                            // Add the new node to the work list for eventual processing
+                            WorkNodes.Enqueue(ChildNode.NodeID);
+                        }
+                        else
+                        {
+                            ParentNode.isLeaf = true;
+                            LeafTotal++;
+
+                            if (ParentNode.GameBoard.FindScore(BLACK) > ParentNode.GameBoard.FindScore(WHITE))
+                            {
+                                ParentNode.BlackWins++;
+                                BlackWinnerTotal++;
+                            }
+                            else if (ParentNode.GameBoard.FindScore(BLACK) < ParentNode.GameBoard.FindScore(WHITE))
+                            {
+                                ParentNode.WhiteWins++;
+                                WhiteWinnerTotal++;
+                            }
+                            else
+                            {
+                                TieTotal++;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Point CurrentMove in ParentNode.AvailableMoves)
+                        {
+                            ChildBoard = new Board(ref ParentNode.GameBoard);
+                            ChildBoard.PutPiece(CurrentMove.X, CurrentMove.Y, ChildTurn);
+                            ChildNode = new SimulationNode(ChildBoard, ChildTurn);
+
+                            // Add this child to the parent's child node list
+                            if (!ParentNode.ContainsChild(ChildNode.NodeID))
+                                ParentNode.AddChildNode(ChildNode.NodeID);
+
+                            if (NodeMasterList.ContainsKey(ChildNode.NodeID))
+                            {
+                                // Since the node already exists, just add the current parent to it's parent node list
+                                if (!NodeMasterList[ChildNode.NodeID].ContainsParent(ParentNode.NodeID))
+                                    NodeMasterList[ChildNode.NodeID].AddParentNode(ParentNode.NodeID);
+                            }
+                            else
+                            {
+                                // Add the new node to the master list
+                                NodeMasterList.Add(ChildNode.NodeID, ChildNode);
+
+                                // Add the new node to the work list for eventual processing
+                                WorkNodes.Enqueue(ChildNode.NodeID);
+                            }
+                        }
+                    }
+                    // Clear all of the moves from the nodes working list
+                    ParentNode.ClearMoves();
+                }
+
+                /////////////////////////////////////////////////////////////
+                //DEBUG BULLSHIT
+                /////////////////////////////////////////////////////////////
+                if (DisplayDebug)
+                {
+                    TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
+                    Console.WriteLine("===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
+                    //DebugTextBox.Text += "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo();
+                    WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
+                }
+            }
+
+            public void AnalyzeAIDatabase(BackgroundWorker WorkerThread, Boolean VisualizeResults = false, RichTextBox DebugTextBox = null, Boolean DisplayDebug = true)
+            {
+
+                /////////////////////////////////////////////////////////////
+                //DEBUG BULLSHIT
+                /////////////////////////////////////////////////////////////
+                DateTime SimulationClock = DateTime.Now;
+
+                if (DisplayDebug)
+                {
+                    Console.WriteLine("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")");
+                   // DebugTextBox.Text += "===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")\n";
+                }
+                /////////////////////////////////////////////////////////////
+
+                // Reset all previous analysis values and queue all of the leaf nodes to process
+                LeafNodes = new Queue<String>();
+                WorkNodes = new Queue<String>();
+
+                foreach (String CurrentNodeID in NodeMasterList.Keys)
+                {
+                    if (NodeMasterList[ CurrentNodeID ].isLeaf)
+                        LeafNodes.Enqueue(NodeMasterList[ CurrentNodeID ].NodeID);
+
+                    NodeMasterList[CurrentNodeID].BlackWins = 0;
+                    NodeMasterList[CurrentNodeID].WhiteWins = 0;
+                }
+
+                /////////////////////////////////////////////////////////////
+                //DEBUG BULLSHIT
+                /////////////////////////////////////////////////////////////
+                if (DisplayDebug)
+                {
+                    TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
+                    Console.WriteLine("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)");
+                    //DebugTextBox.Text += "(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)\n";
+                }
+                /////////////////////////////////////////////////////////////
+
+                SimulationNode CurrentLeafNode;
+                String CurrentWorkNodeID;
+                int WinningColor;
+
+                while (LeafNodes.Count > 0)
+                {
+                    // If the BackgroundWorker.CancellationPending property is true, cancel
+                    if (WorkerThread.CancellationPending)
+                    {
+                        Console.WriteLine("#####Database Analysis has been cancelled#####");
+                        break;
+                    }
+
+                    // Grab the next leaf node from the leaf queue
+                    CurrentLeafNode = NodeMasterList[LeafNodes.Dequeue()];
+
+                    // Update the game board visual
+                    if (VisualizeResults)
+                        CurrentLeafNode.GameBoard.RefreshPieces();
+
+                    // Find who the winner of the leaf node is
+                    if (CurrentLeafNode.GameBoard.FindScore(WHITE) > CurrentLeafNode.GameBoard.FindScore(BLACK))
+                        WinningColor = WHITE;
+                    else if (CurrentLeafNode.GameBoard.FindScore(WHITE) < CurrentLeafNode.GameBoard.FindScore(BLACK))
+                        WinningColor = BLACK;
+                    else
+                        WinningColor = -1;
+
+                    // If this is a tie, there is no reason to process it
+                    if ( ( WinningColor == BLACK ) || ( WinningColor == WHITE ) )
+                    {
+                        // Seed the work list with the leaf
+                        WorkNodes.Enqueue(LeafNodes.Dequeue());
+
+                        while (WorkNodes.Count > 0)
+                        {
+                            CurrentWorkNodeID = WorkNodes.Dequeue();
+
+                            if( WinningColor == BLACK )
+                                NodeMasterList[ CurrentWorkNodeID ].BlackWins++;
+                            else
+                                NodeMasterList[ CurrentWorkNodeID ].WhiteWins++;
+
+                            foreach (String ParentNode in NodeMasterList[CurrentWorkNodeID].ParentNodes)
+                                WorkNodes.Enqueue(ParentNode);
+                        }
+                    }
+                }
+
+                /////////////////////////////////////////////////////////////
+                //DEBUG BULLSHIT
+                /////////////////////////////////////////////////////////////
+                if (DisplayDebug)
+                {
+                    TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
+                    Console.WriteLine("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n");
+                    //DebugTextBox.Text += "===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n";
+                }
+                /////////////////////////////////////////////////////////////
+            }
+
+            private int SimulateGameMove(Board CurrentBoard, int Turn )
+            {
+                SimulationCycles++;
+                SimulationDepth++;
+
+                if( SimulationCycles % 5000 == 0 )
+                    Console.WriteLine(SimulationCycles + " Sim cycles in: " + WinnerTotal + " winners / " + LoserTotal + " losers" );
+
+                if (!BlackMoves.ContainsKey(CurrentBoard.GetID()))
+                {
+                    BlackMoves.Add(CurrentBoard.GetID(), 0);
+                }
+
+                // If there are still moves left for the current player, start a new simulation for each of them
+                if ( CurrentBoard.MovePossible( Turn ) )
+                {
+                    Point[] PossibleMoves = CurrentBoard.AvailableMoves( Turn );
+
+                    for (int lc = 0; lc < PossibleMoves.Length; lc++)
+                    {
+                        // Make a copy of the current board
+                        SimulationBoard = new Board(ref CurrentBoard);
+
+                        // Place the current move on the new board
+                        SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
+
+                        if (!BlackMoves.ContainsKey(SimulationBoard.GetID()))
+                        {
+                            BlackMoves.Add(SimulationBoard.GetID(), 0);
+                        }
+
+                        //Console.WriteLine( (Turn == WHITE ? "White" : "Black" ) + " moved to (" + PossibleMoves[lc].X + "," + PossibleMoves[lc].Y + ")");
+
+                        // Start a simulation for the next player with the updated board
+                        BlackMoves[CurrentBoard.GetID()] += SimulateGameMove(SimulationBoard, Turn == WHITE ? BLACK : WHITE);
+                    }
+
+                    SimulationDepth--;
+                    return (BlackMoves[CurrentBoard.GetID()]);
+                }
+
+                // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
+                else if (CurrentBoard.MovePossible( Turn == WHITE ? BLACK : WHITE)) 
+                {
+                    //Console.WriteLine( (Turn == WHITE ? "White" : "Black") + " cannot move, passing");
+
+                    BlackMoves[CurrentBoard.GetID()] += SimulateGameMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE);
+
+                    SimulationDepth--;
+                    return ( BlackMoves[CurrentBoard.GetID()] ) ;
+                }
+                // If there are no moves left in the game, collapse the simulation
+                else
+                {
+                    if (CurrentBoard.FindScore(BLACK) > CurrentBoard.FindScore(WHITE))
+                    {
+                        //Console.WriteLine(" ### Black Wins");
+                        BlackMoves[CurrentBoard.GetID()] += 1;
+                        SimulationDepth--;
+                        WinnerTotal++;
+                        return (1);
+                    }
+                    else
+                    {
+                        //Console.WriteLine(" ### Black Loses");
+                        SimulationDepth--;
+                        LoserTotal++;
+                        return (0);
+                    }
+                }
+            }
+		}
+
+        // Class:       Game
+        // Description: Stores game state information and rules
+		private class Game
+		{
+			public int CurrentTurn;
+			public int NextTurn;
+			public int Difficulty;
+			public Boolean VsComputer = true;
+			public Board GameBoard;
+			public int Winner;
+			public Boolean IsComplete = false;
+			public Boolean ProcessMoves = true;
+			public AI AI;
+
+			public Game( int BoardSize = 8 )
+			{
+				CurrentTurn = WHITE;
+				NextTurn = BLACK;
+				Difficulty = AIDifficulty;
+				VsComputer = PvC;
+				GameBoard = new Board( BoardSize );
+				IsComplete = false;
+				AI = new AI( BLACK );
+
+                // Reset the board image to clear any pieces from previous games
+                BoardGFX.DrawImage( BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
+
+                // Reset the board that tracks which pieces have been drawn on the screen
+                LastDrawnBoard = new Board(BoardSize);
+                LastDrawnBoard.ClearBoard();
+
+                GameBoard.RefreshPieces();
+            }
+
+            // Determines if there is a winner in the current game
+            public Boolean DetermineWinner()
+            {
+                int WhiteScore = CurrentGame.GameBoard.FindScore(WHITE);
+                int BlackScore = CurrentGame.GameBoard.FindScore(BLACK);
+
+                //ScoreText.Text = "Current Score:\n" + " White: " + WhiteScore + "\n Black: " + BlackScore;
+
+                if (WhiteScore == 0)
+                {
+                    CurrentGame.IsComplete = true;
+                    CurrentGame.Winner = BLACK;
+                }
+                else if (BlackScore == 0)
+                {
+                    CurrentGame.IsComplete = true;
+                    CurrentGame.Winner = WHITE;
+                }
+                else if (((WhiteScore + BlackScore) == 64) ||
+                    ((!CurrentGame.GameBoard.MovePossible(CurrentGame.CurrentTurn)) && (!CurrentGame.GameBoard.MovePossible(CurrentGame.NextTurn))))
+                {
+                    CurrentGame.IsComplete = true;
+                    if (BlackScore > WhiteScore)
+                    {
+                        CurrentGame.Winner = BLACK;
+                    }
+                    else if (BlackScore < WhiteScore)
+                    {
+                        CurrentGame.Winner = WHITE;
+                    }
+                    else
+                    {
+                        CurrentGame.Winner = EMPTY;
+                    }
+
+                }
+
+                return (CurrentGame.IsComplete);
+            }
+
+            // Processes a single turn of gameplay, two if it is vs. AI
+            public void ProcessTurn(int x, int y)
+            {
+                if (!CurrentGame.IsComplete)
+                {
+                    // As long as this isn't an AI turn, process the requested move
+                    if (!((CurrentGame.VsComputer) && (CurrentGame.CurrentTurn == CurrentGame.AI.color)))
+                    {
+                        if (CurrentGame.GameBoard.MovePossible(CurrentGame.CurrentTurn))
+                        {
+                            if (CurrentGame.GameBoard.MakeMove(x, y, CurrentGame.CurrentTurn))
+                            {
+                                CurrentGame.SwitchTurn();
+                            }
+                        }
+                        else
+                        {
+                            CurrentGame.SwitchTurn();
+                        }
+                    }
+
+                    if ((CurrentGame.VsComputer) && (CurrentGame.CurrentTurn == CurrentGame.AI.color))
+                    {
+                        while (CurrentGame.GameBoard.MovePossible(CurrentGame.AI.color))
+                        {
+                            Point AIMove = CurrentGame.AI.Move(ref CurrentGame);
+
+                            DebugText.Text = CurrentGame.AI.AIDebug;
+                            DebugText.Text += "\nOutside class...\nPlacing " + CurrentGame.GetTurnString(CurrentGame.CurrentTurn) + " AI piece at (" + AIMove.X + "," + AIMove.Y + ")\n";
+
+                            CurrentGame.GameBoard.MakeMove(AIMove.X, AIMove.Y, CurrentGame.CurrentTurn);
+
+                            DebugText.Text += "\nResult Board:\n" + CurrentGame.GameBoard.ToString() + "\n\n";
+
+                            if (CurrentGame.GameBoard.MovePossible(CurrentGame.NextTurn))
+                            {
+                                CurrentGame.SwitchTurn();
+
+                                DebugText.Text += "------------\n" + CurrentGame.GetTurnString(CurrentGame.NextTurn) + " can move to space " + CurrentGame.GameBoard.DebugMovesAvailable + "...ending ai turn\n------------\n";
+                                break;
+                            }
+                            else
+                            {
+                                //CurrentGame.GameBoard.RefreshPieces();
+
+                                DebugText.Text += "------------\n" + CurrentGame.NextTurn + " CANNOT MOVE!  AI moving again\n------------\n";
+                            }
+                        }
+                        DebugText.Text += "------------\nAI " + CurrentGame.GetTurnString(CurrentGame.AI.color) + " turn over!  allowing human player to move\n############\n";
+                    }
+
+                    CurrentGame.GameBoard.RefreshPieces();
+
+                    CurrentGame.DetermineWinner();
+                }
+
+                if (CurrentGame.IsComplete)
+                {
+                    if (CurrentGame.Winner == EMPTY)
+                    {
+                        TurnLabelText.Text = "The game ended in a tie!!!";
+                    }
+                    else
+                    {
+                        TurnLabelText.Text = CurrentGame.GetTurnString(CurrentGame.Winner) + " is the winner!!!";
+                    }
+                }
+
+                TurnLabelText.Text = "Current Turn: " + CurrentGame.GetTurnString(CurrentGame.CurrentTurn) + "\n";
+            }
+
+			public void SwitchTurn()
+			{
+				if( CurrentTurn == WHITE ) 
+				{
+					CurrentTurn = BLACK;
+					NextTurn = WHITE;
+				} 
+				else 
+				{
+					CurrentTurn = WHITE;
+					NextTurn = BLACK;
+				}
+			}
+
+			public string GetTurnString( int color )
+			{
+				if( color == WHITE ) 
+				{
+					return( "White" );
+				} 
+				else if ( color == BLACK )
+				{
+					return( "Black" );
+				} 
+				else 
+				{
+					return( "Illegal Color!" );
+				}
 			}
 		}
 
-		private void DiffMenu_EasyClick(object sender, System.EventArgs e)
+        #region Drop Down Menu Event Handelers
+
+        // Easy AI difficulty selected
+        private void DiffMenu_EasyClick(object sender, System.EventArgs e)
 		{
 			DiffMenu_Easy.Checked = true;
 			DiffMenu_Normal.Checked = false;
@@ -1736,6 +1742,7 @@ namespace Reversi
 			AIDifficulty = 0;
 		}
 
+        // Normal AI difficulty selected
 		private void DiffMenu_NormalClick(object sender, System.EventArgs e)
 		{
 			DiffMenu_Easy.Checked = false;
@@ -1745,6 +1752,7 @@ namespace Reversi
 			AIDifficulty = 1;
 		}
 
+        // Hard AI difficulty selected
 		private void DiffMenu_HardClick(object sender, System.EventArgs e)
 		{
 			DiffMenu_Easy.Checked = false;
@@ -1754,6 +1762,7 @@ namespace Reversi
 			AIDifficulty = 2;
 		}
 
+        // Very Hard AI difficulty selected
 		private void DiffMenu_VeryHardClick(object sender, System.EventArgs e)
 		{
 			DiffMenu_Easy.Checked = false;
@@ -1763,6 +1772,7 @@ namespace Reversi
 			AIDifficulty = 3;
 		}
 
+        // Player vs Player selected
 		private void PvPMenu_Click(object sender, System.EventArgs e)
 		{
 			PvPMenu.Checked = true;
@@ -1770,6 +1780,7 @@ namespace Reversi
 			PvC = false;
 		}
 
+        // Player vs AI selected
 		private void PvCMenu_Click(object sender, System.EventArgs e)
 		{
 			PvPMenu.Checked = false;
@@ -1777,33 +1788,37 @@ namespace Reversi
 			PvC = true;
 		}
 
+        // Game exit selected
 		private void ExitMenu_Click(object sender, System.EventArgs e)
 		{
 			ReversiForm.ActiveForm.Close();
 		}
 
+        // New game selected
 		private void NewGameMenu_Click(object sender, System.EventArgs e)
 		{
 			CurrentGame = new Game( getBoardSize() );
-			BoardPicture.Invalidate();
 		}
 
+        // Skip turn (debug option) selected
 		private void DebugSkip_Click(object sender, System.EventArgs e)
 		{
 			CurrentGame.SwitchTurn();
 			TurnLabel.Text = "Current Turn: " + CurrentGame.GetTurnString( CurrentGame.CurrentTurn ) + "\n" ;		
 		}
 
+        // unused
 		private void DebugProcess_Click(object sender, System.EventArgs e)
 		{
 			CurrentGame.ProcessMoves = !CurrentGame.ProcessMoves;
 			DebugProcess.Checked = !DebugProcess.Checked;
 		}
 
+        // Start a new game scenario where white cannot move
 		private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
 		{
-			CurrentGame = new Game();
-			DebugAITrace.Text = "";
+			CurrentGame = new Game( 8 );
+			DebugText.Text = "";
 			CurrentGame.GameBoard.ClearBoard();
 			CurrentGame.GameBoard.PutPiece( 0, 0, BLACK );
             CurrentGame.GameBoard.PutPiece( 0, 1, BLACK );
@@ -1823,26 +1838,15 @@ namespace Reversi
             CurrentGame.GameBoard.PutPiece( 1, 7, WHITE );
 			CurrentGame.CurrentTurn = WHITE;
 			CurrentGame.NextTurn = BLACK;
-			CurrentGame.GameBoard.RefreshPieces( BoardPicture.CreateGraphics() );
-			BoardPicture.Invalidate();
-			ProcessTurn( CurrentGame, 0, 0 );
+			CurrentGame.GameBoard.RefreshPieces();
+			//BoardPicture.Invalidate();
+			CurrentGame.ProcessTurn( 0, 0 );
 		}
+        #endregion
 
-		private void Title_Click(object sender, System.EventArgs e)
-		{
-		
-		}
+        #region AI Database Form & Event Handelers
 
-        private void BuildDataObjectMenuItem_Click(object sender, EventArgs e)
-        {
-            StartBuildDB();
-        }
-
-        private void DebugAITrace_TextChanged(object sender, EventArgs e)
-        {
-            DebugAITrace.ScrollToCaret();
-        }
-
+        // Responds to the analyze database button press, starts the job
         private void BuildAIDBButton_Click(object sender, EventArgs e)
         {
             cancelButton.Visible = true;
@@ -1852,11 +1856,13 @@ namespace Reversi
             //StartBuildDB();
         }
 
+        // Dumps the database information to the debug window
         private void dumpDBInfoButton_Click(object sender, EventArgs e)
         {
-            DebugAITrace.Text += CurrentGame.AI.DumpSimulationInfo();
+            DebugText.Text += CurrentGame.AI.DumpSimulationInfo();
         }
 
+        // Responds to the analyze database button press
         private void anaylzeDBButton_Click(object sender, EventArgs e)
         {
             cancelButton.Visible = true;
@@ -1865,25 +1871,29 @@ namespace Reversi
             DBAnalysisWorker.RunWorkerAsync();
         }
 
+        // Starts the database background worker (button press)
         private void DBBuildWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             StartBuildDB(Convert.ToInt32( e.Argument.ToString()));
         }
 
+        // Starts the database build background worker
         private void StartBuildDB( int BoardSize = 4 )
         {
-            CurrentGame = new Game();
-            CurrentGame.GameBoard.ClearBoard();
-            CurrentGame.GameBoard.RefreshPieces(BoardPicture.CreateGraphics());
-            BoardPicture.Invalidate();
+            CurrentGame = new Game( BoardSize );
+            //CurrentGame.GameBoard.ClearBoard();
+            //CurrentGame.GameBoard.RefreshPieces();
+            //BoardPicture.Invalidate();
 
             //int BoardSize = Convert.ToInt32(gridSizeDropDown.Items[gridSizeDropDown.SelectedIndex].ToString());
 
             Boolean DisplayDebug = true;
 
-            CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, BoardPicture.CreateGraphics(), DebugAITrace, DisplayDebug);
+            CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, DisplayDebug);
         }
 
+
+        // Cancels any of the background jobs that are currently running
         private void cancelButton_Click(object sender, EventArgs e)
         {
             if( DBBuildWorker.IsBusy )
@@ -1896,42 +1906,68 @@ namespace Reversi
             cancelButton.Visible = false;
         }
 
+        // Starts of the database analysis background worker
         private void DBAnalysisWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Boolean DisplayDebug = true;
-            CurrentGame.AI.AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, BoardPicture.CreateGraphics(), DebugAITrace, DisplayDebug);
+            CurrentGame.AI.AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, DebugText, DisplayDebug);
         }
 
-        private void gridSizeDropDown_SelectedIndexChanged(object sender, EventArgs e)
-        {  
-            gridDimensionLabel.Text = getBoardSize() + "x" + getBoardSize();
-
-            BoardPicture.Width = 40 * getBoardSize();
-            BoardPicture.Height = 40 * getBoardSize();
-        }
-
-        private int getBoardSize()
-        {
-            return (Convert.ToInt32(gridSizeDropDown.Items[gridSizeDropDown.SelectedIndex].ToString()));
-        }
-
+        // Called from within the database build background woker to report the progress of the build
         private void DBBuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            simTimerLabel.Text = TimeSpan.FromTicks( e.ProgressPercentage ).ToString(@"hh\:mm\:ss") ;
+            simTimerLabel.Text = TimeSpan.FromTicks(e.ProgressPercentage).ToString(@"hh\:mm\:ss");
 
-            if( e.UserState.ToString() != "" )
-                DebugAITrace.Text += e.UserState.ToString();
+            if (e.UserState.ToString() != "")
+                DebugText.Text += e.UserState.ToString();
 
             nodeCounter.Text = CurrentGame.AI.NodeMasterList.Count.ToString();
             workCounter.Text = CurrentGame.AI.WorkNodes.Count.ToString();
             victoryCounter.Text = CurrentGame.AI.LeafTotal.ToString();
         }
 
+        // Runs when the database background worker thread is finished
         private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             simTimerLabel.Text = "";
             cancelButton.Visible = false;
         }
+        #endregion
 
-	}
+        #region Miscellaneous Form Level Methods
+ 
+        // Returns an integer board size as selected on the form
+        private int getBoardSize()
+        {
+            return (Convert.ToInt32(gridSizeDropDown.Items[gridSizeDropDown.SelectedIndex].ToString()));
+        }
+
+        // Responds to the MouseUp event on the board image, processes the click as a placed piece
+        private void PlaceUserPiece(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            int x = (e.X + 1) / 40;
+            int y = (e.Y + 1) / 40;
+
+            CurrentGame.ProcessTurn(x, y);
+        }
+
+        // If the grid size drop down changes, updates the board with the new dimensions
+        private void gridSizeDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        {  
+            gridDimensionLabel.Text = getBoardSize() + "x" + getBoardSize();
+
+            BoardPicture.Width = 40 * getBoardSize();
+            BoardPicture.Height = 40 * getBoardSize();
+
+            CurrentGame = new Game(getBoardSize());
+        }
+
+        // Starts a new game 100ms after the form has loaded
+        private void NewGameTimer_Tick(object sender, EventArgs e)
+        {
+            CurrentGame = new Game(getBoardSize());
+            NewGameTimer.Enabled = false;
+        }
+        #endregion
+    }
 }
