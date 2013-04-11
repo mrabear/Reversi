@@ -577,7 +577,8 @@ namespace Reversi
             // 
             // RAMUsageBar
             // 
-            this.RAMUsageBar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.RAMUsageBar.BackColor = System.Drawing.Color.Silver;
+            this.RAMUsageBar.ForeColor = System.Drawing.Color.Navy;
             this.RAMUsageBar.Location = new System.Drawing.Point(364, 191);
             this.RAMUsageBar.Name = "RAMUsageBar";
             this.RAMUsageBar.Size = new System.Drawing.Size(357, 24);
@@ -1102,6 +1103,9 @@ namespace Reversi
 
 			public Point Move( ref Game SourceGame )
 			{
+                // Sleep breifly to make it feel like the ai is actually doing something (obviously take out later)
+                Thread.Sleep(750);
+
 				AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
                           SourceGame.GetTurnString(color) + "\n" +
                           "AI is set to difficulty level " + SourceGame.Difficulty + "\n" +
@@ -1502,6 +1506,7 @@ namespace Reversi
 			public int Winner;
 			public Boolean IsComplete = false;
 			public Boolean ProcessMoves = true;
+            public Boolean TurnInProgress = false;
 			public AI AI;
 
 			public Game( int BoardSize = 8 )
@@ -1560,6 +1565,8 @@ namespace Reversi
             // Processes a single turn of gameplay, two if it is vs. AI
             public void ProcessTurn(int x, int y)
             {
+                TurnInProgress = true;
+
                 if (!CurrentGame.IsComplete)
                 {
                     // As long as this isn't an AI turn, process the requested move
@@ -1576,6 +1583,8 @@ namespace Reversi
                         {
                             CurrentGame.SwitchTurn();
                         }
+
+                        CurrentGame.GameBoard.RefreshPieces();
                     }
 
                     if ((CurrentGame.VsComputer) && (CurrentGame.CurrentTurn == CurrentGame.AI.color))
@@ -1604,10 +1613,9 @@ namespace Reversi
                         }
 
                         CurrentGame.SwitchTurn();
+                        CurrentGame.GameBoard.RefreshPieces();
                         DebugText.Text += "------------\nAI " + CurrentGame.GetTurnString(CurrentGame.AI.color) + " turn over!  allowing human player to move\n############\n";
                     }
-
-                    CurrentGame.GameBoard.RefreshPieces();
 
                     CurrentGame.DetermineWinner();
                 }
@@ -1625,6 +1633,8 @@ namespace Reversi
                 }
 
                 TurnLabelText.Text = "Current Turn: " + CurrentGame.GetTurnString(CurrentGame.CurrentTurn) + "\n";
+
+                TurnInProgress = false;
             }
 
 			public void SwitchTurn()
@@ -1896,9 +1906,9 @@ namespace Reversi
             Graphics RAMGfx = RAMUsageBar.CreateGraphics();
             int MemoryAbortLine = Convert.ToInt32(RAMUsageBar.Width * Properties.Settings.Default.MemoryFloor);
 
-            RAMGfx.DrawString(RAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.Black, new PointF(120, 2));
+            RAMGfx.DrawString(RAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.White, new PointF(120, 2));
             RAMGfx.DrawLine(new Pen(Color.Red, 2), MemoryAbortLine, 0, MemoryAbortLine, RAMUsageBar.Height);      
-            RAMGfx.DrawString("Abort   Line", new Font("Arial", (float)8, FontStyle.Regular), Brushes.Red, new PointF(MemoryAbortLine - 34, 4));
+            RAMGfx.DrawString("Abort   Line", new Font("Arial", (float)8, FontStyle.Regular), Brushes.White, new PointF(MemoryAbortLine - 34, 4));
         }
 
         #endregion
@@ -1917,7 +1927,9 @@ namespace Reversi
             int x = (e.X + 1) / 40;
             int y = (e.Y + 1) / 40;
 
-            CurrentGame.ProcessTurn(x, y);
+            // Don't process the mouse click if there is a turn already being processed
+            if( !CurrentGame.TurnInProgress )
+                CurrentGame.ProcessTurn(x, y);
         }
 
         // If the grid size drop down changes, updates the board with the new dimensions
