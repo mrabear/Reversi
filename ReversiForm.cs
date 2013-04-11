@@ -695,45 +695,21 @@ namespace Reversi
 
         #endregion
 
-        // Class:       Piece
-        // Description: Stores location and color information for a spot on the board
-        private class Piece
-        {
-
-            public int color = EMPTY;
-            public int X = -1;
-            public int Y = -1;
-
-            public Piece(int PieceColor)
-            {
-                color = PieceColor;
-            }
-
-            public Piece(int PieceColor, int pX, int pY)
-            {
-                color = PieceColor;
-                X = pX;
-                Y = pY;
-            }
-
-            public int GetX() { return X; }
-            public int GetY() { return Y; }
-        }
-
         // Class:       Board
         // Description: Stores the game board and all of the methods to manipulate it
         private class Board
 		{
-			public Piece[,] BoardPieces;
+            // The array of pieces that represents the board state
+			public int[,] BoardPieces;
 
+            // The size of the board, which will always be BoardSize x BoardSize
             public int BoardSize;
 
-			public string DebugMovesAvailable;
-
+            // The default constructor creates an 8x8 board
 			public Board( )
 			{
                 this.BoardSize = 8;
-                BoardPieces = new Piece[BoardSize, BoardSize];
+                BoardPieces = new int[BoardSize, BoardSize];
                 ClearBoard();
                 PlaceStartingPieces();
 			}
@@ -742,69 +718,72 @@ namespace Reversi
             public Board(int SourceSize)
             {
                 BoardSize = Math.Max( 4, SourceSize );
-                BoardPieces = new Piece[BoardSize, BoardSize];
+                BoardPieces = new int[BoardSize, BoardSize];
                 ClearBoard();
                 PlaceStartingPieces();
             }
 
+            // Create a board using a reference to another board as a template
             public Board(ref Board SourceBoard)
             {
                 BoardSize = SourceBoard.BoardSize;
-                BoardPieces = new Piece[BoardSize, BoardSize];
+                BoardPieces = new int[BoardSize, BoardSize];
                 this.CopyBoard(ref SourceBoard);
             }
 
+            // Create a board using another board as a template
             public Board(Board SourceBoard)
             {
                 BoardSize = SourceBoard.BoardSize;
-                BoardPieces = new Piece[BoardSize, BoardSize];
+                BoardPieces = new int[BoardSize, BoardSize];
                 this.CopyBoard(ref SourceBoard);
             }
 
+            // Returns true if the piece is within the bounds of the game board
 			public Boolean InBounds( int x, int y )
 			{
                 if ((x > BoardSize - 1) || (y > BoardSize - 1) || (x < 0) || (y < 0)) 
-				{
 					return false;
-				}
 				else
-				{
 					return true;
-				}
 			}
 
-            public void CopyBoard( ref Piece[,] NewBoardPieces)
+            // Copies the content of one board to another
+            public void CopyBoard( ref int[,] NewBoardPieces)
             {
                 Array.Copy( NewBoardPieces, BoardPieces, NewBoardPieces.Length );
             }
 
+            // Overload of copyboard that takes a source board as input
 			public void CopyBoard( ref Board SourceBoard )
 			{
                 CopyBoard( ref SourceBoard.BoardPieces );
-
-                /*for (int olc = 0; olc < BoardSize; olc++)
-				{
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-					{
-						BoardPieces[ilc,olc] = new Piece( SourceBoard.PieceAt( ilc, olc ).color, SourceBoard.PieceAt( ilc, olc ).X, SourceBoard.PieceAt( ilc, olc ).Y ) ;
-					}				
-				}*/
 			}
 
+            // Overrides the default ToString method to return a string representation of the board
 			public override String ToString()
 			{
-				string boardString = "";
-                for (int olc = 0; olc < BoardSize; olc++)
-				{
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-					{
-						boardString += PieceAt( ilc, olc ).color;
-					}
-					boardString += "\n";
-				}
-
-				return boardString;
+                return(BuildBoardString());
 			}
+
+            // Returns a string representation of the board
+            public String BuildBoardString(Boolean SingleLine = false)
+            {
+                string boardString = "";
+
+                for (int Y = 0; Y < BoardSize; Y++)
+                {
+                    for (int X = 0; X < BoardSize; X++)
+                    {
+                        boardString += ColorAt(X, Y);
+                    }
+
+                    if (!SingleLine)
+                        boardString += "\n";
+                }
+
+                return boardString;
+            }
 
             // Returns a unique identifier for a specific board state and turn
             public String GetID(int CurrentTurn)
@@ -812,70 +791,45 @@ namespace Reversi
                 return (CurrentTurn + this.GetID());
             }
 
-
             // Returns a unique identifier for a specific board state irrespective of turn
             public String GetID()
             {
-                string boardString = "";
-                for (int olc = 0; olc < BoardSize; olc++)
-                {
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-                    {
-                        boardString += PieceAt(ilc, olc).color;
-                    }
-                }
-
-                return boardString;
+                return(BuildBoardString(true));
             }
 
-			public Piece PieceAt( int x, int y )
-			{
-                if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
-				{
-					return null;
-				}
-				return( BoardPieces[x,y] );
-			}
-
-           /* public Boolean MakeMove(Game CurrentGamex, int x, int y, int color, Boolean ProcessMove)
+            // Returns the color at the given board location
+            public int ColorAt(int x, int y)
             {
-                return( MakeMove(x, y, color, ProcessMove ));
-            }*/
+                if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
+                    return EMPTY;
 
+                return(BoardPieces[x, y]);
+            }
+
+            // Attempts to process the implications of a legal move and updates the board if ProcessMove = true
 			public Boolean MakeMove( int x, int y, int color, Boolean ProcessMove = true )
 			{
-
 				int CurrentTurn = color ;
 				int NextTurn;
+
 				if ( CurrentTurn == WHITE )
-				{
-					NextTurn = BLACK;
-				} 
+					NextTurn = BLACK; 
 				else 
-				{
 					NextTurn = WHITE;
-				}
 
 				// Check for already existing piece
-				if( PieceAt( x, y ).color != EMPTY )
-				{
-					//DebugText.Text = "A piece is already on that space";
+				if( ColorAt( x, y ) != EMPTY )
 					return false;
-				}
 
 				Boolean findStatus = false;
 				Boolean takeStatus = false;
 			
-				//DebugText.Text = "Current Game Turn: " + CurrentGame.CurrentTurn + "\nNext Game Turn: " + CurrentGame.NextTurn + "\n\n";
                 for (int olc = Math.Max(y - 1, 0); olc <= Math.Min(y + 1, BoardSize - 1); olc++)
 				{
                     for (int ilc = Math.Max(x - 1, 0); ilc <= Math.Min(x + 1, BoardSize - 1); ilc++)
 					{
-						// If the piece is placed next to an enemy piece, track it
-						if( PieceAt( ilc, olc ).color == ( NextTurn ) )
+                        if (ColorAt(ilc, olc) == (NextTurn))
 						{
-							//DebugText.Text += "Found adjacent opponent piece at " + ilc + "," + olc + " (" + MainBoard.PieceAt( ilc, olc ).color + "=" + CurrentGame.NextTurn + ")\n";
-						
 							findStatus = true;
 
 							int newX = ilc;
@@ -884,40 +838,31 @@ namespace Reversi
 							int dirY = olc - y;
 
 							Board TempBoard = new Board( this );
-							//TempBoard.CopyBoard( this );
 
-							//DebugText.Text += "Direction X: " + dirX + "\nDirection Y: " + dirY + "\n    Start Trace From: " + newX + "," + newY + "\n";
-							while( TempBoard.PieceAt( newX, newY ).color == NextTurn )
+                            while (TempBoard.ColorAt(newX, newY) == NextTurn)
 							{
 								TempBoard.PutPiece( newX, newY, CurrentTurn );
 								newX += dirX;
 								newY += dirY;
-								//DebugText.Text += "    Next piece is: " + newX + "," + newY + "\n";
 							
 								if ( !TempBoard.InBounds( newX, newY ) )
-								{
 									break;
-								}
 							}
+
 							if ( TempBoard.InBounds( newX, newY ) )
 							{
-								if( TempBoard.PieceAt( newX, newY ).color == CurrentTurn )
+                                if (TempBoard.ColorAt(newX, newY) == CurrentTurn)
 								{
-									//DebugText.Text += "\nPieces taken, mainboard updated\n";
                                     if ( ProcessMove )
 									{
 										TempBoard.PutPiece( x, y, color );
 										CopyBoard( ref TempBoard );
 									}
-									//MainBoard.RefreshPieces( ref BoardGFX );
-									takeStatus = true;
+
+                                    takeStatus = true;
 								}
 							}
 						} 
-						else 
-						{
-							//DebugText.Text += "Checked " + ilc + "," + olc + " (color=" + MainBoard.PieceAt( ilc, olc ).color + ")\n";
-						}
 					}
 				}
 
@@ -933,81 +878,55 @@ namespace Reversi
 				return takeStatus;
 			}
 
-           /* public Point[] AvailableMoves( Game CurrentGame )
-            {
-                return( AvailableMoves( CurrentGame.CurrentTurn ));
-            }*/
-
+            // Returns a list of all available moves for a given player
 			public Point[] AvailableMoves( int CurrentTurn )
 			{
 				Point[] Moves = new Point[64];
 				int foundMoves = 0;
-                for (int olc = 0; olc < BoardSize; olc++)
-				{
-                    for (int ilc = 0; ilc < BoardSize; ilc++)
-					{
-						if( PieceAt( ilc, olc ).color == EMPTY )
-						{
-							if( MakeMove( ilc, olc, CurrentTurn, false ) )
+                for (int Y = 0; Y < BoardSize; Y++)
+                    for (int X = 0; X < BoardSize; X++)
+                        if (ColorAt(X, Y) == EMPTY)
+							if( MakeMove( X, Y, CurrentTurn, false ) )
 							{
-								Moves[ foundMoves ] = new Point( ilc, olc ); 
+								Moves[ foundMoves ] = new Point( X, Y ); 
 								foundMoves++;
 							}
-						}
-					}
-				}
 
 				Point[] FinalMoves = new Point[ foundMoves ];
-				for( int lc = 0 ; lc < FinalMoves.Length ; lc++ )
-				{
-					FinalMoves[ lc ] = Moves[ lc ];
-				}
+                for (int index = 0; index < FinalMoves.Length; index++)
+                    FinalMoves[index] = Moves[index];
 
 				return FinalMoves;				
 			}
 
+            // Returns true if a move is possible for the given player
 			public Boolean MovePossible( int color )
 			{
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{	
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-						if( PieceAt( ilc, olc ).color == EMPTY )
-						{
-							if( MakeMove( ilc, olc, color, false ) )
-							{
-								DebugMovesAvailable = "(" + ilc + "," + olc + ")" ;
+				for( int Y = 0; Y < BoardSize; Y++ )
+					for( int X = 0; X < BoardSize; X++ )
+                        if (ColorAt(X, Y) == EMPTY)
+							if( MakeMove( X, Y, color, false ) )
 								return true;
-							}
-						}
-					}
-				}
 
 				return false;
 			}
 
-			public Piece PutPiece( int x, int y, int color )
+            // Places a piece at the given location
+			public void PutPiece( int x, int y, int color )
 			{
-				if ( ( color == WHITE ) || ( color == BLACK ) || ( color == EMPTY ) )
-				{
-					BoardPieces[x,y] = new Piece( color, x, y );
-					return( BoardPieces[x,y] );
-				}
-
-				return( null );
+				if ( ( color == WHITE ) || ( color == BLACK ) )
+					BoardPieces[x,y] = color;
+                else
+                    BoardPieces[x, y] = EMPTY;
 			}
 
+            // Empty the board
 			public void ClearBoard()
 			{
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-						BoardPieces[olc,ilc] = new Piece( 0 );
-					}				
-				}
+                Array.Clear(BoardPieces, 0, BoardSize * BoardSize);
 			}
 
+            // Initialize the game board with the starting pieces
             public void PlaceStartingPieces()
             {
                 if (BoardSize == 8)
@@ -1033,29 +952,27 @@ namespace Reversi
                 }
             }
 
+            // Redraw the piece images on the board
 			public void RefreshPieces()
 			{
                 //Board lastdrawn = new Board(LastDrawnBoard);
                 Image PieceImage = WhitePieceImage;
-                Piece CurrentPiece = new Piece( EMPTY );
 
-				for( int olc = 0; olc < BoardSize; olc++ )
+				for( int Y = 0; Y < BoardSize; Y++ )
 				{	
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
+					for( int X = 0; X < BoardSize; X++ )
 					{
-                        CurrentPiece = PieceAt(ilc, olc);
-
-                        if( CurrentPiece.color != EMPTY )
-                            if (LastDrawnBoard.PieceAt(CurrentPiece.X, CurrentPiece.Y).color != CurrentPiece.color)
+                        if (ColorAt(X, Y) != EMPTY)
+                            if (LastDrawnBoard.ColorAt(X, Y) != this.ColorAt(X, Y) )
                             {
                                 // Choose the piece image
-                                if (CurrentPiece.color == BLACK)
+                                if (ColorAt(X, Y) == BLACK)
                                     PieceImage = BlackPieceImage;
                                 else
                                     PieceImage = WhitePieceImage;
 
                                 // Draw the new piece
-                                BoardGFX.DrawImage(PieceImage, CurrentPiece.X * 40 + 1, CurrentPiece.Y * 40 + 1, PieceImage.Width, PieceImage.Height);
+                                BoardGFX.DrawImage(PieceImage, X * 40 + 1, Y * 40 + 1, PieceImage.Width, PieceImage.Height);
                             }
 					}
 				}
@@ -1063,17 +980,15 @@ namespace Reversi
                 LastDrawnBoard.CopyBoard( ref BoardPieces );
 			}
 
+            // Return the score of the given player
 			public int FindScore( int colorToCheck )
 			{
 				int score = 0;
-				for( int olc = 0; olc < BoardSize; olc++ )
-				{	
-					for( int ilc = 0; ilc < BoardSize; ilc++ )
-					{
-                        if (PieceAt(ilc, olc).color == colorToCheck)
+				for( int Y = 0; Y < BoardSize; Y++ )
+					for( int X = 0; X < BoardSize; X++ )
+                        if (ColorAt(X, Y) == colorToCheck)
 							score++;
-					}
-				}
+
 				return score ;
 			}
 			
@@ -1686,13 +1601,11 @@ namespace Reversi
                             if (CurrentGame.GameBoard.MovePossible(CurrentGame.NextTurn))
                             {
                                 CurrentGame.SwitchTurn();
-
-                                DebugText.Text += "------------\n" + CurrentGame.GetTurnString(CurrentGame.NextTurn) + " can move to space " + CurrentGame.GameBoard.DebugMovesAvailable + "...ending ai turn\n------------\n";
                                 break;
                             }
                             else
                             {
-                                //CurrentGame.GameBoard.RefreshPieces();
+                                CurrentGame.GameBoard.RefreshPieces();
 
                                 DebugText.Text += "------------\n" + CurrentGame.NextTurn + " CANNOT MOVE!  AI moving again\n------------\n";
                             }
@@ -1983,9 +1896,6 @@ namespace Reversi
                     RAMUsageBar.Maximum = Convert.ToInt32(result["FreePhysicalMemory"]);
 
                 RAMUsageBar.Value = Math.Min(Convert.ToInt32(result["FreePhysicalMemory"]), RAMUsageBar.Maximum);
-
-                //DebugText.Text = (Convert.ToInt32(result["TotalVisibleMemorySize"]) - Convert.ToInt32(result["FreePhysicalMemory"])) + " KB\n";
-
             }
 
             // If RAM is running low, emergency stop any running jobs
@@ -2001,7 +1911,6 @@ namespace Reversi
             RAMGfx.DrawString(RAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.Black, new PointF(120, 2));
             RAMGfx.DrawLine(new Pen(Color.Red, 2), MemoryAbortLine, 0, MemoryAbortLine, RAMUsageBar.Height);      
             RAMGfx.DrawString("Abort   Line", new Font("Arial", (float)8, FontStyle.Regular), Brushes.Red, new PointF(MemoryAbortLine - 34, 4));
-
         }
 
         #endregion
