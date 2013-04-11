@@ -1547,18 +1547,11 @@ namespace Reversi
                 {
                     CurrentGame.IsComplete = true;
                     if (BlackScore > WhiteScore)
-                    {
                         CurrentGame.Winner = BLACK;
-                    }
                     else if (BlackScore < WhiteScore)
-                    {
                         CurrentGame.Winner = WHITE;
-                    }
                     else
-                    {
                         CurrentGame.Winner = EMPTY;
-                    }
-
                 }
 
                 return (CurrentGame.IsComplete);
@@ -1600,7 +1593,6 @@ namespace Reversi
 
                             if (CurrentGame.GameBoard.MovePossible(CurrentGame.NextTurn))
                             {
-                                CurrentGame.SwitchTurn();
                                 break;
                             }
                             else
@@ -1610,6 +1602,8 @@ namespace Reversi
                                 DebugText.Text += "------------\n" + CurrentGame.NextTurn + " CANNOT MOVE!  AI moving again\n------------\n";
                             }
                         }
+
+                        CurrentGame.SwitchTurn();
                         DebugText.Text += "------------\nAI " + CurrentGame.GetTurnString(CurrentGame.AI.color) + " turn over!  allowing human player to move\n############\n";
                     }
 
@@ -1650,17 +1644,11 @@ namespace Reversi
 			public string GetTurnString( int color )
 			{
 				if( color == WHITE ) 
-				{
 					return( "White" );
-				} 
 				else if ( color == BLACK )
-				{
 					return( "Black" );
-				} 
 				else 
-				{
 					return( "Illegal Color!" );
-				}
 			}
 		}
 
