@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Data;
 using System.Threading;
+using System.Management;
 
 namespace Reversi
 {
@@ -84,6 +85,9 @@ namespace Reversi
         private Label victoryCounterLabel;
         private Label victoryCounter;
         private PictureBox blackPieceImg;
+        private ProgressBar RAMUsageBar;
+        public System.Windows.Forms.Timer RAMCheckTimer;
+        private Label RAMLabel;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -143,6 +147,9 @@ namespace Reversi
             this.blackPieceImg = new System.Windows.Forms.PictureBox();
             this.whitePieceImg = new System.Windows.Forms.PictureBox();
             this.NewGameTimer = new System.Windows.Forms.Timer(this.components);
+            this.RAMUsageBar = new System.Windows.Forms.ProgressBar();
+            this.RAMCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.RAMLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -326,15 +333,15 @@ namespace Reversi
             // DebugAITrace
             // 
             this.DebugAITrace.HideSelection = false;
-            this.DebugAITrace.Location = new System.Drawing.Point(364, 216);
+            this.DebugAITrace.Location = new System.Drawing.Point(364, 241);
             this.DebugAITrace.Name = "DebugAITrace";
-            this.DebugAITrace.Size = new System.Drawing.Size(329, 210);
+            this.DebugAITrace.Size = new System.Drawing.Size(357, 185);
             this.DebugAITrace.TabIndex = 5;
             this.DebugAITrace.Text = "";
             // 
             // AITraceLabel
             // 
-            this.AITraceLabel.Location = new System.Drawing.Point(483, 197);
+            this.AITraceLabel.Location = new System.Drawing.Point(490, 224);
             this.AITraceLabel.Name = "AITraceLabel";
             this.AITraceLabel.Size = new System.Drawing.Size(112, 16);
             this.AITraceLabel.TabIndex = 6;
@@ -484,7 +491,7 @@ namespace Reversi
             // nodeCounter
             // 
             this.nodeCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nodeCounter.Location = new System.Drawing.Point(364, 147);
+            this.nodeCounter.Location = new System.Drawing.Point(364, 139);
             this.nodeCounter.Name = "nodeCounter";
             this.nodeCounter.Size = new System.Drawing.Size(124, 32);
             this.nodeCounter.TabIndex = 13;
@@ -494,7 +501,7 @@ namespace Reversi
             // workCounter
             // 
             this.workCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.workCounter.Location = new System.Drawing.Point(608, 147);
+            this.workCounter.Location = new System.Drawing.Point(608, 139);
             this.workCounter.Name = "workCounter";
             this.workCounter.Size = new System.Drawing.Size(113, 32);
             this.workCounter.TabIndex = 14;
@@ -505,7 +512,7 @@ namespace Reversi
             // 
             this.nodeCounterLabel.AutoSize = true;
             this.nodeCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nodeCounterLabel.Location = new System.Drawing.Point(379, 134);
+            this.nodeCounterLabel.Location = new System.Drawing.Point(379, 126);
             this.nodeCounterLabel.Name = "nodeCounterLabel";
             this.nodeCounterLabel.Size = new System.Drawing.Size(94, 13);
             this.nodeCounterLabel.TabIndex = 16;
@@ -515,7 +522,7 @@ namespace Reversi
             // 
             this.workCounterLabel.AutoSize = true;
             this.workCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.workCounterLabel.Location = new System.Drawing.Point(611, 134);
+            this.workCounterLabel.Location = new System.Drawing.Point(622, 126);
             this.workCounterLabel.Name = "workCounterLabel";
             this.workCounterLabel.Size = new System.Drawing.Size(84, 13);
             this.workCounterLabel.TabIndex = 17;
@@ -525,7 +532,7 @@ namespace Reversi
             // 
             this.victoryCounterLabel.AutoSize = true;
             this.victoryCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.victoryCounterLabel.Location = new System.Drawing.Point(508, 134);
+            this.victoryCounterLabel.Location = new System.Drawing.Point(510, 126);
             this.victoryCounterLabel.Name = "victoryCounterLabel";
             this.victoryCounterLabel.Size = new System.Drawing.Size(74, 13);
             this.victoryCounterLabel.TabIndex = 19;
@@ -534,7 +541,7 @@ namespace Reversi
             // victoryCounter
             // 
             this.victoryCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.victoryCounter.Location = new System.Drawing.Point(479, 147);
+            this.victoryCounter.Location = new System.Drawing.Point(486, 139);
             this.victoryCounter.Name = "victoryCounter";
             this.victoryCounter.Size = new System.Drawing.Size(123, 32);
             this.victoryCounter.TabIndex = 18;
@@ -568,10 +575,38 @@ namespace Reversi
             this.NewGameTimer.Enabled = true;
             this.NewGameTimer.Tick += new System.EventHandler(this.NewGameTimer_Tick);
             // 
+            // RAMUsageBar
+            // 
+            this.RAMUsageBar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.RAMUsageBar.Location = new System.Drawing.Point(364, 191);
+            this.RAMUsageBar.Name = "RAMUsageBar";
+            this.RAMUsageBar.Size = new System.Drawing.Size(357, 24);
+            this.RAMUsageBar.Step = 1;
+            this.RAMUsageBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.RAMUsageBar.TabIndex = 22;
+            this.RAMUsageBar.Visible = false;
+            // 
+            // RAMCheckTimer
+            // 
+            this.RAMCheckTimer.Interval = 500;
+            this.RAMCheckTimer.Tick += new System.EventHandler(this.RAMCheckTimer_Tick);
+            // 
+            // RAMLabel
+            // 
+            this.RAMLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.RAMLabel.Location = new System.Drawing.Point(364, 169);
+            this.RAMLabel.Name = "RAMLabel";
+            this.RAMLabel.Size = new System.Drawing.Size(84, 25);
+            this.RAMLabel.TabIndex = 23;
+            this.RAMLabel.Text = "Memory:";
+            this.RAMLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.RAMLabel.Visible = false;
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(733, 438);
+            this.Controls.Add(this.RAMUsageBar);
             this.Controls.Add(this.whitePieceImg);
             this.Controls.Add(this.blackPieceImg);
             this.Controls.Add(this.victoryCounterLabel);
@@ -590,6 +625,7 @@ namespace Reversi
             this.Controls.Add(this.Title);
             this.Controls.Add(this.BoardPicture);
             this.Controls.Add(this.unusedGrid);
+            this.Controls.Add(this.RAMLabel);
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "ReversiForm";
@@ -947,22 +983,6 @@ namespace Reversi
 				}
 
 				return false;
-			}
-
-            public void DrawPiece( ref Piece CurrentPiece )
-			{
-                Image PieceImage = WhitePieceImage;
-
-                if (CurrentPiece.color == BLACK)
-				{
-					PieceImage = BlackPieceImage;
-				}
-
-                //Board Temp = new Board(LastDrawnBoard);
-
-                // Draw the new piece
-                if ( LastDrawnBoard.PieceAt(CurrentPiece.X, CurrentPiece.Y).color != CurrentPiece.color)
-                    BoardGFX.DrawImage(PieceImage, CurrentPiece.X * 40 + 1, CurrentPiece.Y * 40 + 1, PieceImage.Width, PieceImage.Height);
 			}
 
 			public Piece PutPiece( int x, int y, int color )
@@ -1849,11 +1869,8 @@ namespace Reversi
         // Responds to the analyze database button press, starts the job
         private void BuildAIDBButton_Click(object sender, EventArgs e)
         {
-            cancelButton.Visible = true;
-            DBBuildWorker.WorkerSupportsCancellation = true;
-            DBBuildWorker.WorkerReportsProgress = true;
+            SetupSimulationForm();
             DBBuildWorker.RunWorkerAsync(getBoardSize());
-            //StartBuildDB();
         }
 
         // Dumps the database information to the debug window
@@ -1865,9 +1882,7 @@ namespace Reversi
         // Responds to the analyze database button press
         private void anaylzeDBButton_Click(object sender, EventArgs e)
         {
-            cancelButton.Visible = true;
-            DBAnalysisWorker.WorkerSupportsCancellation = true;
-            DBAnalysisWorker.WorkerReportsProgress = true;
+            SetupSimulationForm();
             DBAnalysisWorker.RunWorkerAsync();
         }
 
@@ -1881,29 +1896,25 @@ namespace Reversi
         private void StartBuildDB( int BoardSize = 4 )
         {
             CurrentGame = new Game( BoardSize );
-            //CurrentGame.GameBoard.ClearBoard();
-            //CurrentGame.GameBoard.RefreshPieces();
-            //BoardPicture.Invalidate();
-
-            //int BoardSize = Convert.ToInt32(gridSizeDropDown.Items[gridSizeDropDown.SelectedIndex].ToString());
-
-            Boolean DisplayDebug = true;
-
-            CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, DisplayDebug);
+            CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
         }
 
 
         // Cancels any of the background jobs that are currently running
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            if( DBBuildWorker.IsBusy )
+            cancelAIWorkers();
+        }
+
+        private void cancelAIWorkers()
+        {
+            if (DBBuildWorker.IsBusy)
                 DBBuildWorker.CancelAsync();
 
-            if( DBAnalysisWorker.IsBusy )
+            if (DBAnalysisWorker.IsBusy)
                 DBAnalysisWorker.CancelAsync();
 
-            simTimerLabel.Text = "";
-            cancelButton.Visible = false;
+            ClearSimulationForm();
         }
 
         // Starts of the database analysis background worker
@@ -1929,9 +1940,60 @@ namespace Reversi
         // Runs when the database background worker thread is finished
         private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            ClearSimulationForm();
+        }
+
+        private void ClearSimulationForm()
+        {
             simTimerLabel.Text = "";
             cancelButton.Visible = false;
+            RAMCheckTimer.Enabled = false;
+            RAMUsageBar.Visible = false;
+            RAMLabel.Visible = false;
+            RAMUsageBar.Maximum = 100;
         }
+
+        private void SetupSimulationForm()
+        {
+            cancelButton.Visible = true;
+            DBAnalysisWorker.WorkerSupportsCancellation = true;
+            DBAnalysisWorker.WorkerReportsProgress = true;
+            DBBuildWorker.WorkerSupportsCancellation = true;
+            DBBuildWorker.WorkerReportsProgress = true;
+            RAMCheckTimer.Enabled = true;
+            RAMUsageBar.Visible = true;
+            RAMLabel.Visible = true;
+        }
+
+        private void RAMCheckTimer_Tick(object sender, EventArgs e)
+        {
+            ObjectQuery wql = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(wql);
+            ManagementObjectCollection results = searcher.Get();
+
+            foreach (ManagementObject result in results)
+            {
+                if (RAMUsageBar.Maximum < 1024)
+                    RAMUsageBar.Maximum = Convert.ToInt32(result["FreePhysicalMemory"]);
+
+                RAMUsageBar.Value = Math.Min(Convert.ToInt32(result["FreePhysicalMemory"]), RAMUsageBar.Maximum);
+
+                //DebugText.Text = (Convert.ToInt32(result["TotalVisibleMemorySize"]) - Convert.ToInt32(result["FreePhysicalMemory"])) + " KB\n";
+
+            }
+
+            // If RAM is running low, emergency stop any running jobs
+            if ((float)RAMUsageBar.Value / (float)RAMUsageBar.Maximum < Properties.Settings.Default.MemoryFloor)
+            {
+                cancelAIWorkers();
+                DebugText.Text += "#####   DB Build Aborted: Memory floor reached (" + RAMUsageBar.Value.ToString("0,0.") + " KB free)  #####";
+            }
+
+            RAMUsageBar.CreateGraphics().DrawString(RAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.Black, new PointF(120, 2));
+
+            //DebugText.Text = "Ping\n";
+        }
+
         #endregion
 
         #region Miscellaneous Form Level Methods
@@ -1969,5 +2031,6 @@ namespace Reversi
             NewGameTimer.Enabled = false;
         }
         #endregion
+
     }
 }

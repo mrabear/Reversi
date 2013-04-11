@@ -49,5 +49,14 @@ namespace Reversi.Properties {
                 return ((int)(this["EMPTY"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.1")]
+        public double MemoryFloor {
+            get {
+                return ((double)(this["MemoryFloor"]));
+            }
+        }
     }
 }
