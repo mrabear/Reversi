@@ -40,7 +40,6 @@ namespace Reversi
         private PictureBox BoardPicture;
         private IContainer components;
         public System.Windows.Forms.Timer NewGameTimer;
-        private System.Windows.Forms.Label TurnLabel;
         private System.Windows.Forms.MainMenu mainMenu1;
         private System.Windows.Forms.MenuItem menuItem1;
         private System.Windows.Forms.MenuItem menuItem2;
@@ -57,7 +56,6 @@ namespace Reversi
         private System.Windows.Forms.MenuItem menuItem3;
         private System.Windows.Forms.MenuItem DebugSkip;
         private System.Windows.Forms.MenuItem DebugProcess;
-        private System.Windows.Forms.Label ScoreText;
         public RichTextBox DebugAITrace;
         private System.Windows.Forms.Label AITraceLabel;
 
@@ -91,6 +89,12 @@ namespace Reversi
         private TabControl AIInfoTabControl;
         private TabPage AIDBTab;
         private TabPage AISimTab;
+        private Label CurrentTurnLabel;
+        private PictureBox CurrentTurnImage;
+        private Label blackScoreLabel;
+        private Label label2;
+        private Label whiteScoreBoard;
+        private Label blackScoreBoard;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -104,7 +108,6 @@ namespace Reversi
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
             this.BoardPicture = new System.Windows.Forms.PictureBox();
             this.Title = new System.Windows.Forms.Label();
-            this.TurnLabel = new System.Windows.Forms.Label();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
             this.menuItem1 = new System.Windows.Forms.MenuItem();
             this.NewGameMenu = new System.Windows.Forms.MenuItem();
@@ -125,7 +128,6 @@ namespace Reversi
             this.DebugScenario_NoWhite = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoBlack = new System.Windows.Forms.MenuItem();
             this.DebugScenario_TieGame = new System.Windows.Forms.MenuItem();
-            this.ScoreText = new System.Windows.Forms.Label();
             this.DebugAITrace = new System.Windows.Forms.RichTextBox();
             this.AITraceLabel = new System.Windows.Forms.Label();
             this.BuildAIDBButton = new System.Windows.Forms.Button();
@@ -156,6 +158,12 @@ namespace Reversi
             this.AIInfoTabControl = new System.Windows.Forms.TabControl();
             this.AIDBTab = new System.Windows.Forms.TabPage();
             this.AISimTab = new System.Windows.Forms.TabPage();
+            this.CurrentTurnLabel = new System.Windows.Forms.Label();
+            this.CurrentTurnImage = new System.Windows.Forms.PictureBox();
+            this.blackScoreLabel = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.whiteScoreBoard = new System.Windows.Forms.Label();
+            this.blackScoreBoard = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -163,6 +171,7 @@ namespace Reversi
             ((System.ComponentModel.ISupportInitialize)(this.whitePieceImg)).BeginInit();
             this.AIInfoTabControl.SuspendLayout();
             this.AIDBTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).BeginInit();
             this.SuspendLayout();
             // 
             // BoardPicture
@@ -184,14 +193,6 @@ namespace Reversi
             this.Title.TabIndex = 1;
             this.Title.Text = "Reversi";
             this.Title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // TurnLabel
-            // 
-            this.TurnLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TurnLabel.Location = new System.Drawing.Point(188, 388);
-            this.TurnLabel.Name = "TurnLabel";
-            this.TurnLabel.Size = new System.Drawing.Size(88, 41);
-            this.TurnLabel.TabIndex = 3;
             // 
             // mainMenu1
             // 
@@ -330,13 +331,6 @@ namespace Reversi
             // 
             this.DebugScenario_TieGame.Index = 2;
             this.DebugScenario_TieGame.Text = "Tie Game";
-            // 
-            // ScoreText
-            // 
-            this.ScoreText.Location = new System.Drawing.Point(31, 388);
-            this.ScoreText.Name = "ScoreText";
-            this.ScoreText.Size = new System.Drawing.Size(88, 41);
-            this.ScoreText.TabIndex = 4;
             // 
             // DebugAITrace
             // 
@@ -655,18 +649,85 @@ namespace Reversi
             this.AISimTab.Text = "AI Game Simulations";
             this.AISimTab.UseVisualStyleBackColor = true;
             // 
+            // CurrentTurnLabel
+            // 
+            this.CurrentTurnLabel.BackColor = System.Drawing.Color.Transparent;
+            this.CurrentTurnLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CurrentTurnLabel.ForeColor = System.Drawing.Color.Black;
+            this.CurrentTurnLabel.Location = new System.Drawing.Point(17, 386);
+            this.CurrentTurnLabel.Name = "CurrentTurnLabel";
+            this.CurrentTurnLabel.Size = new System.Drawing.Size(107, 40);
+            this.CurrentTurnLabel.TabIndex = 3;
+            this.CurrentTurnLabel.Text = "Current\r\nTurn";
+            this.CurrentTurnLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // CurrentTurnImage
+            // 
+            this.CurrentTurnImage.Image = ((System.Drawing.Image)(resources.GetObject("CurrentTurnImage.Image")));
+            this.CurrentTurnImage.InitialImage = null;
+            this.CurrentTurnImage.Location = new System.Drawing.Point(86, 387);
+            this.CurrentTurnImage.Name = "CurrentTurnImage";
+            this.CurrentTurnImage.Size = new System.Drawing.Size(38, 38);
+            this.CurrentTurnImage.TabIndex = 25;
+            this.CurrentTurnImage.TabStop = false;
+            this.CurrentTurnImage.Visible = false;
+            // 
+            // blackScoreLabel
+            // 
+            this.blackScoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreLabel.Location = new System.Drawing.Point(261, 381);
+            this.blackScoreLabel.Name = "blackScoreLabel";
+            this.blackScoreLabel.Size = new System.Drawing.Size(79, 21);
+            this.blackScoreLabel.TabIndex = 26;
+            this.blackScoreLabel.Text = "Black:";
+            this.blackScoreLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // label2
+            // 
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(162, 381);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(79, 21);
+            this.label2.TabIndex = 27;
+            this.label2.Text = "White:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // whiteScoreBoard
+            // 
+            this.whiteScoreBoard.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.whiteScoreBoard.Location = new System.Drawing.Point(161, 399);
+            this.whiteScoreBoard.Name = "whiteScoreBoard";
+            this.whiteScoreBoard.Size = new System.Drawing.Size(79, 31);
+            this.whiteScoreBoard.TabIndex = 28;
+            this.whiteScoreBoard.Text = "0";
+            this.whiteScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // blackScoreBoard
+            // 
+            this.blackScoreBoard.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreBoard.Location = new System.Drawing.Point(261, 399);
+            this.blackScoreBoard.Name = "blackScoreBoard";
+            this.blackScoreBoard.Size = new System.Drawing.Size(79, 31);
+            this.blackScoreBoard.TabIndex = 29;
+            this.blackScoreBoard.Text = "0";
+            this.blackScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(741, 435);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.blackScoreLabel);
+            this.Controls.Add(this.CurrentTurnImage);
             this.Controls.Add(this.AIInfoTabControl);
             this.Controls.Add(this.whitePieceImg);
             this.Controls.Add(this.blackPieceImg);
-            this.Controls.Add(this.ScoreText);
-            this.Controls.Add(this.TurnLabel);
+            this.Controls.Add(this.CurrentTurnLabel);
             this.Controls.Add(this.Title);
             this.Controls.Add(this.BoardPicture);
             this.Controls.Add(this.unusedGrid);
+            this.Controls.Add(this.whiteScoreBoard);
+            this.Controls.Add(this.blackScoreBoard);
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "ReversiForm";
@@ -680,6 +741,7 @@ namespace Reversi
             this.AIInfoTabControl.ResumeLayout(false);
             this.AIDBTab.ResumeLayout(false);
             this.AIDBTab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -701,8 +763,13 @@ namespace Reversi
             BoardGFX = BoardPicture.CreateGraphics();
 
             DebugText = DebugAITrace;
-            TurnLabelText = TurnLabel;
             simTimerLabel.Text = "";
+
+            gWhiteScoreBoard = whiteScoreBoard;
+            gBlackScoreBoard = blackScoreBoard;
+            gCurrentTurnImage = CurrentTurnImage;
+            gCurrentTurnLabel = CurrentTurnLabel;
+
             gridSizeDropDown.SelectedIndex = 4;
             unusedGrid.SendToBack();
         }
@@ -721,9 +788,13 @@ namespace Reversi
         private static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
 
         // Static handles to form objects
-        private static Label TurnLabelText = new Label();
+        //private static Label TurnLabelText = new Label();
         private static RichTextBox DebugText = new RichTextBox();
         private static Graphics BoardGFX;
+        private static Label gWhiteScoreBoard;
+        private static Label gBlackScoreBoard;
+        private static Label gCurrentTurnLabel;
+        private static PictureBox gCurrentTurnImage;
 
         // The board used to track what has been drawn on the screen
         private static Board LastDrawnBoard = new Board();
@@ -1012,7 +1083,21 @@ namespace Reversi
 				}
 
                 LastDrawnBoard.CopyBoard( BoardPieces );
+
+                UpdateScoreBoard();
 			}
+
+            public void UpdateScoreBoard()
+            {
+                int tempblack = FindScore(BLACK);
+                int tempwhite = FindScore(WHITE);
+
+                gBlackScoreBoard.Text = FindScore(BLACK).ToString();
+                gWhiteScoreBoard.Text = FindScore(WHITE).ToString();
+                gBlackScoreBoard.Refresh();
+                gWhiteScoreBoard.Refresh();
+
+            }
 
             // Return the score of the given player
 			public int FindScore( int colorToCheck )
@@ -1169,14 +1254,45 @@ namespace Reversi
 				// that list.  This line should be replaced with algorithims to determine which
 				// of the available moves is best.
            		Point ChosenMove = PossibleMoves[0];
+                Boolean MoveFound = false;
+                Point ChildChosenMove;
+                Point[] ChildPossibleMoves;
+                Board ChildBoard = new Board( CurrentGame.GameBoard );
+                int CurrentWeight = 0;
+                int ChildTurn;
 
                 AIDebug += "\nPossible Moves:\n";
                 foreach (Point CurrentPoint in PossibleMoves)
                 {
                     AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
 
+                    CurrentWeight += BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
+
                     if (BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > BoardValueMask[ChosenMove.X, ChosenMove.Y])
-                        ChosenMove = CurrentPoint;
+                    {
+                        ChildTurn = CurrentGame.CurrentTurn == WHITE ? BLACK : WHITE;
+
+                        ChildBoard.CopyBoard(CurrentGame.GameBoard);
+
+                        ChildBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, ChildTurn);
+                        ChildPossibleMoves = ChildBoard.AvailableMoves(ChildTurn);
+                        ChildChosenMove = new Point(0, 1);
+
+                        foreach (Point ChildPoint in ChildPossibleMoves)
+                        {
+                            if ((BoardValueMask[ChildPoint.X, ChildPoint.Y] > BoardValueMask[ChildChosenMove.X, ChildChosenMove.Y])  || ( !MoveFound ))
+                            {
+                                ChildChosenMove = ChildPoint;
+                            }
+                        }
+
+                        if( ( BoardValueMask[CurrentPoint.X, CurrentPoint.Y] - BoardValueMask[ChildChosenMove.X, ChildChosenMove.Y] > BoardValueMask[ChosenMove.X, ChosenMove.Y] ) || ( !MoveFound ) )
+                        {
+                            MoveFound = true;
+                            ChosenMove = CurrentPoint;
+                        }
+                    }
+
                 }
 
 				AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
@@ -1570,6 +1686,12 @@ namespace Reversi
                 // Reset the board image to clear any pieces from previous games
                 BoardGFX.DrawImage( BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
 
+                gBlackScoreBoard.Text = "0";
+                gWhiteScoreBoard.Text = "0";
+                gCurrentTurnLabel.Text = "Current\nTurn";
+                gCurrentTurnImage.Visible = true;
+                UpdateTurnImage(CurrentTurn);
+
                 // Reset the board that tracks which pieces have been drawn on the screen
                 LastDrawnBoard = new Board(BoardSize);
                 LastDrawnBoard.ClearBoard();
@@ -1672,15 +1794,15 @@ namespace Reversi
                 {
                     if (CurrentGame.Winner == EMPTY)
                     {
-                        TurnLabelText.Text = "The game ended in a tie!!!";
+                        gCurrentTurnLabel.Text = "Tie";
+                        gCurrentTurnImage.Visible = false;
                     }
                     else
                     {
-                        TurnLabelText.Text = CurrentGame.GetTurnString(CurrentGame.Winner) + " is the winner!!!";
+                        gCurrentTurnLabel.Text = "Winner";
+                        UpdateTurnImage(CurrentGame.Winner);
                     }
                 }
-
-                TurnLabelText.Text = "Current Turn: " + CurrentGame.GetTurnString(CurrentGame.CurrentTurn) + "\n";
 
                 TurnInProgress = false;
             }
@@ -1697,7 +1819,16 @@ namespace Reversi
 					CurrentTurn = WHITE;
 					NextTurn = BLACK;
 				}
+                UpdateTurnImage( CurrentTurn );
 			}
+
+            public void UpdateTurnImage( int turn )
+            {
+                if (turn == WHITE)
+                    gCurrentTurnImage.CreateGraphics().DrawImage(WhitePieceImage, 0, 0, WhitePieceImage.Width, WhitePieceImage.Height);
+                else
+                    gCurrentTurnImage.CreateGraphics().DrawImage(BlackPieceImage, 0, 0, BlackPieceImage.Width, BlackPieceImage.Height);
+            }
 
 			public string GetTurnString( int color )
 			{
@@ -1784,7 +1915,6 @@ namespace Reversi
 		private void DebugSkip_Click(object sender, System.EventArgs e)
 		{
 			CurrentGame.SwitchTurn();
-			TurnLabel.Text = "Current Turn: " + CurrentGame.GetTurnString( CurrentGame.CurrentTurn ) + "\n" ;		
 		}
 
         // unused
