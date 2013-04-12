@@ -1096,6 +1096,19 @@ namespace Reversi
             public int LoserTotal = 0;
             public int LeafTotal = 0;
 
+            // This is an attempt to rate the value of each spot on the board
+            public int[,] BoardValueMask = new int[,]
+            {
+	            {5,0,4,4,4,4,0,5},
+   	            {0,0,1,1,1,1,0,0},
+   	            {4,1,3,2,2,3,1,4},
+   	            {4,1,2,0,0,2,1,4},
+   	            {4,1,2,0,0,2,1,4},
+   	            {4,1,3,2,2,3,1,4},
+   	            {0,0,1,1,1,1,0,0},
+	            {5,0,3,3,3,3,0,5}
+            };
+
 			public AI( int AIcolor )
 			{		
 				color = AIcolor;	
@@ -1104,7 +1117,7 @@ namespace Reversi
 			public Point Move( ref Game SourceGame )
 			{
                 // Sleep breifly to make it feel like the ai is actually doing something (obviously take out later)
-                Thread.Sleep(750);
+                //Thread.Sleep(750);
 
 				AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
                           SourceGame.GetTurnString(color) + "\n" +
@@ -1112,14 +1125,7 @@ namespace Reversi
                           "\nInherited Game Board:\n" + SourceGame.GameBoard.ToString() + "\n";
 
                 Point[] PossibleMoves = SourceGame.GameBoard.AvailableMoves(SourceGame.CurrentTurn);
-
-				AIDebug += "\nPossible Moves:\n";
-				for( int lc = 0 ; lc < PossibleMoves.Length ; lc++ )
-				{
-					AIDebug += "(" + PossibleMoves[ lc ].X + "," + PossibleMoves[ lc ].Y + ")\n";
-				}
 	
-				AIDebug += "\nTotal Possible Moves: " + PossibleMoves.Length + "\n";
 				if( PossibleMoves.Length < 1 )
 				{
 					return new Point( -1, -1 );
@@ -1130,6 +1136,15 @@ namespace Reversi
 				// that list.  This line should be replaced with algorithims to determine which
 				// of the available moves is best.
            		Point ChosenMove = PossibleMoves[0];
+
+                AIDebug += "\nPossible Moves:\n";
+                foreach (Point CurrentPoint in PossibleMoves)
+                {
+                    AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
+
+                    if (BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > BoardValueMask[ChosenMove.X, ChosenMove.Y])
+                        ChosenMove = CurrentPoint;
+                }
 
 				AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
 
