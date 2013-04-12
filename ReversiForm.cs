@@ -88,6 +88,9 @@ namespace Reversi
         private ProgressBar RAMUsageBar;
         public System.Windows.Forms.Timer RAMCheckTimer;
         private Label RAMLabel;
+        private TabControl AIInfoTabControl;
+        private TabPage AIDBTab;
+        private TabPage AISimTab;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -150,11 +153,16 @@ namespace Reversi
             this.RAMUsageBar = new System.Windows.Forms.ProgressBar();
             this.RAMCheckTimer = new System.Windows.Forms.Timer(this.components);
             this.RAMLabel = new System.Windows.Forms.Label();
+            this.AIInfoTabControl = new System.Windows.Forms.TabControl();
+            this.AIDBTab = new System.Windows.Forms.TabPage();
+            this.AISimTab = new System.Windows.Forms.TabPage();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.blackPieceImg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.whitePieceImg)).BeginInit();
+            this.AIInfoTabControl.SuspendLayout();
+            this.AIDBTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // BoardPicture
@@ -333,15 +341,15 @@ namespace Reversi
             // DebugAITrace
             // 
             this.DebugAITrace.HideSelection = false;
-            this.DebugAITrace.Location = new System.Drawing.Point(364, 241);
+            this.DebugAITrace.Location = new System.Drawing.Point(3, 239);
             this.DebugAITrace.Name = "DebugAITrace";
-            this.DebugAITrace.Size = new System.Drawing.Size(357, 185);
+            this.DebugAITrace.Size = new System.Drawing.Size(357, 147);
             this.DebugAITrace.TabIndex = 5;
             this.DebugAITrace.Text = "";
             // 
             // AITraceLabel
             // 
-            this.AITraceLabel.Location = new System.Drawing.Point(490, 224);
+            this.AITraceLabel.Location = new System.Drawing.Point(129, 222);
             this.AITraceLabel.Name = "AITraceLabel";
             this.AITraceLabel.Size = new System.Drawing.Size(112, 16);
             this.AITraceLabel.TabIndex = 6;
@@ -350,7 +358,7 @@ namespace Reversi
             // 
             // BuildAIDBButton
             // 
-            this.BuildAIDBButton.Location = new System.Drawing.Point(6, 23);
+            this.BuildAIDBButton.Location = new System.Drawing.Point(6, 22);
             this.BuildAIDBButton.Name = "BuildAIDBButton";
             this.BuildAIDBButton.Size = new System.Drawing.Size(108, 23);
             this.BuildAIDBButton.TabIndex = 7;
@@ -380,7 +388,7 @@ namespace Reversi
             this.groupBox1.Controls.Add(this.anaylzeDBButton);
             this.groupBox1.Controls.Add(this.BuildAIDBButton);
             this.groupBox1.Controls.Add(this.visualizeCheckbox);
-            this.groupBox1.Location = new System.Drawing.Point(367, 8);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(244, 107);
             this.groupBox1.TabIndex = 9;
@@ -454,7 +462,7 @@ namespace Reversi
             this.cancelButton.BackColor = System.Drawing.Color.Red;
             this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cancelButton.ForeColor = System.Drawing.Color.White;
-            this.cancelButton.Location = new System.Drawing.Point(634, 20);
+            this.cancelButton.Location = new System.Drawing.Point(273, 18);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(64, 64);
             this.cancelButton.TabIndex = 10;
@@ -481,7 +489,7 @@ namespace Reversi
             // 
             this.simTimerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.simTimerLabel.ForeColor = System.Drawing.Color.Red;
-            this.simTimerLabel.Location = new System.Drawing.Point(616, 83);
+            this.simTimerLabel.Location = new System.Drawing.Point(255, 81);
             this.simTimerLabel.Name = "simTimerLabel";
             this.simTimerLabel.Size = new System.Drawing.Size(98, 34);
             this.simTimerLabel.TabIndex = 12;
@@ -491,7 +499,7 @@ namespace Reversi
             // nodeCounter
             // 
             this.nodeCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nodeCounter.Location = new System.Drawing.Point(364, 139);
+            this.nodeCounter.Location = new System.Drawing.Point(3, 137);
             this.nodeCounter.Name = "nodeCounter";
             this.nodeCounter.Size = new System.Drawing.Size(124, 32);
             this.nodeCounter.TabIndex = 13;
@@ -501,7 +509,7 @@ namespace Reversi
             // workCounter
             // 
             this.workCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.workCounter.Location = new System.Drawing.Point(608, 139);
+            this.workCounter.Location = new System.Drawing.Point(247, 137);
             this.workCounter.Name = "workCounter";
             this.workCounter.Size = new System.Drawing.Size(113, 32);
             this.workCounter.TabIndex = 14;
@@ -512,7 +520,7 @@ namespace Reversi
             // 
             this.nodeCounterLabel.AutoSize = true;
             this.nodeCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nodeCounterLabel.Location = new System.Drawing.Point(379, 126);
+            this.nodeCounterLabel.Location = new System.Drawing.Point(18, 124);
             this.nodeCounterLabel.Name = "nodeCounterLabel";
             this.nodeCounterLabel.Size = new System.Drawing.Size(94, 13);
             this.nodeCounterLabel.TabIndex = 16;
@@ -522,7 +530,7 @@ namespace Reversi
             // 
             this.workCounterLabel.AutoSize = true;
             this.workCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.workCounterLabel.Location = new System.Drawing.Point(622, 126);
+            this.workCounterLabel.Location = new System.Drawing.Point(261, 124);
             this.workCounterLabel.Name = "workCounterLabel";
             this.workCounterLabel.Size = new System.Drawing.Size(84, 13);
             this.workCounterLabel.TabIndex = 17;
@@ -532,7 +540,7 @@ namespace Reversi
             // 
             this.victoryCounterLabel.AutoSize = true;
             this.victoryCounterLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.victoryCounterLabel.Location = new System.Drawing.Point(510, 126);
+            this.victoryCounterLabel.Location = new System.Drawing.Point(149, 124);
             this.victoryCounterLabel.Name = "victoryCounterLabel";
             this.victoryCounterLabel.Size = new System.Drawing.Size(74, 13);
             this.victoryCounterLabel.TabIndex = 19;
@@ -541,7 +549,7 @@ namespace Reversi
             // victoryCounter
             // 
             this.victoryCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.victoryCounter.Location = new System.Drawing.Point(486, 139);
+            this.victoryCounter.Location = new System.Drawing.Point(125, 137);
             this.victoryCounter.Name = "victoryCounter";
             this.victoryCounter.Size = new System.Drawing.Size(123, 32);
             this.victoryCounter.TabIndex = 18;
@@ -579,7 +587,7 @@ namespace Reversi
             // 
             this.RAMUsageBar.BackColor = System.Drawing.Color.Silver;
             this.RAMUsageBar.ForeColor = System.Drawing.Color.Navy;
-            this.RAMUsageBar.Location = new System.Drawing.Point(364, 191);
+            this.RAMUsageBar.Location = new System.Drawing.Point(3, 189);
             this.RAMUsageBar.Name = "RAMUsageBar";
             this.RAMUsageBar.Size = new System.Drawing.Size(357, 24);
             this.RAMUsageBar.Step = 1;
@@ -596,7 +604,7 @@ namespace Reversi
             // RAMLabel
             // 
             this.RAMLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.RAMLabel.Location = new System.Drawing.Point(364, 169);
+            this.RAMLabel.Location = new System.Drawing.Point(3, 167);
             this.RAMLabel.Name = "RAMLabel";
             this.RAMLabel.Size = new System.Drawing.Size(84, 25);
             this.RAMLabel.TabIndex = 23;
@@ -604,30 +612,61 @@ namespace Reversi
             this.RAMLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.RAMLabel.Visible = false;
             // 
+            // AIInfoTabControl
+            // 
+            this.AIInfoTabControl.Controls.Add(this.AIDBTab);
+            this.AIInfoTabControl.Controls.Add(this.AISimTab);
+            this.AIInfoTabControl.Location = new System.Drawing.Point(358, 5);
+            this.AIInfoTabControl.Name = "AIInfoTabControl";
+            this.AIInfoTabControl.SelectedIndex = 0;
+            this.AIInfoTabControl.Size = new System.Drawing.Size(375, 418);
+            this.AIInfoTabControl.TabIndex = 24;
+            // 
+            // AIDBTab
+            // 
+            this.AIDBTab.BackColor = System.Drawing.Color.Transparent;
+            this.AIDBTab.Controls.Add(this.groupBox1);
+            this.AIDBTab.Controls.Add(this.RAMUsageBar);
+            this.AIDBTab.Controls.Add(this.RAMLabel);
+            this.AIDBTab.Controls.Add(this.DebugAITrace);
+            this.AIDBTab.Controls.Add(this.AITraceLabel);
+            this.AIDBTab.Controls.Add(this.victoryCounterLabel);
+            this.AIDBTab.Controls.Add(this.cancelButton);
+            this.AIDBTab.Controls.Add(this.victoryCounter);
+            this.AIDBTab.Controls.Add(this.simTimerLabel);
+            this.AIDBTab.Controls.Add(this.workCounterLabel);
+            this.AIDBTab.Controls.Add(this.nodeCounter);
+            this.AIDBTab.Controls.Add(this.nodeCounterLabel);
+            this.AIDBTab.Controls.Add(this.workCounter);
+            this.AIDBTab.Location = new System.Drawing.Point(4, 22);
+            this.AIDBTab.Name = "AIDBTab";
+            this.AIDBTab.Padding = new System.Windows.Forms.Padding(3);
+            this.AIDBTab.Size = new System.Drawing.Size(367, 392);
+            this.AIDBTab.TabIndex = 0;
+            this.AIDBTab.Text = "AI Database";
+            // 
+            // AISimTab
+            // 
+            this.AISimTab.Location = new System.Drawing.Point(4, 22);
+            this.AISimTab.Name = "AISimTab";
+            this.AISimTab.Padding = new System.Windows.Forms.Padding(3);
+            this.AISimTab.Size = new System.Drawing.Size(367, 392);
+            this.AISimTab.TabIndex = 1;
+            this.AISimTab.Text = "AI Game Simulations";
+            this.AISimTab.UseVisualStyleBackColor = true;
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(733, 438);
-            this.Controls.Add(this.RAMUsageBar);
+            this.ClientSize = new System.Drawing.Size(741, 435);
+            this.Controls.Add(this.AIInfoTabControl);
             this.Controls.Add(this.whitePieceImg);
             this.Controls.Add(this.blackPieceImg);
-            this.Controls.Add(this.victoryCounterLabel);
-            this.Controls.Add(this.victoryCounter);
-            this.Controls.Add(this.workCounterLabel);
-            this.Controls.Add(this.nodeCounterLabel);
-            this.Controls.Add(this.workCounter);
-            this.Controls.Add(this.nodeCounter);
-            this.Controls.Add(this.simTimerLabel);
-            this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.AITraceLabel);
-            this.Controls.Add(this.DebugAITrace);
             this.Controls.Add(this.ScoreText);
             this.Controls.Add(this.TurnLabel);
             this.Controls.Add(this.Title);
             this.Controls.Add(this.BoardPicture);
             this.Controls.Add(this.unusedGrid);
-            this.Controls.Add(this.RAMLabel);
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "ReversiForm";
@@ -638,8 +677,10 @@ namespace Reversi
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.blackPieceImg)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.whitePieceImg)).EndInit();
+            this.AIInfoTabControl.ResumeLayout(false);
+            this.AIDBTab.ResumeLayout(false);
+            this.AIDBTab.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
