@@ -91,8 +91,8 @@ namespace Reversi
         private TabPage AISimTab;
         private Label CurrentTurnLabel;
         private PictureBox CurrentTurnImage;
-        private Label blackScoreLabel;
-        private Label label2;
+        private Label blackScoreBoardTitle;
+        private Label whiteScoreBoardTitle;
         private Label whiteScoreBoard;
         private Label blackScoreBoard;
         private PictureBox whitePieceImg;
@@ -160,8 +160,8 @@ namespace Reversi
             this.AISimTab = new System.Windows.Forms.TabPage();
             this.CurrentTurnLabel = new System.Windows.Forms.Label();
             this.CurrentTurnImage = new System.Windows.Forms.PictureBox();
-            this.blackScoreLabel = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.blackScoreBoardTitle = new System.Windows.Forms.Label();
+            this.whiteScoreBoardTitle = new System.Windows.Forms.Label();
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
@@ -672,25 +672,25 @@ namespace Reversi
             this.CurrentTurnImage.TabStop = false;
             this.CurrentTurnImage.Visible = false;
             // 
-            // blackScoreLabel
+            // blackScoreBoardTitle
             // 
-            this.blackScoreLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreLabel.Location = new System.Drawing.Point(261, 381);
-            this.blackScoreLabel.Name = "blackScoreLabel";
-            this.blackScoreLabel.Size = new System.Drawing.Size(79, 21);
-            this.blackScoreLabel.TabIndex = 26;
-            this.blackScoreLabel.Text = "Black:";
-            this.blackScoreLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.blackScoreBoardTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreBoardTitle.Location = new System.Drawing.Point(261, 381);
+            this.blackScoreBoardTitle.Name = "blackScoreBoardTitle";
+            this.blackScoreBoardTitle.Size = new System.Drawing.Size(79, 21);
+            this.blackScoreBoardTitle.TabIndex = 26;
+            this.blackScoreBoardTitle.Text = "Black:";
+            this.blackScoreBoardTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // label2
+            // whiteScoreBoardTitle
             // 
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(162, 381);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(79, 21);
-            this.label2.TabIndex = 27;
-            this.label2.Text = "White:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.whiteScoreBoardTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(162, 381);
+            this.whiteScoreBoardTitle.Name = "whiteScoreBoardTitle";
+            this.whiteScoreBoardTitle.Size = new System.Drawing.Size(79, 21);
+            this.whiteScoreBoardTitle.TabIndex = 27;
+            this.whiteScoreBoardTitle.Text = "White:";
+            this.whiteScoreBoardTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // whiteScoreBoard
             // 
@@ -716,8 +716,8 @@ namespace Reversi
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(741, 435);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.blackScoreLabel);
+            this.Controls.Add(this.whiteScoreBoardTitle);
+            this.Controls.Add(this.blackScoreBoardTitle);
             this.Controls.Add(this.CurrentTurnImage);
             this.Controls.Add(this.AIInfoTabControl);
             this.Controls.Add(this.whitePieceImg);
@@ -1081,23 +1081,8 @@ namespace Reversi
                             }
 					}
 				}
-
                 LastDrawnBoard.CopyBoard( BoardPieces );
-
-                UpdateScoreBoard();
 			}
-
-            public void UpdateScoreBoard()
-            {
-                int tempblack = FindScore(BLACK);
-                int tempwhite = FindScore(WHITE);
-
-                gBlackScoreBoard.Text = FindScore(BLACK).ToString();
-                gWhiteScoreBoard.Text = FindScore(WHITE).ToString();
-                gBlackScoreBoard.Refresh();
-                gWhiteScoreBoard.Refresh();
-
-            }
 
             // Return the score of the given player
 			public int FindScore( int colorToCheck )
@@ -1686,12 +1671,6 @@ namespace Reversi
                 // Reset the board image to clear any pieces from previous games
                 BoardGFX.DrawImage( BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
 
-                gBlackScoreBoard.Text = "0";
-                gWhiteScoreBoard.Text = "0";
-                gCurrentTurnLabel.Text = "Current\nTurn";
-                gCurrentTurnImage.Visible = true;
-                UpdateTurnImage(CurrentTurn);
-
                 // Reset the board that tracks which pieces have been drawn on the screen
                 LastDrawnBoard = new Board(BoardSize);
                 LastDrawnBoard.ClearBoard();
@@ -1732,6 +1711,14 @@ namespace Reversi
                 return (CurrentGame.IsComplete);
             }
 
+            public void UpdateScoreBoard()
+            {
+                gBlackScoreBoard.Text = GameBoard.FindScore(BLACK).ToString();
+                gWhiteScoreBoard.Text = GameBoard.FindScore(WHITE).ToString();
+                gBlackScoreBoard.Refresh();
+                gWhiteScoreBoard.Refresh();
+            }
+
             // Processes a single turn of gameplay, two if it is vs. AI
             public void ProcessTurn(int x, int y)
             {
@@ -1755,6 +1742,8 @@ namespace Reversi
                         }
 
                         CurrentGame.GameBoard.RefreshPieces();
+                        UpdateScoreBoard();
+
                     }
 
                     if ((CurrentGame.VsComputer) && (CurrentGame.CurrentTurn == CurrentGame.AI.color))
@@ -1784,6 +1773,7 @@ namespace Reversi
 
                         CurrentGame.SwitchTurn();
                         CurrentGame.GameBoard.RefreshPieces();
+                        UpdateScoreBoard();
                         DebugText.Text += "------------\nAI " + CurrentGame.GetTurnString(CurrentGame.AI.color) + " turn over!  allowing human player to move\n############\n";
                     }
 
@@ -1908,8 +1898,29 @@ namespace Reversi
         // New game selected
 		private void NewGameMenu_Click(object sender, System.EventArgs e)
 		{
-			CurrentGame = new Game( getBoardSize() );
+			//CurrentGame = new Game( getBoardSize() );
+            StartNewGame();
 		}
+
+        private void StartNewGame()
+        {
+            gBlackScoreBoard.Text = "0";
+            gWhiteScoreBoard.Text = "0";
+            gCurrentTurnLabel.Text = "Current\nTurn";
+            gCurrentTurnImage.Visible = true;
+
+            // Reset the score board
+            gBlackScoreBoard.Visible = true;
+            gWhiteScoreBoard.Visible = true;
+            CurrentTurnLabel.Visible = true;
+            whiteScoreBoardTitle.Visible = true;
+            blackScoreBoardTitle.Visible = true;
+            CurrentTurnImage.Visible = true;
+
+            CurrentGame = new Game(getBoardSize());
+
+            CurrentGame.UpdateTurnImage(CurrentGame.CurrentTurn);
+        }
 
         // Skip turn (debug option) selected
 		private void DebugSkip_Click(object sender, System.EventArgs e)
@@ -2053,6 +2064,14 @@ namespace Reversi
             RAMUsageBar.Visible = true;
             RAMLabel.Visible = true;
             UpdateRAMprogress();
+
+            // Reset the score board
+            gBlackScoreBoard.Visible = false;
+            gWhiteScoreBoard.Visible = false;
+            CurrentTurnLabel.Visible = false;
+            whiteScoreBoardTitle.Visible = false;
+            blackScoreBoardTitle.Visible = false;
+            CurrentTurnImage.Visible = false;
         }
 
         private void RAMCheckTimer_Tick(object sender, EventArgs e)
@@ -2118,13 +2137,13 @@ namespace Reversi
             BoardPicture.Width = 40 * getBoardSize();
             BoardPicture.Height = 40 * getBoardSize();
 
-            CurrentGame = new Game(getBoardSize());
+            StartNewGame();
         }
 
         // Starts a new game 100ms after the form has loaded
         private void NewGameTimer_Tick(object sender, EventArgs e)
         {
-            CurrentGame = new Game(getBoardSize());
+            StartNewGame();
             NewGameTimer.Enabled = false;
         }
         #endregion
