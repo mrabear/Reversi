@@ -724,20 +724,12 @@ namespace Reversi
                 PlaceStartingPieces();
             }
 
-            // Create a board using a reference to another board as a template
-            public Board(ref Board SourceBoard)
-            {
-                BoardSize = SourceBoard.BoardSize;
-                BoardPieces = new int[BoardSize, BoardSize];
-                this.CopyBoard(ref SourceBoard);
-            }
-
             // Create a board using another board as a template
             public Board(Board SourceBoard)
             {
                 BoardSize = SourceBoard.BoardSize;
                 BoardPieces = new int[BoardSize, BoardSize];
-                this.CopyBoard(ref SourceBoard);
+                this.CopyBoard(SourceBoard);
             }
 
             // Returns true if the piece is within the bounds of the game board
@@ -750,15 +742,15 @@ namespace Reversi
 			}
 
             // Copies the content of one board to another
-            public void CopyBoard( ref int[,] NewBoardPieces)
+            public void CopyBoard( int[,] NewBoardPieces)
             {
                 Array.Copy( NewBoardPieces, BoardPieces, NewBoardPieces.Length );
             }
 
             // Overload of copyboard that takes a source board as input
-			public void CopyBoard( ref Board SourceBoard )
+			public void CopyBoard( Board SourceBoard )
 			{
-                CopyBoard( ref SourceBoard.BoardPieces );
+                CopyBoard( SourceBoard.BoardPieces );
 			}
 
             // Overrides the default ToString method to return a string representation of the board
@@ -857,7 +849,7 @@ namespace Reversi
                                     if ( ProcessMove )
 									{
 										TempBoard.PutPiece( x, y, color );
-										CopyBoard( ref TempBoard );
+										CopyBoard( TempBoard );
 									}
 
                                     takeStatus = true;
@@ -978,7 +970,7 @@ namespace Reversi
 					}
 				}
 
-                LastDrawnBoard.CopyBoard( ref BoardPieces );
+                LastDrawnBoard.CopyBoard( BoardPieces );
 			}
 
             // Return the score of the given player
@@ -1033,7 +1025,7 @@ namespace Reversi
 
                     // Map constructor inputs to variables
                     Turn = SourceTurn;
-                    GameBoard  = new Board( ref SourceBoard );
+                    GameBoard  = new Board( SourceBoard );
                     isTrunk = SetTrunk;
                     isLeaf = SetLeaf;
 
@@ -1114,7 +1106,7 @@ namespace Reversi
 				color = AIcolor;	
 			}
 
-			public Point Move( ref Game SourceGame )
+			public Point Move( Game SourceGame )
 			{
                 // Sleep breifly to make it feel like the ai is actually doing something (obviously take out later)
                 //Thread.Sleep(750);
@@ -1296,7 +1288,7 @@ namespace Reversi
                     {
                         foreach (Point CurrentMove in ParentNode.AvailableMoves)
                         {
-                            ChildBoard = new Board(ref ParentNode.GameBoard);
+                            ChildBoard = new Board(ParentNode.GameBoard);
                             ChildBoard.PutPiece(CurrentMove.X, CurrentMove.Y, ChildTurn);
                             ChildNode = new SimulationNode(ChildBoard, ChildTurn);
 
@@ -1457,7 +1449,7 @@ namespace Reversi
                     for (int lc = 0; lc < PossibleMoves.Length; lc++)
                     {
                         // Make a copy of the current board
-                        SimulationBoard = new Board(ref CurrentBoard);
+                        SimulationBoard = new Board(CurrentBoard);
 
                         // Place the current move on the new board
                         SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
@@ -1606,7 +1598,7 @@ namespace Reversi
                     {
                         while (CurrentGame.GameBoard.MovePossible(CurrentGame.AI.color))
                         {
-                            Point AIMove = CurrentGame.AI.Move(ref CurrentGame);
+                            Point AIMove = CurrentGame.AI.Move(CurrentGame);
 
                             DebugText.Text = CurrentGame.AI.AIDebug;
                             DebugText.Text += "\nOutside class...\nPlacing " + CurrentGame.GetTurnString(CurrentGame.CurrentTurn) + " AI piece at (" + AIMove.X + "," + AIMove.Y + ")\n";
