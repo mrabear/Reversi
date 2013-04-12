@@ -1150,7 +1150,7 @@ namespace Reversi
 			public Point Move( Game SourceGame )
 			{
                 // Sleep breifly to make it feel like the ai is actually doing something (obviously take out later)
-                //Thread.Sleep(750);
+                Thread.Sleep(750);
 
 				AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
                           SourceGame.GetTurnString(color) + "\n" +
