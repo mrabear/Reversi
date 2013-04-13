@@ -95,6 +95,8 @@ namespace Reversi
         private Label whiteScoreBoardTitle;
         private Label whiteScoreBoard;
         private Label blackScoreBoard;
+        private BackgroundWorker AITurnWorker;
+        private BackgroundWorker AITurnMonitor;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -164,6 +166,8 @@ namespace Reversi
             this.whiteScoreBoardTitle = new System.Windows.Forms.Label();
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
+            this.AITurnWorker = new System.ComponentModel.BackgroundWorker();
+            this.AITurnMonitor = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -712,6 +716,18 @@ namespace Reversi
             this.blackScoreBoard.Text = "0";
             this.blackScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // AITurnWorker
+            // 
+            this.AITurnWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.AITurnWorker_DoWork);
+            this.AITurnWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnWorker_ProgressChanged);
+            this.AITurnWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnWorker_RunWorkerCompleted);
+            // 
+            // AITurnMonitor
+            // 
+            this.AITurnMonitor.DoWork += new System.ComponentModel.DoWorkEventHandler(this.AITurnMonitor_DoWork);
+            this.AITurnMonitor.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnMonitor_ProgressChanged);
+            this.AITurnMonitor.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnMonitor_RunWorkerCompleted);
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -760,15 +776,23 @@ namespace Reversi
         public ReversiForm()
         {
             InitializeComponent();
-            BoardGFX = BoardPicture.CreateGraphics();
+            gBoardGFX = BoardPicture.CreateGraphics();
 
-            DebugText = DebugAITrace;
+            gDebugText = DebugAITrace;
             simTimerLabel.Text = "";
 
             gWhiteScoreBoard = whiteScoreBoard;
             gBlackScoreBoard = blackScoreBoard;
             gCurrentTurnImage = CurrentTurnImage;
             gCurrentTurnLabel = CurrentTurnLabel;
+            gAITurnWorker = AITurnWorker;
+            //gAITurnTrigger = AITurnTrigger;
+            gAITurnMonitor = AITurnMonitor;
+
+            AITurnWorker.WorkerSupportsCancellation = true;
+            AITurnWorker.WorkerReportsProgress = true;
+            AITurnMonitor.WorkerSupportsCancellation = true;
+            AITurnMonitor.WorkerReportsProgress = true;
 
             gridSizeDropDown.SelectedIndex = 4;
             unusedGrid.SendToBack();
@@ -789,12 +813,18 @@ namespace Reversi
 
         // Static handles to form objects
         //private static Label TurnLabelText = new Label();
-        private static RichTextBox DebugText = new RichTextBox();
-        private static Graphics BoardGFX;
+        private static RichTextBox gDebugText = new RichTextBox();
+        private static Graphics gBoardGFX;
         private static Label gWhiteScoreBoard;
         private static Label gBlackScoreBoard;
         private static Label gCurrentTurnLabel;
         private static PictureBox gCurrentTurnImage;
+        private static BackgroundWorker gAITurnWorker;
+        private static BackgroundWorker gAITurnMonitor;
+        //private static System.Windows.Forms.Timer gAITurnTrigger;
+
+        //private static delegate void ProcessAITurnDelegate();
+        //private static ProcessAITurnDelegate gProcessAITurnAsync;
 
         // The board used to track what has been drawn on the screen
         private static Board LastDrawnBoard = new Board();
@@ -973,11 +1003,11 @@ namespace Reversi
 
                 if (( !findStatus ) && ( ProcessMove ))
 				{
-					//DebugText.Text = "You must place your piece adjacent to an opponents piece.";
+					//gDebugText.Text = "You must place your piece adjacent to an opponents piece.";
 				}
                 if (( !takeStatus ) && ( ProcessMove ))
 				{
-					//DebugText.Text = "You must place capture at least one piece on each turn.";
+					//gDebugText.Text = "You must place capture at least one piece on each turn.";
 				}
 
 				return takeStatus;
@@ -1077,7 +1107,7 @@ namespace Reversi
                                     PieceImage = WhitePieceImage;
 
                                 // Draw the new piece
-                                BoardGFX.DrawImage(PieceImage, X * 40 + 1, Y * 40 + 1, PieceImage.Width, PieceImage.Height);
+                                gBoardGFX.DrawImage(PieceImage, X * 40 + 1, Y * 40 + 1, PieceImage.Width, PieceImage.Height);
                             }
 					}
 				}
@@ -1199,17 +1229,21 @@ namespace Reversi
             public int LoserTotal = 0;
             public int LeafTotal = 0;
 
+            public bool ProcessingTurn = false;
+
+            public Point NextMove = new Point(-1, -1);
+
             // This is an attempt to rate the value of each spot on the board
             public int[,] BoardValueMask = new int[,]
             {
-	            {5,0,4,4,4,4,0,5},
-   	            {0,0,1,1,1,1,0,0},
+	            {5,2,4,4,4,4,2,5},
+   	            {2,0,1,1,1,1,0,2},
    	            {4,1,3,2,2,3,1,4},
    	            {4,1,2,0,0,2,1,4},
    	            {4,1,2,0,0,2,1,4},
    	            {4,1,3,2,2,3,1,4},
-   	            {0,0,1,1,1,1,0,0},
-	            {5,0,3,3,3,3,0,5}
+   	            {2,0,1,1,1,1,0,2},
+	            {5,2,4,4,4,4,2,5}
             };
 
 			public AI( int AIcolor )
@@ -1217,21 +1251,32 @@ namespace Reversi
 				color = AIcolor;	
 			}
 
+            // Return a point representing the best possible next move for this AI
 			public Point Move( Game SourceGame )
 			{
-                // Sleep breifly to make it feel like the ai is actually doing something (obviously take out later)
-                Thread.Sleep(750);
+                ProcessingTurn = true;
 
-				AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
+                gAITurnWorker.RunWorkerAsync();
+
+                while(ProcessingTurn);
+
+                return NextMove;
+			}
+
+            // Determine the best move possible for the given game
+            public void DetermineNextMove( Game SourceGame )
+            {
+                Thread.Sleep(750);
+                /*AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
                           SourceGame.GetTurnString(color) + "\n" +
                           "AI is set to difficulty level " + SourceGame.Difficulty + "\n" +
-                          "\nInherited Game Board:\n" + SourceGame.GameBoard.ToString() + "\n";
-
+                          "\nInherited Game Board:\n" + SourceGame.GameBoard.ToString() + "\n";*/
+                
                 Point[] PossibleMoves = SourceGame.GameBoard.AvailableMoves(SourceGame.CurrentTurn);
 	
 				if( PossibleMoves.Length < 1 )
 				{
-					return new Point( -1, -1 );
+					NextMove = new Point( -1, -1 );
 				}
 				
 				// This is just a gameplay hack to get by...all the AI is doing at this point is
@@ -1246,10 +1291,10 @@ namespace Reversi
                 int CurrentWeight = 0;
                 int ChildTurn;
 
-                AIDebug += "\nPossible Moves:\n";
+                //AIDebug += "\nPossible Moves:\n";
                 foreach (Point CurrentPoint in PossibleMoves)
                 {
-                    AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
+                    //AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
 
                     CurrentWeight += BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
 
@@ -1280,10 +1325,11 @@ namespace Reversi
 
                 }
 
-				AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
-
-				return ChosenMove;
-			}
+				//AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
+                 
+                NextMove = ChosenMove;
+                ProcessingTurn = false;
+            }
 
             public String DumpSimulationInfo()
             {
@@ -1465,12 +1511,12 @@ namespace Reversi
                 {
                     TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
                     Console.WriteLine("===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
-                    //DebugTextBox.Text += "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo();
+                    //gDebugTextBox.Text += "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo();
                     WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
                 }
             }
 
-            public void AnalyzeAIDatabase(BackgroundWorker WorkerThread, Boolean VisualizeResults = false, RichTextBox DebugTextBox = null, Boolean DisplayDebug = true)
+            public void AnalyzeAIDatabase(BackgroundWorker WorkerThread, Boolean VisualizeResults = false, RichTextBox gDebugTextBox = null, Boolean DisplayDebug = true)
             {
 
                 /////////////////////////////////////////////////////////////
@@ -1505,7 +1551,7 @@ namespace Reversi
                 {
                     TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
                     Console.WriteLine("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)");
-                    //DebugTextBox.Text += "(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)\n";
+                    //gDebugTextBox.Text += "(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)\n";
                 }
                 /////////////////////////////////////////////////////////////
 
@@ -1565,7 +1611,7 @@ namespace Reversi
                 {
                     TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
                     Console.WriteLine("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n");
-                    //DebugTextBox.Text += "===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n";
+                    //gDebugTextBox.Text += "===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n";
                 }
                 /////////////////////////////////////////////////////////////
             }
@@ -1668,8 +1714,10 @@ namespace Reversi
 				IsComplete = false;
 				AI = new AI( BLACK );
 
+                //gProcessAITurnAsync = new ProcessAITurnDelegate(this.ProcessAITurn);
+
                 // Reset the board image to clear any pieces from previous games
-                BoardGFX.DrawImage( BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
+                gBoardGFX.DrawImage( BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
 
                 // Reset the board that tracks which pieces have been drawn on the screen
                 LastDrawnBoard = new Board(BoardSize);
@@ -1708,6 +1756,20 @@ namespace Reversi
                         CurrentGame.Winner = EMPTY;
                 }
 
+                if (IsComplete)
+                {
+                    if (Winner == EMPTY)
+                    {
+                        gCurrentTurnLabel.Text = "Tie";
+                        gCurrentTurnImage.Visible = false;
+                    }
+                    else
+                    {
+                        gCurrentTurnLabel.Text = "Winner";
+                        UpdateTurnImage(Winner);
+                    }
+                }
+
                 return (CurrentGame.IsComplete);
             }
 
@@ -1724,77 +1786,48 @@ namespace Reversi
             {
                 TurnInProgress = true;
 
-                if (!CurrentGame.IsComplete)
+                if (!IsComplete)
                 {
                     // As long as this isn't an AI turn, process the requested move
-                    if (!((CurrentGame.VsComputer) && (CurrentGame.CurrentTurn == CurrentGame.AI.color)))
+                    if (!((VsComputer) && (CurrentTurn == AI.color)))
                     {
-                        if (CurrentGame.GameBoard.MovePossible(CurrentGame.CurrentTurn))
+                        if (GameBoard.MovePossible(CurrentTurn))
                         {
-                            if (CurrentGame.GameBoard.MakeMove(x, y, CurrentGame.CurrentTurn))
+                            if (GameBoard.MakeMove(x, y, CurrentTurn))
                             {
-                                CurrentGame.SwitchTurn();
+                                SwitchTurn();
                             }
                         }
                         else
                         {
-                            CurrentGame.SwitchTurn();
+                            SwitchTurn();
                         }
 
-                        CurrentGame.GameBoard.RefreshPieces();
+                        GameBoard.RefreshPieces();
                         UpdateScoreBoard();
-
                     }
 
-                    if ((CurrentGame.VsComputer) && (CurrentGame.CurrentTurn == CurrentGame.AI.color))
-                    {
-                        while (CurrentGame.GameBoard.MovePossible(CurrentGame.AI.color))
-                        {
-                            Point AIMove = CurrentGame.AI.Move(CurrentGame);
-
-                            DebugText.Text = CurrentGame.AI.AIDebug;
-                            DebugText.Text += "\nOutside class...\nPlacing " + CurrentGame.GetTurnString(CurrentGame.CurrentTurn) + " AI piece at (" + AIMove.X + "," + AIMove.Y + ")\n";
-
-                            CurrentGame.GameBoard.MakeMove(AIMove.X, AIMove.Y, CurrentGame.CurrentTurn);
-
-                            DebugText.Text += "\nResult Board:\n" + CurrentGame.GameBoard.ToString() + "\n\n";
-
-                            if (CurrentGame.GameBoard.MovePossible(CurrentGame.NextTurn))
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                CurrentGame.GameBoard.RefreshPieces();
-
-                                DebugText.Text += "------------\n" + CurrentGame.NextTurn + " CANNOT MOVE!  AI moving again\n------------\n";
-                            }
-                        }
-
-                        CurrentGame.SwitchTurn();
-                        CurrentGame.GameBoard.RefreshPieces();
-                        UpdateScoreBoard();
-                        DebugText.Text += "------------\nAI " + CurrentGame.GetTurnString(CurrentGame.AI.color) + " turn over!  allowing human player to move\n############\n";
-                    }
-
-                    CurrentGame.DetermineWinner();
-                }
-
-                if (CurrentGame.IsComplete)
-                {
-                    if (CurrentGame.Winner == EMPTY)
-                    {
-                        gCurrentTurnLabel.Text = "Tie";
-                        gCurrentTurnImage.Visible = false;
-                    }
+                    if ((VsComputer) && (CurrentTurn == AI.color))
+                        gAITurnMonitor.RunWorkerAsync();
                     else
-                    {
-                        gCurrentTurnLabel.Text = "Winner";
-                        UpdateTurnImage(CurrentGame.Winner);
-                    }
-                }
+                        TurnInProgress = false;
 
-                TurnInProgress = false;
+                    DetermineWinner();
+                }
+            }
+
+            public void ProcessAITurn()
+            {
+                while (GameBoard.MovePossible(AI.color))
+                {
+                    Point AIMove = AI.Move(this);
+                    GameBoard.MakeMove(AIMove.X, AIMove.Y, CurrentTurn);
+
+                    if (GameBoard.MovePossible(CurrentGame.NextTurn))
+                        break;
+                    else
+                        gAITurnMonitor.ReportProgress(0);
+                }
             }
 
 			public void SwitchTurn()
@@ -1939,7 +1972,7 @@ namespace Reversi
 		private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
 		{
 			CurrentGame = new Game( 8 );
-			DebugText.Text = "";
+			gDebugText.Text = "";
 			CurrentGame.GameBoard.ClearBoard();
 			CurrentGame.GameBoard.PutPiece( 0, 0, BLACK );
             CurrentGame.GameBoard.PutPiece( 0, 1, BLACK );
@@ -1974,10 +2007,42 @@ namespace Reversi
             DBBuildWorker.RunWorkerAsync(getBoardSize());
         }
 
+        // Starts the database background worker (button press)
+        private void DBBuildWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            StartBuildDB(Convert.ToInt32(e.Argument.ToString()));
+        }
+
+        // Starts the database build background worker
+        private void StartBuildDB(int BoardSize = 4)
+        {
+            CurrentGame = new Game(BoardSize);
+            CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
+        }
+
+        // Called from within the database build background woker to report the progress of the build
+        private void DBBuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            simTimerLabel.Text = TimeSpan.FromTicks(e.ProgressPercentage).ToString(@"hh\:mm\:ss");
+
+            if (e.UserState.ToString() != "")
+                gDebugText.Text += e.UserState.ToString();
+
+            nodeCounter.Text = CurrentGame.AI.NodeMasterList.Count.ToString();
+            workCounter.Text = CurrentGame.AI.WorkNodes.Count.ToString();
+            victoryCounter.Text = CurrentGame.AI.LeafTotal.ToString();
+        }
+
+        // Runs when the database background worker thread is finished
+        private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            ClearSimulationForm();
+        }
+
         // Dumps the database information to the debug window
         private void dumpDBInfoButton_Click(object sender, EventArgs e)
         {
-            DebugText.Text += CurrentGame.AI.DumpSimulationInfo();
+            gDebugText.Text += CurrentGame.AI.DumpSimulationInfo();
         }
 
         // Responds to the analyze database button press
@@ -1985,19 +2050,6 @@ namespace Reversi
         {
             SetupSimulationForm();
             DBAnalysisWorker.RunWorkerAsync();
-        }
-
-        // Starts the database background worker (button press)
-        private void DBBuildWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            StartBuildDB(Convert.ToInt32( e.Argument.ToString()));
-        }
-
-        // Starts the database build background worker
-        private void StartBuildDB( int BoardSize = 4 )
-        {
-            CurrentGame = new Game( BoardSize );
-            CurrentGame.AI.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
         }
 
         // Cancels any of the background jobs that are currently running
@@ -2021,26 +2073,7 @@ namespace Reversi
         private void DBAnalysisWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Boolean DisplayDebug = true;
-            CurrentGame.AI.AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, DebugText, DisplayDebug);
-        }
-
-        // Called from within the database build background woker to report the progress of the build
-        private void DBBuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            simTimerLabel.Text = TimeSpan.FromTicks(e.ProgressPercentage).ToString(@"hh\:mm\:ss");
-
-            if (e.UserState.ToString() != "")
-                DebugText.Text += e.UserState.ToString();
-
-            nodeCounter.Text = CurrentGame.AI.NodeMasterList.Count.ToString();
-            workCounter.Text = CurrentGame.AI.WorkNodes.Count.ToString();
-            victoryCounter.Text = CurrentGame.AI.LeafTotal.ToString();
-        }
-
-        // Runs when the database background worker thread is finished
-        private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            ClearSimulationForm();
+            CurrentGame.AI.AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, gDebugText, DisplayDebug);
         }
 
         private void ClearSimulationForm()
@@ -2097,7 +2130,7 @@ namespace Reversi
             if ((float)RAMUsageBar.Value / (float)RAMUsageBar.Maximum < Properties.Settings.Default.MemoryFloor)
             {
                 cancelAIWorkers();
-                DebugText.Text += "#####   DB Build Aborted: Memory floor reached (" + RAMUsageBar.Value.ToString("0,0.") + " KB free)  #####";
+                gDebugText.Text += "#####   DB Build Aborted: Memory floor reached (" + RAMUsageBar.Value.ToString("0,0.") + " KB free)  #####";
             }
 
             Graphics RAMGfx = RAMUsageBar.CreateGraphics();
@@ -2148,5 +2181,43 @@ namespace Reversi
         }
         #endregion
 
+
+        private void AITurnWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            CurrentGame.AI.DetermineNextMove( CurrentGame );
+        }
+
+        // Called to report progress on the individual move analysis
+        private void AITurnWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+
+        private void AITurnWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+
+        }
+
+        // Called asynchronously when it is time for the AI to wake up and do some work
+        private void AITurnMonitor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            CurrentGame.ProcessAITurn();
+        }
+
+        // Called every time the AI monitor has a move to render
+        private void AITurnMonitor_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            CurrentGame.GameBoard.RefreshPieces();
+        }
+
+        // Called when the AI monitor has no more moves to place
+        private void AITurnMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            CurrentGame.SwitchTurn();
+            CurrentGame.GameBoard.RefreshPieces();
+            CurrentGame.UpdateScoreBoard();
+
+            CurrentGame.TurnInProgress = false;
+        }
     }
 }
