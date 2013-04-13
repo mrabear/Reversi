@@ -95,7 +95,6 @@ namespace Reversi
         private Label whiteScoreBoardTitle;
         private Label whiteScoreBoard;
         private Label blackScoreBoard;
-        private BackgroundWorker AITurnWorker;
         private BackgroundWorker AITurnMonitor;
         private PictureBox whitePieceImg;
         #endregion
@@ -166,7 +165,6 @@ namespace Reversi
             this.whiteScoreBoardTitle = new System.Windows.Forms.Label();
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
-            this.AITurnWorker = new System.ComponentModel.BackgroundWorker();
             this.AITurnMonitor = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -716,12 +714,6 @@ namespace Reversi
             this.blackScoreBoard.Text = "0";
             this.blackScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // AITurnWorker
-            // 
-            this.AITurnWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.AITurnWorker_DoWork);
-            this.AITurnWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnWorker_ProgressChanged);
-            this.AITurnWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnWorker_RunWorkerCompleted);
-            // 
             // AITurnMonitor
             // 
             this.AITurnMonitor.DoWork += new System.ComponentModel.DoWorkEventHandler(this.AITurnMonitor_DoWork);
@@ -786,12 +778,12 @@ namespace Reversi
             gBlackScoreBoard = blackScoreBoard;
             gCurrentTurnImage = CurrentTurnImage;
             gCurrentTurnLabel = CurrentTurnLabel;
-            gAITurnWorker = AITurnWorker;
+            //gAITurnWorker = AITurnWorker;
             //gAITurnTrigger = AITurnTrigger;
             gAITurnMonitor = AITurnMonitor;
 
-            AITurnWorker.WorkerSupportsCancellation = true;
-            AITurnWorker.WorkerReportsProgress = true;
+            //AITurnWorker.WorkerSupportsCancellation = true;
+            //AITurnWorker.WorkerReportsProgress = true;
             AITurnMonitor.WorkerSupportsCancellation = true;
             AITurnMonitor.WorkerReportsProgress = true;
 
@@ -1257,7 +1249,8 @@ namespace Reversi
 			{
                 ProcessingTurn = true;
 
-                gAITurnWorker.RunWorkerAsync();
+                DetermineNextMove( SourceGame );
+                //gAITurnWorker.RunWorkerAsync();
 
                 while(ProcessingTurn);
 
@@ -2181,23 +2174,6 @@ namespace Reversi
             NewGameTimer.Enabled = false;
         }
         #endregion
-
-
-        private void AITurnWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            CurrentGame.AI.DetermineNextMove( CurrentGame );
-        }
-
-        // Called to report progress on the individual move analysis
-        private void AITurnWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-        }
-
-        private void AITurnWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-
-        }
 
         // Called asynchronously when it is time for the AI to wake up and do some work
         private void AITurnMonitor_DoWork(object sender, DoWorkEventArgs e)
