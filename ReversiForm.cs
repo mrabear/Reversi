@@ -1,5 +1,6 @@
 // Reversi
 // Brian Hebert
+//
 
 using System;
 using System.Drawing;
