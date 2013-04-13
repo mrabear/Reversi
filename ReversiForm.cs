@@ -723,7 +723,7 @@ namespace Reversi
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(741, 435);
+            this.ClientSize = new System.Drawing.Size(741, 433);
             this.Controls.Add(this.whiteScoreBoardTitle);
             this.Controls.Add(this.blackScoreBoardTitle);
             this.Controls.Add(this.CurrentTurnImage);
@@ -736,6 +736,7 @@ namespace Reversi
             this.Controls.Add(this.unusedGrid);
             this.Controls.Add(this.whiteScoreBoard);
             this.Controls.Add(this.blackScoreBoard);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Menu = this.mainDropDownMenu;
@@ -1260,12 +1261,6 @@ namespace Reversi
             // Determine the best move possible for the given game
             public void AnalyzeBoard( Game SourceGame )
             {
-                Thread.Sleep(750);
-                /*AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
-                          SourceGame.GetTurnString(color) + "\n" +
-                          "AI is set to difficulty level " + SourceGame.Difficulty + "\n" +
-                          "\nInherited Game Board:\n" + SourceGame.GameBoard.ToString() + "\n";*/
-                
                 Point[] PossibleMoves = SourceGame.GameBoard.AvailableMoves(SourceGame.CurrentTurn);
 	
 				if( PossibleMoves.Length < 1 )
@@ -1273,56 +1268,84 @@ namespace Reversi
 					NextMove = new Point( -1, -1 );
 				}
 				
-				// This is just a gameplay hack to get by...all the AI is doing at this point is
-				// gathering a list of all possible moves and then picking the first move off of
-				// that list.  This line should be replaced with algorithims to determine which
-				// of the available moves is best.
            		Point ChosenMove = PossibleMoves[0];
-                Boolean MoveFound = false;
-                Point ChildChosenMove;
-                Point[] ChildPossibleMoves;
-                Board ChildBoard = new Board( CurrentGame.GameBoard );
-                int CurrentWeight = 0;
-                int ChildTurn;
+                Board SimBoard = new Board( CurrentGame.GameBoard );
+                double CurrentWeight, BestWeight = 0;
 
                 //AIDebug += "\nPossible Moves:\n";
                 foreach (Point CurrentPoint in PossibleMoves)
                 {
                     //AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
+                    SimBoard.CopyBoard(CurrentGame.GameBoard);
 
-                    CurrentWeight += BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
+                    SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.CurrentTurn);
 
-                    if (BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > BoardValueMask[ChosenMove.X, ChosenMove.Y])
-                    {
-                        ChildTurn = CurrentGame.CurrentTurn == WHITE ? BLACK : WHITE;
+                    CurrentWeight = EvaluatePotentialMove(SimBoard, SourceGame.CurrentTurn);
 
-                        ChildBoard.CopyBoard(CurrentGame.GameBoard);
-
-                        ChildBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, ChildTurn);
-                        ChildPossibleMoves = ChildBoard.AvailableMoves(ChildTurn);
-                        ChildChosenMove = new Point(0, 1);
-
-                        foreach (Point ChildPoint in ChildPossibleMoves)
-                        {
-                            if ((BoardValueMask[ChildPoint.X, ChildPoint.Y] > BoardValueMask[ChildChosenMove.X, ChildChosenMove.Y])  || ( !MoveFound ))
-                            {
-                                ChildChosenMove = ChildPoint;
-                            }
-                        }
-
-                        if( ( BoardValueMask[CurrentPoint.X, CurrentPoint.Y] - BoardValueMask[ChildChosenMove.X, ChildChosenMove.Y] > BoardValueMask[ChosenMove.X, ChosenMove.Y] ) || ( !MoveFound ) )
-                        {
-                            MoveFound = true;
-                            ChosenMove = CurrentPoint;
-                        }
-                    }
-
+                    if (CurrentWeight > BestWeight)
+                        ChosenMove = CurrentPoint;
                 }
 
-				//AIDebug += "\nMove Chosen: (" + ChosenMove.X + "," + ChosenMove.Y + ")\n";
-                 
                 NextMove = ChosenMove;
                 ProcessingTurn = false;
+            }
+
+            private double WeightMove(int X, int Y, int SimulationDepth, int WeightOverride = 0)
+            {
+                double SimStep = Math.Floor((double)SimulationDepth / 2);
+                double MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
+
+                return ((SimulationDepth % 2 == 0 ? -1 : 1) * (WeightOverride !=0 ? WeightOverride : BoardValueMask[X, Y]) * (( MaxStep - SimStep ) / MaxStep ));
+            }
+
+            private double EvaluatePotentialMove(Board CurrentBoard, int Turn, int SimulationDepth = 1)
+            {
+                /*if (SimulationCycles % 5000 == 0)
+                    Console.WriteLine("Simuldation Depth:" + SimulationDepth);*/
+
+                if (SimulationDepth >= Properties.Settings.Default.MaxDepth)
+                {
+                    return (0);
+                }
+                // If there are still moves left for the current player, start a new simulation for each of them
+                else if (CurrentBoard.MovePossible(Turn))
+                {
+                    Point[] PossibleMoves = CurrentBoard.AvailableMoves(Turn);
+                    double  TotalWeight = 0;
+                    Board SimulationBoard;
+
+                    for (int lc = 0; lc < PossibleMoves.Length; lc++)
+                    {
+                        // Make a copy of the current board
+                        SimulationBoard = new Board(CurrentBoard);
+
+                        // Place the current move on the new board
+                        SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
+
+                        // Start a simulation for the next player with the updated board
+                        TotalWeight += WeightMove(PossibleMoves[lc].X, PossibleMoves[lc].Y, SimulationDepth) + EvaluatePotentialMove(SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
+                    }
+                    return (TotalWeight);
+                }
+                // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
+                else if (CurrentBoard.MovePossible(Turn == WHITE ? BLACK : WHITE))
+                {
+                    //Console.WriteLine( (Turn == WHITE ? "White" : "Black") + " cannot move, passing");
+
+                    return( EvaluatePotentialMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1) );
+                }
+                // If there are no moves left in the game, collapse the simulation
+                else
+                {
+                    if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == WHITE ? BLACK : WHITE))
+                    {
+                        return( WeightMove(-1,-1,SimulationDepth,Properties.Settings.Default.VictoryWeight));
+                    }
+                    else
+                    {
+                        return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight * -1));
+                    }
+                }
             }
 
             public String DumpSimulationInfo()
@@ -1608,78 +1631,6 @@ namespace Reversi
                     //gDebugTextBox.Text += "===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n";
                 }
                 /////////////////////////////////////////////////////////////
-            }
-
-            private int SimulateGameMove(Board CurrentBoard, int Turn )
-            {
-                SimulationCycles++;
-                SimulationDepth++;
-
-                if( SimulationCycles % 5000 == 0 )
-                    Console.WriteLine(SimulationCycles + " Sim cycles in: " + WinnerTotal + " winners / " + LoserTotal + " losers" );
-
-                if (!BlackMoves.ContainsKey(CurrentBoard.GetID()))
-                {
-                    BlackMoves.Add(CurrentBoard.GetID(), 0);
-                }
-
-                // If there are still moves left for the current player, start a new simulation for each of them
-                if ( CurrentBoard.MovePossible( Turn ) )
-                {
-                    Point[] PossibleMoves = CurrentBoard.AvailableMoves( Turn );
-
-                    for (int lc = 0; lc < PossibleMoves.Length; lc++)
-                    {
-                        // Make a copy of the current board
-                        SimulationBoard = new Board(CurrentBoard);
-
-                        // Place the current move on the new board
-                        SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
-
-                        if (!BlackMoves.ContainsKey(SimulationBoard.GetID()))
-                        {
-                            BlackMoves.Add(SimulationBoard.GetID(), 0);
-                        }
-
-                        //Console.WriteLine( (Turn == WHITE ? "White" : "Black" ) + " moved to (" + PossibleMoves[lc].X + "," + PossibleMoves[lc].Y + ")");
-
-                        // Start a simulation for the next player with the updated board
-                        BlackMoves[CurrentBoard.GetID()] += SimulateGameMove(SimulationBoard, Turn == WHITE ? BLACK : WHITE);
-                    }
-
-                    SimulationDepth--;
-                    return (BlackMoves[CurrentBoard.GetID()]);
-                }
-
-                // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
-                else if (CurrentBoard.MovePossible( Turn == WHITE ? BLACK : WHITE)) 
-                {
-                    //Console.WriteLine( (Turn == WHITE ? "White" : "Black") + " cannot move, passing");
-
-                    BlackMoves[CurrentBoard.GetID()] += SimulateGameMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE);
-
-                    SimulationDepth--;
-                    return ( BlackMoves[CurrentBoard.GetID()] ) ;
-                }
-                // If there are no moves left in the game, collapse the simulation
-                else
-                {
-                    if (CurrentBoard.FindScore(BLACK) > CurrentBoard.FindScore(WHITE))
-                    {
-                        //Console.WriteLine(" ### Black Wins");
-                        BlackMoves[CurrentBoard.GetID()] += 1;
-                        SimulationDepth--;
-                        WinnerTotal++;
-                        return (1);
-                    }
-                    else
-                    {
-                        //Console.WriteLine(" ### Black Loses");
-                        SimulationDepth--;
-                        LoserTotal++;
-                        return (0);
-                    }
-                }
             }
 		}
 
