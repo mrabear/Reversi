@@ -40,9 +40,9 @@ namespace Reversi
         private PictureBox BoardPicture;
         private IContainer components;
         public System.Windows.Forms.Timer NewGameTimer;
-        private System.Windows.Forms.MainMenu mainMenu1;
-        private System.Windows.Forms.MenuItem menuItem1;
-        private System.Windows.Forms.MenuItem menuItem2;
+        private System.Windows.Forms.MainMenu mainDropDownMenu;
+        private System.Windows.Forms.MenuItem fileDropDownMenu;
+        private System.Windows.Forms.MenuItem gameSetupDropDownMenu;
         private System.Windows.Forms.MenuItem menuItem8;
         private System.Windows.Forms.MenuItem DiffMenu_Easy;
         private System.Windows.Forms.MenuItem DiffMenu_Normal;
@@ -53,7 +53,7 @@ namespace Reversi
         private System.Windows.Forms.MenuItem PvCMenu;
         private System.Windows.Forms.MenuItem ExitMenu;
         private System.Windows.Forms.MenuItem NewGameMenu;
-        private System.Windows.Forms.MenuItem menuItem3;
+        private System.Windows.Forms.MenuItem debugDropDownMenu;
         private System.Windows.Forms.MenuItem DebugSkip;
         private System.Windows.Forms.MenuItem DebugProcess;
         public RichTextBox DebugAITrace;
@@ -95,7 +95,7 @@ namespace Reversi
         private Label whiteScoreBoardTitle;
         private Label whiteScoreBoard;
         private Label blackScoreBoard;
-        private BackgroundWorker AITurnMonitor;
+        private BackgroundWorker AITurnWorker;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -109,11 +109,11 @@ namespace Reversi
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
             this.BoardPicture = new System.Windows.Forms.PictureBox();
             this.Title = new System.Windows.Forms.Label();
-            this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
-            this.menuItem1 = new System.Windows.Forms.MenuItem();
+            this.mainDropDownMenu = new System.Windows.Forms.MainMenu(this.components);
+            this.fileDropDownMenu = new System.Windows.Forms.MenuItem();
             this.NewGameMenu = new System.Windows.Forms.MenuItem();
             this.ExitMenu = new System.Windows.Forms.MenuItem();
-            this.menuItem2 = new System.Windows.Forms.MenuItem();
+            this.gameSetupDropDownMenu = new System.Windows.Forms.MenuItem();
             this.PvPMenu = new System.Windows.Forms.MenuItem();
             this.PvCMenu = new System.Windows.Forms.MenuItem();
             this.menuItem9 = new System.Windows.Forms.MenuItem();
@@ -122,7 +122,7 @@ namespace Reversi
             this.DiffMenu_Normal = new System.Windows.Forms.MenuItem();
             this.DiffMenu_Hard = new System.Windows.Forms.MenuItem();
             this.DiffMenu_VeryHard = new System.Windows.Forms.MenuItem();
-            this.menuItem3 = new System.Windows.Forms.MenuItem();
+            this.debugDropDownMenu = new System.Windows.Forms.MenuItem();
             this.DebugSkip = new System.Windows.Forms.MenuItem();
             this.DebugProcess = new System.Windows.Forms.MenuItem();
             this.menuItem4 = new System.Windows.Forms.MenuItem();
@@ -165,7 +165,7 @@ namespace Reversi
             this.whiteScoreBoardTitle = new System.Windows.Forms.Label();
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
-            this.AITurnMonitor = new System.ComponentModel.BackgroundWorker();
+            this.AITurnWorker = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -196,20 +196,20 @@ namespace Reversi
             this.Title.Text = "Reversi";
             this.Title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // mainMenu1
+            // mainDropDownMenu
             // 
-            this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
-            this.menuItem1,
-            this.menuItem2,
-            this.menuItem3});
+            this.mainDropDownMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.fileDropDownMenu,
+            this.gameSetupDropDownMenu,
+            this.debugDropDownMenu});
             // 
-            // menuItem1
+            // fileDropDownMenu
             // 
-            this.menuItem1.Index = 0;
-            this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.fileDropDownMenu.Index = 0;
+            this.fileDropDownMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.NewGameMenu,
             this.ExitMenu});
-            this.menuItem1.Text = "File";
+            this.fileDropDownMenu.Text = "File";
             // 
             // NewGameMenu
             // 
@@ -223,15 +223,15 @@ namespace Reversi
             this.ExitMenu.Text = "E&xit";
             this.ExitMenu.Click += new System.EventHandler(this.ExitMenu_Click);
             // 
-            // menuItem2
+            // gameSetupDropDownMenu
             // 
-            this.menuItem2.Index = 1;
-            this.menuItem2.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.gameSetupDropDownMenu.Index = 1;
+            this.gameSetupDropDownMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.PvPMenu,
             this.PvCMenu,
             this.menuItem9,
             this.menuItem8});
-            this.menuItem2.Text = "Game Setup";
+            this.gameSetupDropDownMenu.Text = "Game Setup";
             // 
             // PvPMenu
             // 
@@ -287,14 +287,14 @@ namespace Reversi
             this.DiffMenu_VeryHard.Text = "&Very Hard";
             this.DiffMenu_VeryHard.Click += new System.EventHandler(this.DiffMenu_VeryHardClick);
             // 
-            // menuItem3
+            // debugDropDownMenu
             // 
-            this.menuItem3.Index = 2;
-            this.menuItem3.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.debugDropDownMenu.Index = 2;
+            this.debugDropDownMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.DebugSkip,
             this.DebugProcess,
             this.menuItem4});
-            this.menuItem3.Text = "Debug";
+            this.debugDropDownMenu.Text = "Debug";
             // 
             // DebugSkip
             // 
@@ -714,11 +714,11 @@ namespace Reversi
             this.blackScoreBoard.Text = "0";
             this.blackScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // AITurnMonitor
+            // AITurnWorker
             // 
-            this.AITurnMonitor.DoWork += new System.ComponentModel.DoWorkEventHandler(this.AITurnMonitor_DoWork);
-            this.AITurnMonitor.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnMonitor_ProgressChanged);
-            this.AITurnMonitor.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnMonitor_RunWorkerCompleted);
+            this.AITurnWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.AITurnMonitor_DoWork);
+            this.AITurnWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnMonitor_ProgressChanged);
+            this.AITurnWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnMonitor_RunWorkerCompleted);
             // 
             // ReversiForm
             // 
@@ -738,7 +738,7 @@ namespace Reversi
             this.Controls.Add(this.blackScoreBoard);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Menu = this.mainMenu1;
+            this.Menu = this.mainDropDownMenu;
             this.Name = "ReversiForm";
             this.Text = "Reversi";
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).EndInit();
@@ -778,14 +778,14 @@ namespace Reversi
             gBlackScoreBoard = blackScoreBoard;
             gCurrentTurnImage = CurrentTurnImage;
             gCurrentTurnLabel = CurrentTurnLabel;
-            //gAITurnWorker = AITurnWorker;
+            gAITurnWorker = AITurnWorker;
             //gAITurnTrigger = AITurnTrigger;
-            gAITurnMonitor = AITurnMonitor;
+            //gAITurnMonitor = AITurnMonitor;
 
             //AITurnWorker.WorkerSupportsCancellation = true;
             //AITurnWorker.WorkerReportsProgress = true;
-            AITurnMonitor.WorkerSupportsCancellation = true;
-            AITurnMonitor.WorkerReportsProgress = true;
+            AITurnWorker.WorkerSupportsCancellation = true;
+            AITurnWorker.WorkerReportsProgress = true;
 
             gridSizeDropDown.SelectedIndex = 4;
             unusedGrid.SendToBack();
@@ -813,7 +813,7 @@ namespace Reversi
         private static Label gCurrentTurnLabel;
         private static PictureBox gCurrentTurnImage;
         private static BackgroundWorker gAITurnWorker;
-        private static BackgroundWorker gAITurnMonitor;
+        //private static BackgroundWorker gAITurnMonitor;
         //private static System.Windows.Forms.Timer gAITurnTrigger;
 
         //private static delegate void ProcessAITurnDelegate();
@@ -1245,11 +1245,11 @@ namespace Reversi
 			}
 
             // Return a point representing the best possible next move for this AI
-			public Point Move( Game SourceGame )
+            public Point DetermineNextMove(Game SourceGame)
 			{
                 ProcessingTurn = true;
 
-                DetermineNextMove( SourceGame );
+                AnalyzeBoard(SourceGame);
                 //gAITurnWorker.RunWorkerAsync();
 
                 while(ProcessingTurn);
@@ -1258,7 +1258,7 @@ namespace Reversi
 			}
 
             // Determine the best move possible for the given game
-            public void DetermineNextMove( Game SourceGame )
+            public void AnalyzeBoard( Game SourceGame )
             {
                 Thread.Sleep(750);
                 /*AIDebug = "---------------------\nStarting AI Move Sequence:\nAI is " +
@@ -1802,7 +1802,7 @@ namespace Reversi
                     }
 
                     if ((VsComputer) && (CurrentTurn == AI.color))
-                        gAITurnMonitor.RunWorkerAsync();
+                        gAITurnWorker.RunWorkerAsync();
                     else
                         TurnInProgress = false;
 
@@ -1814,13 +1814,13 @@ namespace Reversi
             {
                 while (GameBoard.MovePossible(AI.color))
                 {
-                    Point AIMove = AI.Move(this);
+                    Point AIMove = AI.DetermineNextMove(this);
                     GameBoard.MakeMove(AIMove.X, AIMove.Y, CurrentTurn);
 
                     if (GameBoard.MovePossible(CurrentGame.NextTurn))
                         break;
                     else
-                        gAITurnMonitor.ReportProgress(0);
+                        gAITurnWorker.ReportProgress(0);
                 }
             }
 
