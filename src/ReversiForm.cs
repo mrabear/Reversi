@@ -12,6 +12,37 @@ namespace Reversi
 {
 	public class ReversiForm : System.Windows.Forms.Form
 	{
+        #region Global Variables
+
+        // Color constants
+
+        // Static handles to graphical assets
+        private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
+        private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
+        private static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
+        private static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
+
+        // Static handles to form objects
+        private static RichTextBox gDebugText = new RichTextBox();
+        private static Graphics gBoardGFX;
+        private static Label gWhiteScoreBoard;
+        private static Label gBlackScoreBoard;
+        private static Label gCurrentTurnLabel;
+        private static PictureBox gCurrentTurnImage;
+        private static BackgroundWorker gAITurnWorker;
+
+        // The board used to track what has been drawn on the screen
+        private static Board LastDrawnBoard = new Board();
+
+        // The Global Game Object
+        private static Game CurrentGame;
+
+        // Flags that determine who is playing (ai or human)
+        private static Boolean PvC = true;
+        private static int AIDifficulty = 1;
+
+        #endregion
+
         #region Windows Form Designer generated code
         /// <summary>
         /// Clean up any resources being used.
@@ -788,37 +819,6 @@ namespace Reversi
             gridSizeDropDown.SelectedIndex = 4;
             unusedGrid.SendToBack();
         }
-
-        #region Global Variables
-
-        // Color constants
-
-        // Static handles to graphical assets
-        private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
-        private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
-        private static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
-        private static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
-
-        // Static handles to form objects
-        private static RichTextBox gDebugText = new RichTextBox();
-        private static Graphics gBoardGFX;
-        private static Label gWhiteScoreBoard;
-        private static Label gBlackScoreBoard;
-        private static Label gCurrentTurnLabel;
-        private static PictureBox gCurrentTurnImage;
-        private static BackgroundWorker gAITurnWorker;
- 
-        // The board used to track what has been drawn on the screen
-        private static Board LastDrawnBoard = new Board();
-
-        // The Global Game Object
-        private static Game CurrentGame;
-
-        // Flags that determine who is playing (ai or human)
-        private static Boolean PvC = true;
-        private static int AIDifficulty = 1;
-
-        #endregion
 
         #region Getters and Setters
 

@@ -203,8 +203,8 @@ namespace Reversi
             //Board CurrentBoard = new Board();
             int ParentTurn = Properties.Settings.Default.WHITE;
             SimulationNode ParentNode = new SimulationNode(new Board(BoardSize), ParentTurn);
-            String ParentNodeID = ParentNode.NodeID;
-            String RootNodeID = ParentNode.NodeID;
+            String ParentNodeID = ParentNode.getNodeID();
+            String RootNodeID = ParentNode.getNodeID();
 
             int ChildTurn = Properties.Settings.Default.BLACK;
             //String ChildNodeID;
@@ -248,59 +248,59 @@ namespace Reversi
                 ParentNode = NodeMasterList[ParentNodeID];
 
                 // Set the child turn to be the next player
-                ChildTurn = (ParentNode.Turn == Properties.Settings.Default.WHITE) ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE;
+                ChildTurn = (ParentNode.getTurn() == Properties.Settings.Default.WHITE) ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE;
 
                 //if (NodeMasterList.Count % 10 == 0)
                 //Console.WriteLine("Turn " + (ParentNode.Turn == Properties.Settings.Default.WHITE ? "White" : "Black") + "\nScore: B-" + ParentNode.Board.FindScore(Properties.Settings.Default.BLACK) + " W-" + ParentNode.Board.FindScore(Properties.Settings.Default.WHITE)  + "\n======================\n" + ParentNode.Board.ToString() );
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ReversiForm.RefreshPieces(ParentNode.GameBoard);
+                    ReversiForm.RefreshPieces(ParentNode.getGameBoard());
 
-                if (ParentNode.AvailableMoves.Length == 0)
+                if (ParentNode.getAvailableMoves().Length == 0)
                 {
-                    ParentNode.isPassTurn = true;
+                    ParentNode.setIsPassTurn( true );
 
-                    ChildNode = new SimulationNode(ParentNode.GameBoard, ChildTurn);
+                    ChildNode = new SimulationNode(ParentNode.getGameBoard(), ChildTurn);
 
-                    if (ChildNode.AvailableMoves.Length > 0)
+                    if (ChildNode.getAvailableMoves().Length > 0)
                     {
 
-                        if (NodeMasterList.ContainsKey(ChildNode.NodeID))
+                        if (NodeMasterList.ContainsKey(ChildNode.getNodeID()))
                         {
                             // Since the node already exists, just add the current parent to it's parent node list
-                            if (!NodeMasterList[ChildNode.NodeID].ContainsParent(ParentNode.NodeID))
-                                NodeMasterList[ChildNode.NodeID].AddParentNode(ParentNode.NodeID);
+                            if (!NodeMasterList[ChildNode.getNodeID()].ContainsParent(ParentNode.getNodeID()))
+                                NodeMasterList[ChildNode.getNodeID()].AddParentNode(ParentNode.getNodeID());
                         }
                         else
                         {
                             // Add the new node to the master list
-                            NodeMasterList.Add(ChildNode.NodeID, ChildNode);
+                            NodeMasterList.Add(ChildNode.getNodeID(), ChildNode);
 
                             // Add the new node to the work list for eventual processing
-                            WorkNodes.Enqueue(ChildNode.NodeID);
+                            WorkNodes.Enqueue(ChildNode.getNodeID());
                         }
 
                         // Add this child to the parent's child node list
-                        if (!ParentNode.ContainsChild(ChildNode.NodeID))
-                            ParentNode.AddChildNode(ChildNode.NodeID);
+                        if (!ParentNode.ContainsChild(ChildNode.getNodeID()))
+                            ParentNode.AddChildNode(ChildNode.getNodeID());
 
                         // Add the new node to the work list for eventual processing
-                        WorkNodes.Enqueue(ChildNode.NodeID);
+                        WorkNodes.Enqueue(ChildNode.getNodeID());
                     }
                     else
                     {
-                        ParentNode.isLeaf = true;
+                        ParentNode.setIsLeaf( true );
                         LeafTotal++;
 
-                        if (ParentNode.GameBoard.FindScore(Properties.Settings.Default.BLACK) > ParentNode.GameBoard.FindScore(Properties.Settings.Default.WHITE))
+                        if (ParentNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK) > ParentNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE))
                         {
-                            ParentNode.BlackWins++;
+                            ParentNode.setBlackWins( ParentNode.getBlackWins() + 1 );
                             BlackWinnerTotal++;
                         }
-                        else if (ParentNode.GameBoard.FindScore(Properties.Settings.Default.BLACK) < ParentNode.GameBoard.FindScore(Properties.Settings.Default.WHITE))
+                        else if (ParentNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK) < ParentNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE))
                         {
-                            ParentNode.WhiteWins++;
+                            ParentNode.setWhiteWins( ParentNode.getWhiteWins() + 1 );
                             WhiteWinnerTotal++;
                         }
                         else
@@ -311,29 +311,29 @@ namespace Reversi
                 }
                 else
                 {
-                    foreach (Point CurrentMove in ParentNode.AvailableMoves)
+                    foreach (Point CurrentMove in ParentNode.getAvailableMoves())
                     {
-                        ChildBoard = new Board(ParentNode.GameBoard);
+                        ChildBoard = new Board(ParentNode.getGameBoard());
                         ChildBoard.PutPiece(CurrentMove.X, CurrentMove.Y, ChildTurn);
                         ChildNode = new SimulationNode(ChildBoard, ChildTurn);
 
                         // Add this child to the parent's child node list
-                        if (!ParentNode.ContainsChild(ChildNode.NodeID))
-                            ParentNode.AddChildNode(ChildNode.NodeID);
+                        if (!ParentNode.ContainsChild(ChildNode.getNodeID()))
+                            ParentNode.AddChildNode(ChildNode.getNodeID());
 
-                        if (NodeMasterList.ContainsKey(ChildNode.NodeID))
+                        if (NodeMasterList.ContainsKey(ChildNode.getNodeID()))
                         {
                             // Since the node already exists, just add the current parent to it's parent node list
-                            if (!NodeMasterList[ChildNode.NodeID].ContainsParent(ParentNode.NodeID))
-                                NodeMasterList[ChildNode.NodeID].AddParentNode(ParentNode.NodeID);
+                            if (!NodeMasterList[ChildNode.getNodeID()].ContainsParent(ParentNode.getNodeID()))
+                                NodeMasterList[ChildNode.getNodeID()].AddParentNode(ParentNode.getNodeID());
                         }
                         else
                         {
                             // Add the new node to the master list
-                            NodeMasterList.Add(ChildNode.NodeID, ChildNode);
+                            NodeMasterList.Add(ChildNode.getNodeID(), ChildNode);
 
                             // Add the new node to the work list for eventual processing
-                            WorkNodes.Enqueue(ChildNode.NodeID);
+                            WorkNodes.Enqueue(ChildNode.getNodeID());
                         }
                     }
                 }
@@ -374,11 +374,11 @@ namespace Reversi
 
             foreach (String CurrentNodeID in NodeMasterList.Keys)
             {
-                if (NodeMasterList[CurrentNodeID].isLeaf)
-                    LeafNodes.Enqueue(NodeMasterList[CurrentNodeID].NodeID);
+                if (NodeMasterList[CurrentNodeID].getIsLeaf())
+                    LeafNodes.Enqueue(NodeMasterList[CurrentNodeID].getNodeID());
 
-                NodeMasterList[CurrentNodeID].BlackWins = 0;
-                NodeMasterList[CurrentNodeID].WhiteWins = 0;
+                NodeMasterList[CurrentNodeID].setBlackWins( 0 );
+                NodeMasterList[CurrentNodeID].setWhiteWins( 0 );
             }
 
             /////////////////////////////////////////////////////////////
@@ -410,12 +410,12 @@ namespace Reversi
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ReversiForm.RefreshPieces( CurrentLeafNode.GameBoard );
+                    ReversiForm.RefreshPieces( CurrentLeafNode.getGameBoard() );
 
                 // Find who the winner of the leaf node is
-                if (CurrentLeafNode.GameBoard.FindScore(Properties.Settings.Default.WHITE) > CurrentLeafNode.GameBoard.FindScore(Properties.Settings.Default.BLACK))
+                if (CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE) > CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK))
                     WinningColor = Properties.Settings.Default.WHITE;
-                else if (CurrentLeafNode.GameBoard.FindScore(Properties.Settings.Default.WHITE) < CurrentLeafNode.GameBoard.FindScore(Properties.Settings.Default.BLACK))
+                else if (CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE) < CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK))
                     WinningColor = Properties.Settings.Default.BLACK;
                 else
                     WinningColor = -1;
@@ -431,11 +431,11 @@ namespace Reversi
                         CurrentWorkNodeID = WorkNodes.Dequeue();
 
                         if (WinningColor == Properties.Settings.Default.BLACK)
-                            NodeMasterList[CurrentWorkNodeID].BlackWins++;
+                            NodeMasterList[CurrentWorkNodeID].setBlackWins( NodeMasterList[CurrentWorkNodeID].getBlackWins() + 1 );
                         else
-                            NodeMasterList[CurrentWorkNodeID].WhiteWins++;
+                            NodeMasterList[CurrentWorkNodeID].setWhiteWins(NodeMasterList[CurrentWorkNodeID].getWhiteWins() + 1);
 
-                        foreach (String ParentNode in NodeMasterList[CurrentWorkNodeID].ParentNodes)
+                        foreach (String ParentNode in NodeMasterList[CurrentWorkNodeID].getParentNodes())
                             WorkNodes.Enqueue(ParentNode);
                     }
                 }
