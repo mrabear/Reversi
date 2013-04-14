@@ -99,4 +99,5 @@ namespace Reversi
             isTrunk = false;
         }
     }
+
 }

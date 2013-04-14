@@ -11,6 +11,10 @@ namespace Reversi
     // Description: Stores the game board and all of the methods to manipulate it
     public class Board
     {
+        private static int BLACK = Properties.Settings.Default.BLACK;
+        private static int WHITE = Properties.Settings.Default.WHITE;
+        private static int EMPTY = Properties.Settings.Default.EMPTY;
+
         // The array of pieces that represents the board state
         private int[,] BoardPieces;
 
@@ -112,7 +116,7 @@ namespace Reversi
         public int ColorAt(int x, int y)
         {
             if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
-                return Properties.Settings.Default.EMPTY;
+                return EMPTY;
 
             return (BoardPieces[x, y]);
         }
@@ -123,13 +127,13 @@ namespace Reversi
             int CurrentTurn = color;
             int NextTurn;
 
-            if (CurrentTurn == Properties.Settings.Default.WHITE)
-                NextTurn = Properties.Settings.Default.BLACK;
+            if (CurrentTurn == WHITE)
+                NextTurn = BLACK;
             else
-                NextTurn = Properties.Settings.Default.WHITE;
+                NextTurn = WHITE;
 
             // Check for already existing piece
-            if (ColorAt(x, y) != Properties.Settings.Default.EMPTY)
+            if (ColorAt(x, y) != EMPTY)
                 return false;
 
             Boolean findStatus = false;
@@ -196,7 +200,7 @@ namespace Reversi
             int foundMoves = 0;
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == Properties.Settings.Default.EMPTY)
+                    if (ColorAt(X, Y) == EMPTY)
                         if (MakeMove(X, Y, CurrentTurn, false))
                         {
                             Moves[foundMoves] = new Point(X, Y);
@@ -215,7 +219,7 @@ namespace Reversi
         {
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == Properties.Settings.Default.EMPTY)
+                    if (ColorAt(X, Y) == EMPTY)
                         if (MakeMove(X, Y, color, false))
                             return true;
 
@@ -225,10 +229,10 @@ namespace Reversi
         // Places a piece at the given location
         public void PutPiece(int x, int y, int color)
         {
-            if ((color == Properties.Settings.Default.WHITE) || (color == Properties.Settings.Default.BLACK))
+            if ((color == WHITE) || (color == BLACK))
                 BoardPieces[x, y] = color;
             else
-                BoardPieces[x, y] = Properties.Settings.Default.EMPTY;
+                BoardPieces[x, y] = EMPTY;
         }
 
         // Empty the board
@@ -242,25 +246,52 @@ namespace Reversi
         {
             if (BoardSize == 8)
             {
-                PutPiece(3, 3, Properties.Settings.Default.WHITE);
-                PutPiece(4, 4, Properties.Settings.Default.WHITE);
-                PutPiece(3, 4, Properties.Settings.Default.BLACK);
-                PutPiece(4, 3, Properties.Settings.Default.BLACK);
+                PutPiece(3, 3, WHITE);
+                PutPiece(4, 4, WHITE);
+                PutPiece(3, 4, BLACK);
+                PutPiece(4, 3, BLACK);
             }
             else if (BoardSize == 6)
             {
-                PutPiece(2, 2, Properties.Settings.Default.WHITE);
-                PutPiece(3, 3, Properties.Settings.Default.WHITE);
-                PutPiece(2, 3, Properties.Settings.Default.BLACK);
-                PutPiece(3, 2, Properties.Settings.Default.BLACK);
+                PutPiece(2, 2, WHITE);
+                PutPiece(3, 3, WHITE);
+                PutPiece(2, 3, BLACK);
+                PutPiece(3, 2, BLACK);
             }
             else
             {
-                PutPiece(1, 1, Properties.Settings.Default.WHITE);
-                PutPiece(2, 2, Properties.Settings.Default.WHITE);
-                PutPiece(1, 2, Properties.Settings.Default.BLACK);
-                PutPiece(2, 1, Properties.Settings.Default.BLACK);
+                PutPiece(1, 1, WHITE);
+                PutPiece(2, 2, WHITE);
+                PutPiece(1, 2, BLACK);
+                PutPiece(2, 1, BLACK);
             }
+        }
+
+        // Redraw the piece images on the board
+        public void RefreshPieces()
+        {
+            //Board lastdrawn = new Board(LastDrawnBoard);
+            Image PieceImage = ReversiForm.WhitePieceImage;
+
+            for (int Y = 0; Y < BoardSize; Y++)
+            {
+                for (int X = 0; X < BoardSize; X++)
+                {
+                    if (ColorAt(X, Y) != EMPTY)
+                        if (ReversiForm.LastDrawnBoard.ColorAt(X, Y) != this.ColorAt(X, Y))
+                        {
+                            // Choose the piece image
+                            if (ColorAt(X, Y) == BLACK)
+                                PieceImage = ReversiForm.BlackPieceImage;
+                            else
+                                PieceImage = ReversiForm.WhitePieceImage;
+
+                            // Draw the new piece
+                            ReversiForm.gBoardGFX.DrawImage(PieceImage, X * 40 + 1, Y * 40 + 1, PieceImage.Width, PieceImage.Height);
+                        }
+                }
+            }
+            ReversiForm.LastDrawnBoard.CopyBoard(BoardPieces);
         }
 
         // Return the score of the given player
@@ -276,4 +307,5 @@ namespace Reversi
         }
 
     }
+
 }

@@ -10,12 +10,15 @@ using System.Windows.Forms;
 
 namespace Reversi
 {
+
     // Class:       AI
     // Description: Stores the game simulation code used by the AI opponent to play the game
     public class AI
     {
-        //private string AIDebug = "";
-        private int color;
+        // Color constants
+        private static int BLACK = Properties.Settings.Default.BLACK;
+        private static int WHITE = Properties.Settings.Default.WHITE;
+        private static int EMPTY = Properties.Settings.Default.EMPTY;
 
         private Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
 
@@ -25,13 +28,11 @@ namespace Reversi
         private Queue<String> LeafNodes = new Queue<String>();
 
         private int SimulationCycles = 0;
-        //private int SimulationDepth = 0;
-        //private int WinnerTotal = 0;
         private int WhiteWinnerTotal = 0;
         private int BlackWinnerTotal = 0;
         private int TieTotal = 0;
-        //private int LoserTotal = 0;
         private int LeafTotal = 0;
+        private int color;
 
         private bool ProcessingTurn = false;
 
@@ -88,14 +89,14 @@ namespace Reversi
             }
 
             Point ChosenMove = PossibleMoves[0];
-            Board SimBoard = new Board(ReversiForm.getCurrentGame().getGameBoard());
+            Board SimBoard = new Board(ReversiForm.CurrentGame.getGameBoard());
             double CurrentWeight, BestWeight = 0;
 
             //AIDebug += "\nPossible Moves:\n";
             foreach (Point CurrentPoint in PossibleMoves)
             {
                 //AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
-                SimBoard.CopyBoard(ReversiForm.getCurrentGame().getGameBoard());
+                SimBoard.CopyBoard(ReversiForm.CurrentGame.getGameBoard());
 
                 SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
 
@@ -142,21 +143,21 @@ namespace Reversi
                     SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
 
                     // Start a simulation for the next player with the updated board
-                    TotalWeight += WeightMove(PossibleMoves[lc].X, PossibleMoves[lc].Y, SimulationDepth) + EvaluatePotentialMove(SimulationBoard, Turn == Properties.Settings.Default.WHITE ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE, SimulationDepth + 1);
+                    TotalWeight += WeightMove(PossibleMoves[lc].X, PossibleMoves[lc].Y, SimulationDepth) + EvaluatePotentialMove(SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
                 }
                 return (TotalWeight);
             }
             // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
-            else if (CurrentBoard.MovePossible(Turn == Properties.Settings.Default.WHITE ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE))
+            else if (CurrentBoard.MovePossible(Turn == WHITE ? BLACK : WHITE))
             {
-                //Console.WriteLine( (Turn == Properties.Settings.Default.WHITE ? "White" : "Black") + " cannot move, passing");
+                //Console.WriteLine( (Turn == WHITE ? "White" : "Black") + " cannot move, passing");
 
-                return (EvaluatePotentialMove(CurrentBoard, Turn == Properties.Settings.Default.WHITE ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE, SimulationDepth + 1));
+                return (EvaluatePotentialMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1));
             }
             // If there are no moves left in the game, collapse the simulation
             else
             {
-                if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == Properties.Settings.Default.WHITE ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE))
+                if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == WHITE ? BLACK : WHITE))
                 {
                     return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight));
                 }
@@ -201,12 +202,12 @@ namespace Reversi
             NodeMasterList = new Dictionary<string, SimulationNode>();
 
             //Board CurrentBoard = new Board();
-            int ParentTurn = Properties.Settings.Default.WHITE;
+            int ParentTurn = WHITE;
             SimulationNode ParentNode = new SimulationNode(new Board(BoardSize), ParentTurn);
             String ParentNodeID = ParentNode.getNodeID();
             String RootNodeID = ParentNode.getNodeID();
 
-            int ChildTurn = Properties.Settings.Default.BLACK;
+            int ChildTurn = BLACK;
             //String ChildNodeID;
             Board ChildBoard;
             SimulationNode ChildNode;
@@ -248,14 +249,14 @@ namespace Reversi
                 ParentNode = NodeMasterList[ParentNodeID];
 
                 // Set the child turn to be the next player
-                ChildTurn = (ParentNode.getTurn() == Properties.Settings.Default.WHITE) ? Properties.Settings.Default.BLACK : Properties.Settings.Default.WHITE;
+                ChildTurn = (ParentNode.getTurn() == WHITE) ? BLACK : WHITE;
 
                 //if (NodeMasterList.Count % 10 == 0)
-                //Console.WriteLine("Turn " + (ParentNode.Turn == Properties.Settings.Default.WHITE ? "White" : "Black") + "\nScore: B-" + ParentNode.Board.FindScore(Properties.Settings.Default.BLACK) + " W-" + ParentNode.Board.FindScore(Properties.Settings.Default.WHITE)  + "\n======================\n" + ParentNode.Board.ToString() );
+                //Console.WriteLine("Turn " + (ParentNode.Turn == WHITE ? "White" : "Black") + "\nScore: B-" + ParentNode.Board.FindScore(BLACK) + " W-" + ParentNode.Board.FindScore(WHITE)  + "\n======================\n" + ParentNode.Board.ToString() );
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ReversiForm.RefreshPieces(ParentNode.getGameBoard());
+                    ParentNode.getGameBoard().RefreshPieces();
 
                 if (ParentNode.getAvailableMoves().Length == 0)
                 {
@@ -293,14 +294,14 @@ namespace Reversi
                         ParentNode.setIsLeaf( true );
                         LeafTotal++;
 
-                        if (ParentNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK) > ParentNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE))
+                        if (ParentNode.getGameBoard().FindScore(BLACK) > ParentNode.getGameBoard().FindScore(WHITE))
                         {
                             ParentNode.setBlackWins( ParentNode.getBlackWins() + 1 );
                             BlackWinnerTotal++;
                         }
-                        else if (ParentNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK) < ParentNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE))
+                        else if (ParentNode.getGameBoard().FindScore(BLACK) < ParentNode.getGameBoard().FindScore(WHITE))
                         {
-                            ParentNode.setWhiteWins( ParentNode.getWhiteWins() + 1 );
+                            ParentNode.setWhiteWins(ParentNode.getWhiteWins() + 1);
                             WhiteWinnerTotal++;
                         }
                         else
@@ -410,18 +411,18 @@ namespace Reversi
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ReversiForm.RefreshPieces( CurrentLeafNode.getGameBoard() );
+                    CurrentLeafNode.getGameBoard().RefreshPieces();
 
                 // Find who the winner of the leaf node is
-                if (CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE) > CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK))
-                    WinningColor = Properties.Settings.Default.WHITE;
-                else if (CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.WHITE) < CurrentLeafNode.getGameBoard().FindScore(Properties.Settings.Default.BLACK))
-                    WinningColor = Properties.Settings.Default.BLACK;
+                if (CurrentLeafNode.getGameBoard().FindScore(WHITE) > CurrentLeafNode.getGameBoard().FindScore(BLACK))
+                    WinningColor = WHITE;
+                else if (CurrentLeafNode.getGameBoard().FindScore(WHITE) < CurrentLeafNode.getGameBoard().FindScore(BLACK))
+                    WinningColor = BLACK;
                 else
                     WinningColor = -1;
 
                 // If this is a tie, there is no reason to process it
-                if ((WinningColor == Properties.Settings.Default.BLACK) || (WinningColor == Properties.Settings.Default.WHITE))
+                if ((WinningColor == BLACK) || (WinningColor == WHITE))
                 {
                     // Seed the work list with the leaf
                     WorkNodes.Enqueue(LeafNodes.Dequeue());
@@ -430,8 +431,8 @@ namespace Reversi
                     {
                         CurrentWorkNodeID = WorkNodes.Dequeue();
 
-                        if (WinningColor == Properties.Settings.Default.BLACK)
-                            NodeMasterList[CurrentWorkNodeID].setBlackWins( NodeMasterList[CurrentWorkNodeID].getBlackWins() + 1 );
+                        if (WinningColor == BLACK)
+                            NodeMasterList[CurrentWorkNodeID].setBlackWins(NodeMasterList[CurrentWorkNodeID].getBlackWins() + 1);
                         else
                             NodeMasterList[CurrentWorkNodeID].setWhiteWins(NodeMasterList[CurrentWorkNodeID].getWhiteWins() + 1);
 
@@ -453,4 +454,5 @@ namespace Reversi
             /////////////////////////////////////////////////////////////
         }
     }
+
 }
