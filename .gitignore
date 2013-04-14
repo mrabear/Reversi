@@ -1,3 +1,6 @@
 bin/
 obj/
 Image Scraps/
+*.suo
+*.sln
+*.user
