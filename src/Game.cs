@@ -31,20 +31,20 @@ namespace Reversi
         {
             CurrentTurn = WHITE;
             NextTurn = BLACK;
-            Difficulty = ReversiForm.AIDifficulty;
-            VsComputer = ReversiForm.PvC;
+            Difficulty = ReversiForm.getAIDifficulty();
+            VsComputer = ReversiForm.isVsComputer();
             GameBoard = new Board(BoardSize);
             IsComplete = false;
             AI = new AI(BLACK);
 
             // Reset the board image to clear any pieces from previous games
-            ReversiForm.gBoardGFX.DrawImage(ReversiForm.BoardImage, 0, 0, ReversiForm.BoardImage.Width, ReversiForm.BoardImage.Height);
+            ReversiForm.ResetBoardImage();
 
             // Reset the board that tracks which pieces have been drawn on the screen
-            ReversiForm.LastDrawnBoard = new Board(BoardSize);
-            ReversiForm.LastDrawnBoard.ClearBoard();
+            ReversiForm.setLastDrawnBoard( BoardSize );
+            ReversiForm.getLastDrawnBoard().ClearBoard();
 
-            GameBoard.RefreshPieces();
+            ReversiForm.RefreshPieces(GameBoard);
         }
 
         #region Getters and Setters
@@ -65,54 +65,37 @@ namespace Reversi
         // Determines if there is a winner in the current game
         public Boolean DetermineWinner()
         {
-            int WhiteScore = ReversiForm.CurrentGame.GameBoard.FindScore(WHITE);
-            int BlackScore = ReversiForm.CurrentGame.GameBoard.FindScore(BLACK);
+            int WhiteScore = GameBoard.FindScore(WHITE);
+            int BlackScore = GameBoard.FindScore(BLACK);
 
             if (WhiteScore == 0)
             {
-                ReversiForm.CurrentGame.IsComplete = true;
-                ReversiForm.CurrentGame.Winner = BLACK;
+                IsComplete = true;
+                Winner = BLACK;
             }
             else if (BlackScore == 0)
             {
-                ReversiForm.CurrentGame.IsComplete = true;
-                ReversiForm.CurrentGame.Winner = WHITE;
+                IsComplete = true;
+                Winner = WHITE;
             }
             else if (((WhiteScore + BlackScore) == 64) ||
-                ((!ReversiForm.CurrentGame.GameBoard.MovePossible(ReversiForm.CurrentGame.CurrentTurn)) && (!ReversiForm.CurrentGame.GameBoard.MovePossible(ReversiForm.CurrentGame.NextTurn))))
+                ((!GameBoard.MovePossible(CurrentTurn)) && (!GameBoard.MovePossible(NextTurn))))
             {
-                ReversiForm.CurrentGame.IsComplete = true;
+                IsComplete = true;
                 if (BlackScore > WhiteScore)
-                    ReversiForm.CurrentGame.Winner = BLACK;
+                    Winner = BLACK;
                 else if (BlackScore < WhiteScore)
-                    ReversiForm.CurrentGame.Winner = WHITE;
+                    Winner = WHITE;
                 else
-                    ReversiForm.CurrentGame.Winner = EMPTY;
+                    Winner = EMPTY;
             }
 
             if (IsComplete)
             {
-                if (Winner == EMPTY)
-                {
-                    ReversiForm.gCurrentTurnLabel.Text = "Tie";
-                    ReversiForm.gCurrentTurnImage.Visible = false;
-                }
-                else
-                {
-                    ReversiForm.gCurrentTurnLabel.Text = "Winner";
-                    UpdateTurnImage(Winner);
-                }
+                ReversiForm.ShowWinner(Winner);
             }
 
-            return (ReversiForm.CurrentGame.IsComplete);
-        }
-
-        public void UpdateScoreBoard()
-        {
-            ReversiForm.gBlackScoreBoard.Text = GameBoard.FindScore(BLACK).ToString();
-            ReversiForm.gWhiteScoreBoard.Text = GameBoard.FindScore(WHITE).ToString();
-            ReversiForm.gBlackScoreBoard.Refresh();
-            ReversiForm.gWhiteScoreBoard.Refresh();
+            return (IsComplete);
         }
 
         // Processes a single turn of gameplay, two if it is vs. AI
@@ -137,12 +120,12 @@ namespace Reversi
                         SwitchTurn();
                     }
 
-                    GameBoard.RefreshPieces();
-                    UpdateScoreBoard();
+                    ReversiForm.RefreshPieces();
+                    ReversiForm.UpdateScoreBoard();
                 }
 
                 if ((VsComputer) && (CurrentTurn == AI.getColor()))
-                    ReversiForm.gAITurnWorker.RunWorkerAsync();
+                    ReversiForm.StartAITurnWorker();
                 else
                     TurnInProgress = false;
 
@@ -157,10 +140,10 @@ namespace Reversi
                 Point AIMove = AI.DetermineNextMove(this);
                 GameBoard.MakeMove(AIMove.X, AIMove.Y, CurrentTurn);
 
-                if (GameBoard.MovePossible(ReversiForm.CurrentGame.NextTurn))
+                if (GameBoard.MovePossible(NextTurn))
                     break;
                 else
-                    ReversiForm.gAITurnWorker.ReportProgress(0);
+                    ReversiForm.ReportAITurnWorkerProgress(0);
             }
         }
 
@@ -176,15 +159,7 @@ namespace Reversi
                 CurrentTurn = WHITE;
                 NextTurn = BLACK;
             }
-            UpdateTurnImage(CurrentTurn);
-        }
-
-        public void UpdateTurnImage(int turn)
-        {
-            if (turn == WHITE)
-                ReversiForm.gCurrentTurnImage.CreateGraphics().DrawImage(ReversiForm.WhitePieceImage, 0, 0, ReversiForm.WhitePieceImage.Width, ReversiForm.WhitePieceImage.Height);
-            else
-                ReversiForm.gCurrentTurnImage.CreateGraphics().DrawImage(ReversiForm.BlackPieceImage, 0, 0, ReversiForm.BlackPieceImage.Width, ReversiForm.BlackPieceImage.Height);
+            ReversiForm.UpdateTurnImage(CurrentTurn);
         }
 
         public string GetTurnString(int color)

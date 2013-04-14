@@ -791,34 +791,120 @@ namespace Reversi
         #region Global Variables
 
         // Color constants
-        public static int BLACK = Properties.Settings.Default.BLACK;
-        public static int WHITE = Properties.Settings.Default.WHITE;
-        public static int EMPTY = Properties.Settings.Default.EMPTY;
+        private static int BLACK = Properties.Settings.Default.BLACK;
+        private static int WHITE = Properties.Settings.Default.WHITE;
+        private static int EMPTY = Properties.Settings.Default.EMPTY;
 
         // Static handles to graphical assets
-        public static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
-        public static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
-        public static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
-        public static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
+        private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
+        private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
+        private static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
+        private static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
 
         // Static handles to form objects
-        public static RichTextBox gDebugText = new RichTextBox();
-        public static Graphics gBoardGFX;
-        public static Label gWhiteScoreBoard;
-        public static Label gBlackScoreBoard;
-        public static Label gCurrentTurnLabel;
-        public static PictureBox gCurrentTurnImage;
-        public static BackgroundWorker gAITurnWorker;
+        private static RichTextBox gDebugText = new RichTextBox();
+        private static Graphics gBoardGFX;
+        private static Label gWhiteScoreBoard;
+        private static Label gBlackScoreBoard;
+        private static Label gCurrentTurnLabel;
+        private static PictureBox gCurrentTurnImage;
+        private static BackgroundWorker gAITurnWorker;
 
         // The board used to track what has been drawn on the screen
-        public static Board LastDrawnBoard = new Board();
+        private static Board LastDrawnBoard = new Board();
 
         // The Global Game Object
-        public static Game CurrentGame;
+        private static Game gCurrentGame = ReversiApplication.getCurrentGame();
 
         // Flags that determine who is playing (ai or human)
-        public static Boolean PvC = true;
-        public static int AIDifficulty = 1;
+        private static Boolean PvC = true;
+        private static int AIDifficulty = 1;
+
+        #endregion
+
+        #region Getters and Setters
+
+        public static Board getLastDrawnBoard() { return LastDrawnBoard; }
+        public static void setLastDrawnBoard(Board SourceBoard) { LastDrawnBoard.CopyBoard(SourceBoard); }
+        public static void setLastDrawnBoard(int BoardSize) { LastDrawnBoard = new Board( BoardSize ); }
+
+        public static Boolean isVsComputer() { return PvC; }
+
+        public static int getAIDifficulty() { return AIDifficulty; }
+        public static void setAIDifficulty(int setAIDifficulty) { AIDifficulty = setAIDifficulty; }
+        
+        public static void StartAITurnWorker()
+        {
+            gAITurnWorker.RunWorkerAsync();
+        }
+
+        public static void ReportAITurnWorkerProgress(int progress = 0)
+        {
+            ReversiForm.gAITurnWorker.ReportProgress(progress);
+        }
+
+        public static void UpdateScoreBoard()
+        {
+            ReversiForm.gBlackScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(Properties.Settings.Default.BLACK).ToString();
+            ReversiForm.gWhiteScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(Properties.Settings.Default.WHITE).ToString();
+            ReversiForm.gBlackScoreBoard.Refresh();
+            ReversiForm.gWhiteScoreBoard.Refresh();
+        }
+
+        // Redraw the piece images on the board
+        public static void RefreshPieces()
+        {
+            RefreshPieces(gCurrentGame.getGameBoard());
+        }
+
+        public static void RefreshPieces(Board SourceBoard)
+        {
+            for (int Y = 0; Y < SourceBoard.getBoardSize(); Y++)
+            {
+                for (int X = 0; X < SourceBoard.getBoardSize(); X++)
+                {
+                    if (SourceBoard.ColorAt(X, Y) != Properties.Settings.Default.EMPTY)
+                        if (getLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y))
+                        {
+                            // Draw the new piece
+                            DrawPiece(SourceBoard.ColorAt(X, Y), X, Y);
+                        }
+                }
+            }
+            getLastDrawnBoard().CopyBoard(SourceBoard.getBoardPieces());
+        }
+
+        public static void DrawPiece(int Color, int X, int Y)
+        {
+            gBoardGFX.DrawImage(Color == Properties.Settings.Default.WHITE ? WhitePieceImage : BlackPieceImage, X * 40 + 1, Y * 40 + 1, WhitePieceImage.Width, WhitePieceImage.Height);
+        }
+
+        public static void ResetBoardImage()
+        {
+            gBoardGFX.DrawImage(BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
+        }
+
+        public static void UpdateTurnImage(int turn)
+        {
+            if (turn == Properties.Settings.Default.WHITE)
+                gCurrentTurnImage.CreateGraphics().DrawImage(ReversiForm.WhitePieceImage, 0, 0, WhitePieceImage.Width, WhitePieceImage.Height);
+            else
+                gCurrentTurnImage.CreateGraphics().DrawImage(ReversiForm.BlackPieceImage, 0, 0, BlackPieceImage.Width, BlackPieceImage.Height);
+        }
+
+        public static void ShowWinner(int WinningColor)
+        {
+            if (WinningColor == Properties.Settings.Default.EMPTY)
+            {
+                ReversiForm.gCurrentTurnLabel.Text = "Tie";
+                ReversiForm.gCurrentTurnImage.Visible = false;
+            }
+            else
+            {
+                ReversiForm.gCurrentTurnLabel.Text = "Winner";
+                ReversiForm.UpdateTurnImage(WinningColor);
+            }
+        }
 
         #endregion
 
@@ -908,50 +994,28 @@ namespace Reversi
             blackScoreBoardTitle.Visible = true;
             CurrentTurnImage.Visible = true;
 
-            CurrentGame = new Game(getBoardSize());
+            ReversiApplication.resetCurrentGame( getBoardSize() );
+            gCurrentGame = ReversiApplication.getCurrentGame();
 
-            CurrentGame.UpdateTurnImage(CurrentGame.getCurrentTurn());
+            ReversiForm.UpdateTurnImage(gCurrentGame.getCurrentTurn());
         }
 
         // Skip turn (debug option) selected
         private void DebugSkip_Click(object sender, System.EventArgs e)
         {
-            CurrentGame.SwitchTurn();
+            gCurrentGame.SwitchTurn();
         }
 
         // unused
         private void DebugProcess_Click(object sender, System.EventArgs e)
         {
-            CurrentGame.setProcessMoves( !CurrentGame.getProcessMoves() );
+            gCurrentGame.setProcessMoves(!gCurrentGame.getProcessMoves());
             DebugProcess.Checked = !DebugProcess.Checked;
         }
 
         // Start a new game scenario where white cannot move
         private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
         {
-            CurrentGame = new Game(8);
-            gDebugText.Text = "";
-            CurrentGame.getGameBoard().ClearBoard();
-            CurrentGame.getGameBoard().PutPiece(0, 0, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 1, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 2, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 3, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 4, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 5, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 6, BLACK);
-            CurrentGame.getGameBoard().PutPiece(0, 7, BLACK);
-            CurrentGame.getGameBoard().PutPiece(1, 0, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 1, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 2, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 3, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 4, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 5, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 6, WHITE);
-            CurrentGame.getGameBoard().PutPiece(1, 7, WHITE);
-            CurrentGame.setCurrentTurn( WHITE );
-            CurrentGame.setNextTurn( BLACK );
-            CurrentGame.getGameBoard().RefreshPieces();
-            CurrentGame.ProcessTurn(0, 0);
         }
         #endregion
 
@@ -973,8 +1037,10 @@ namespace Reversi
         // Starts the database build background worker
         private void StartBuildDB(int BoardSize = 4)
         {
-            CurrentGame = new Game(BoardSize);
-            CurrentGame.getAI().BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
+            ReversiApplication.resetCurrentGame(BoardSize);
+            gCurrentGame = ReversiApplication.getCurrentGame();
+
+            gCurrentGame.getAI().BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
         }
 
         // Called from within the database build background woker to report the progress of the build
@@ -985,9 +1051,9 @@ namespace Reversi
             if (e.UserState.ToString() != "")
                 gDebugText.Text += e.UserState.ToString();
 
-            nodeCounter.Text = CurrentGame.getAI().getNodeMasterListCount().ToString();
-            workCounter.Text = CurrentGame.getAI().getWorkNodeCount().ToString();
-            victoryCounter.Text = CurrentGame.getAI().getLeafTotal().ToString();
+            nodeCounter.Text = gCurrentGame.getAI().getNodeMasterListCount().ToString();
+            workCounter.Text = gCurrentGame.getAI().getWorkNodeCount().ToString();
+            victoryCounter.Text = gCurrentGame.getAI().getLeafTotal().ToString();
         }
 
         // Runs when the database background worker thread is finished
@@ -999,7 +1065,7 @@ namespace Reversi
         // Dumps the database information to the debug window
         private void dumpDBInfoButton_Click(object sender, EventArgs e)
         {
-            gDebugText.Text += CurrentGame.getAI().DumpSimulationInfo();
+            gDebugText.Text += gCurrentGame.getAI().DumpSimulationInfo();
         }
 
         // Responds to the analyze database button press
@@ -1030,7 +1096,7 @@ namespace Reversi
         private void DBAnalysisWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Boolean DisplayDebug = true;
-            CurrentGame.getAI().AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, gDebugText, DisplayDebug);
+            gCurrentGame.getAI().AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, gDebugText, DisplayDebug);
         }
 
         private void ClearSimulationForm()
@@ -1115,8 +1181,8 @@ namespace Reversi
             int y = (e.Y + 1) / 40;
 
             // Don't process the mouse click if there is a turn already being processed
-            if (!CurrentGame.getTurnInProgress())
-                CurrentGame.ProcessTurn(x, y);
+            if (!gCurrentGame.getTurnInProgress())
+                gCurrentGame.ProcessTurn(x, y);
         }
 
         // If the grid size drop down changes, updates the board with the new dimensions
@@ -1138,26 +1204,30 @@ namespace Reversi
         }
         #endregion
 
+        #region AI Turn BG Worker Event Handelers
+
         // Called asynchronously when it is time for the AI to wake up and do some work
         private void AITurnMonitor_DoWork(object sender, DoWorkEventArgs e)
         {
-            CurrentGame.ProcessAITurn();
+            gCurrentGame.ProcessAITurn();
         }
 
         // Called every time the AI monitor has a move to render
         private void AITurnMonitor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            CurrentGame.getGameBoard().RefreshPieces();
+            RefreshPieces();
         }
 
         // Called when the AI monitor has no more moves to place
         private void AITurnMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            CurrentGame.SwitchTurn();
-            CurrentGame.getGameBoard().RefreshPieces();
-            CurrentGame.UpdateScoreBoard();
+            gCurrentGame.SwitchTurn();
+            RefreshPieces();
+            ReversiForm.UpdateScoreBoard();
 
-            CurrentGame.setTurnInProgress(  false );
+            gCurrentGame.setTurnInProgress(false);
         }
+
+        #endregion
     }
 }

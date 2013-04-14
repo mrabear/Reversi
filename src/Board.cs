@@ -267,33 +267,6 @@ namespace Reversi
             }
         }
 
-        // Redraw the piece images on the board
-        public void RefreshPieces()
-        {
-            //Board lastdrawn = new Board(LastDrawnBoard);
-            Image PieceImage = ReversiForm.WhitePieceImage;
-
-            for (int Y = 0; Y < BoardSize; Y++)
-            {
-                for (int X = 0; X < BoardSize; X++)
-                {
-                    if (ColorAt(X, Y) != EMPTY)
-                        if (ReversiForm.LastDrawnBoard.ColorAt(X, Y) != this.ColorAt(X, Y))
-                        {
-                            // Choose the piece image
-                            if (ColorAt(X, Y) == BLACK)
-                                PieceImage = ReversiForm.BlackPieceImage;
-                            else
-                                PieceImage = ReversiForm.WhitePieceImage;
-
-                            // Draw the new piece
-                            ReversiForm.gBoardGFX.DrawImage(PieceImage, X * 40 + 1, Y * 40 + 1, PieceImage.Width, PieceImage.Height);
-                        }
-                }
-            }
-            ReversiForm.LastDrawnBoard.CopyBoard(BoardPieces);
-        }
-
         // Return the score of the given player
         public int FindScore(int colorToCheck)
         {

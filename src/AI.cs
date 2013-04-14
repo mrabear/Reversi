@@ -89,14 +89,14 @@ namespace Reversi
             }
 
             Point ChosenMove = PossibleMoves[0];
-            Board SimBoard = new Board(ReversiForm.CurrentGame.getGameBoard());
+            Board SimBoard = new Board(SourceGame.getGameBoard());
             double CurrentWeight, BestWeight = 0;
 
             //AIDebug += "\nPossible Moves:\n";
             foreach (Point CurrentPoint in PossibleMoves)
             {
                 //AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
-                SimBoard.CopyBoard(ReversiForm.CurrentGame.getGameBoard());
+                SimBoard.CopyBoard(SourceGame.getGameBoard());
 
                 SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
 
@@ -256,7 +256,7 @@ namespace Reversi
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ParentNode.getGameBoard().RefreshPieces();
+                    ReversiForm.RefreshPieces(ParentNode.getGameBoard());
 
                 if (ParentNode.getAvailableMoves().Length == 0)
                 {
@@ -411,7 +411,7 @@ namespace Reversi
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    CurrentLeafNode.getGameBoard().RefreshPieces();
+                    ReversiForm.RefreshPieces(CurrentLeafNode.getGameBoard());
 
                 // Find who the winner of the leaf node is
                 if (CurrentLeafNode.getGameBoard().FindScore(WHITE) > CurrentLeafNode.getGameBoard().FindScore(BLACK))

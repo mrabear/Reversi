@@ -11,6 +11,10 @@ namespace Reversi
     public static class ReversiApplication
     {
         private static ReversiForm MainForm;
+        private static Game CurrentGame;
+
+        public static Game getCurrentGame() { return CurrentGame; }
+        public static void resetCurrentGame(int BoardSize = 8) { CurrentGame = new Game(BoardSize); }
 
         static void Main()
         {
