@@ -783,19 +783,6 @@ namespace Reversi
             this.ResumeLayout(false);
 
         }
-
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            ReversiForm MainForm = new ReversiForm();
-            Application.Run(MainForm);
-
-            //MainForm.StartNewGame()
-            
-        }
         #endregion
 
         // The main form constructor
@@ -908,7 +895,6 @@ namespace Reversi
         }
 
         #endregion
-
 
         #region Drop Down Menu Event Handelers
 
@@ -1247,20 +1233,6 @@ namespace Reversi
             ReversiForm.UpdateScoreBoard();
 
             ReversiForm.CurrentGame.setTurnInProgress( false );
-        }
-    }
-
-    public static class ReversiApplication
-    {
-        public static ReversiForm MainForm;
-
-        static void Main()
-        {
-            MainForm = new ReversiForm();
-            Application.Run(MainForm);
-
-            //MainForm.StartNewGame()
-
         }
     }
 }

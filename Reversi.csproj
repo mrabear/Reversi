@@ -114,6 +114,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="src\ReversiApplication.cs" />
     <Compile Include="src\ReversiForm.cs">
       <SubType>Form</SubType>
     </Compile>
