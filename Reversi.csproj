@@ -7,7 +7,7 @@
     <ProjectGuid>{A4E4AE17-FD83-4EB0-B770-A3A839706C54}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>reversi_large.ico</ApplicationIcon>
+    <ApplicationIcon>images\reversi_large.ico</ApplicationIcon>
     <AssemblyKeyContainerName />
     <AssemblyName>Reversi</AssemblyName>
     <AssemblyOriginatorKeyFile />
@@ -18,7 +18,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Reversi</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>Reversi.ReversiForm</StartupObject>
+    <StartupObject>Reversi.ReversiApplication</StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -100,7 +100,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="src\AI.cs" />
+    <Compile Include="src\Game.cs" />
+    <Compile Include="src\AssemblyInfo.cs" />
+    <Compile Include="src\Board.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -111,24 +114,25 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ReversiForm.cs">
+    <Compile Include="src\ReversiForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Content Include="Images\blackpiece.png" />
-    <Content Include="Images\reversi_grid.png" />
-    <Content Include="Images\reversi_inactive_grid.png" />
-    <Content Include="Images\whitepiece.png" />
-    <Content Include="reversi_large.ico" />
+    <Compile Include="src\SimulationNode.cs" />
+    <Content Include="images\blackpiece.png" />
+    <Content Include="images\reversi_grid.png" />
+    <Content Include="images\reversi_inactive_grid.png" />
+    <Content Include="images\whitepiece.png" />
+    <Content Include="images\reversi_large.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="ReversiForm.resx">
+    <EmbeddedResource Include="src\ReversiForm.resx">
       <DependentUpon>ReversiForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="Properties\app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
