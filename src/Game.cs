@@ -32,10 +32,7 @@ namespace Reversi
             IsComplete = false;
             AI = new AI(Properties.Settings.Default.BLACK);
 
-            //gProcessAITurnAsync = new ProcessAITurnDelegate(this.ProcessAITurn);
-
             // Reset the board image to clear any pieces from previous games
-            //ReversiApplication.MainForm.DrawImageToBoard(ReversiApplication.MainForm.BoardImage, 0, 0, ReversiApplication.MainForm.BoardImage.Width, ReversiApplication.MainForm.BoardImage.Height);
             ReversiForm.ResetBoardImage();
 
             // Reset the board that tracks which pieces have been drawn on the screen
@@ -65,8 +62,6 @@ namespace Reversi
         {
             int WhiteScore = ReversiForm.getCurrentGame().GameBoard.FindScore(Properties.Settings.Default.WHITE);
             int BlackScore = ReversiForm.getCurrentGame().GameBoard.FindScore(Properties.Settings.Default.BLACK);
-
-            //ScoreText.Text = "Current Score:\n" + " White: " + WhiteScore + "\n Black: " + BlackScore;
 
             if (WhiteScore == 0)
             {
