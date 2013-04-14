@@ -67,7 +67,7 @@ namespace Reversi
         private System.Windows.Forms.Label Title;
         private PictureBox BoardPicture;
         private IContainer components;
-        public System.Windows.Forms.Timer NewGameTimer;
+        private Timer NewGameTimer;
         private System.Windows.Forms.MainMenu mainDropDownMenu;
         private System.Windows.Forms.MenuItem fileDropDownMenu;
         private System.Windows.Forms.MenuItem gameSetupDropDownMenu;
@@ -84,7 +84,7 @@ namespace Reversi
         private System.Windows.Forms.MenuItem debugDropDownMenu;
         private System.Windows.Forms.MenuItem DebugSkip;
         private System.Windows.Forms.MenuItem DebugProcess;
-        public RichTextBox DebugAITrace;
+        private RichTextBox DebugAITrace;
         private System.Windows.Forms.Label AITraceLabel;
 
         private System.Windows.Forms.MenuItem menuItem4;
@@ -112,7 +112,7 @@ namespace Reversi
         private Label victoryCounter;
         private PictureBox blackPieceImg;
         private ProgressBar RAMUsageBar;
-        public System.Windows.Forms.Timer RAMCheckTimer;
+        private Timer RAMCheckTimer;
         private Label RAMLabel;
         private TabControl AIInfoTabControl;
         private TabPage AIDBTab;
