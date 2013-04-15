@@ -756,14 +756,6 @@ namespace Reversi
 
         }
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.Run(new ReversiForm());
-        }
         #endregion
 
         // The main form constructor
@@ -887,22 +879,22 @@ namespace Reversi
         public static void UpdateTurnImage(int turn)
         {
             if (turn == Properties.Settings.Default.WHITE)
-                gCurrentTurnImage.CreateGraphics().DrawImage(ReversiForm.WhitePieceImage, 0, 0, WhitePieceImage.Width, WhitePieceImage.Height);
+                gCurrentTurnImage.CreateGraphics().DrawImage(WhitePieceImage, 0, 0, WhitePieceImage.Width, WhitePieceImage.Height);
             else
-                gCurrentTurnImage.CreateGraphics().DrawImage(ReversiForm.BlackPieceImage, 0, 0, BlackPieceImage.Width, BlackPieceImage.Height);
+                gCurrentTurnImage.CreateGraphics().DrawImage(BlackPieceImage, 0, 0, BlackPieceImage.Width, BlackPieceImage.Height);
         }
 
         public static void ShowWinner(int WinningColor)
         {
             if (WinningColor == Properties.Settings.Default.EMPTY)
             {
-                ReversiForm.gCurrentTurnLabel.Text = "Tie";
-                ReversiForm.gCurrentTurnImage.Visible = false;
+                gCurrentTurnLabel.Text = "Tie";
+                gCurrentTurnImage.Visible = false;
             }
             else
             {
-                ReversiForm.gCurrentTurnLabel.Text = "Winner";
-                ReversiForm.UpdateTurnImage(WinningColor);
+                gCurrentTurnLabel.Text = "Winner";
+                UpdateTurnImage(WinningColor);
             }
         }
 
@@ -969,7 +961,7 @@ namespace Reversi
         // Game exit selected
         private void ExitMenu_Click(object sender, System.EventArgs e)
         {
-            ReversiForm.ActiveForm.Close();
+            ActiveForm.Close();
         }
 
         // New game selected
@@ -997,7 +989,7 @@ namespace Reversi
             ReversiApplication.resetCurrentGame( getBoardSize() );
             gCurrentGame = ReversiApplication.getCurrentGame();
 
-            ReversiForm.UpdateTurnImage(gCurrentGame.getCurrentTurn());
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
         }
 
         // Skip turn (debug option) selected
@@ -1223,7 +1215,7 @@ namespace Reversi
         {
             gCurrentGame.SwitchTurn();
             RefreshPieces();
-            ReversiForm.UpdateScoreBoard();
+            UpdateScoreBoard();
 
             gCurrentGame.setTurnInProgress(false);
         }

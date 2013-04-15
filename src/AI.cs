@@ -7,6 +7,8 @@ using System.Drawing;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Reversi
 {
@@ -23,7 +25,7 @@ namespace Reversi
         private Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
 
         private Dictionary<string, SimulationNode> NodeMasterList = new Dictionary<string, SimulationNode>();
-
+        
         private Queue<String> WorkNodes = new Queue<String>();
         private Queue<String> LeafNodes = new Queue<String>();
 
@@ -90,21 +92,31 @@ namespace Reversi
 
             Point ChosenMove = PossibleMoves[0];
             Board SimBoard = new Board(SourceGame.getGameBoard());
-            double CurrentWeight, BestWeight = 0;
+            Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
 
             //AIDebug += "\nPossible Moves:\n";
-            foreach (Point CurrentPoint in PossibleMoves)
+            Parallel.ForEach(PossibleMoves, CurrentPoint =>
             {
-                //AIDebug += "(" + CurrentPoint.X + "," + CurrentPoint.Y + ") Weight=" + BoardValueMask[CurrentPoint.X, CurrentPoint.Y] + "\n";
                 SimBoard.CopyBoard(SourceGame.getGameBoard());
-
                 SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
 
-                CurrentWeight = EvaluatePotentialMove(SimBoard, SourceGame.getCurrentTurn());
+                double EvalResult = EvaluatePotentialMove(SimBoard, SourceGame.getCurrentTurn());
 
-                if (CurrentWeight > BestWeight)
-                    ChosenMove = CurrentPoint;
+                // Serializes the theads to make sure the update functions properly
+                lock (this)
+                {
+                    MoveResults.Add(CurrentPoint, EvalResult);
+                    Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveResults[CurrentPoint]);
+                }
+            } );
+
+            foreach(Point ResultMove in MoveResults.Keys)
+            {
+                if (MoveResults[ResultMove] > MoveResults[ChosenMove])
+                    ChosenMove = ResultMove;
             }
+
+            Console.WriteLine("#### Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen");
 
             NextMove = ChosenMove;
             ProcessingTurn = false;
@@ -150,21 +162,15 @@ namespace Reversi
             // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
             else if (CurrentBoard.MovePossible(Turn == WHITE ? BLACK : WHITE))
             {
-                //Console.WriteLine( (Turn == WHITE ? "White" : "Black") + " cannot move, passing");
-
                 return (EvaluatePotentialMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1));
             }
             // If there are no moves left in the game, collapse the simulation
             else
             {
                 if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == WHITE ? BLACK : WHITE))
-                {
                     return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight));
-                }
                 else
-                {
                     return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight * -1));
-                }
             }
         }
 
