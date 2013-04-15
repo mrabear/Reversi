@@ -73,7 +73,6 @@ namespace Reversi
             ProcessingTurn = true;
 
             AnalyzeBoard(SourceGame);
-            //gAITurnWorker.RunWorkerAsync();
 
             while (ProcessingTurn) ;
 
@@ -93,20 +92,26 @@ namespace Reversi
             Point ChosenMove = PossibleMoves[0];
             Board SimBoard = new Board(SourceGame.getGameBoard());
             Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
-
-            //AIDebug += "\nPossible Moves:\n";
+            
             Parallel.ForEach(PossibleMoves, CurrentPoint =>
             {
                 SimBoard.CopyBoard(SourceGame.getGameBoard());
                 SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
+                
+                List<BandedWeightRow> EvalResult = new List<BandedWeightRow>(Properties.Settings.Default.MaxDepth);
 
-                double EvalResult = EvaluatePotentialMove(SimBoard, SourceGame.getCurrentTurn());
+                for (int index = 0; index < Properties.Settings.Default.MaxDepth; index++)
+                    EvalResult.Add(new BandedWeightRow());
+
+                EvaluatePotentialMove(ref EvalResult, SimBoard, SourceGame.getCurrentTurn());
+
+                double MoveWeight = WeightMove(EvalResult);
 
                 // Serializes the theads to make sure the update functions properly
                 lock (this)
                 {
-                    MoveResults.Add(CurrentPoint, EvalResult);
-                    Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveResults[CurrentPoint]);
+                    MoveResults.Add(CurrentPoint, MoveWeight);
+                    Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight);
                 }
             } );
 
@@ -130,11 +135,57 @@ namespace Reversi
             return ((SimulationDepth % 2 == 0 ? -1 : 1) * (WeightOverride != 0 ? WeightOverride : BoardValueMask[X, Y]) * ((MaxStep - SimStep) / MaxStep));
         }
 
+        private double WeightMove(List<BandedWeightRow> BandedWeightTable)
+        {
+            double MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
+            double Penalty, Average, WeightedTotal = 0;
+            int Sign;
+
+            for (int SimDepth = 0; SimDepth < BandedWeightTable.Count; SimDepth++)
+            {
+                // The penalty to assign to this simulation depth
+                Penalty = (MaxStep - Math.Floor((double)SimDepth / 2)) / MaxStep;
+
+                // The sign to apply to this analysis (+ for beneficial moves, - for opponent moves)
+                Sign = (SimDepth % 2 == 0 ? -1 : 1);
+
+                // The average of all of the values for the current simulation depth
+                Average = (BandedWeightTable[SimDepth].TotalWeight / BandedWeightTable[SimDepth].NodeCount);
+
+                // The end calculation
+                WeightedTotal += Sign * Average * Penalty;
+            }
+
+            return (WeightedTotal);
+        }
+
+        public class BandedWeightRow
+        {
+            public int NodeCount;
+            public double TotalWeight;
+
+            public BandedWeightRow()
+            {
+                NodeCount = 0;
+                TotalWeight = 0;
+            }
+
+            public BandedWeightRow(double NewWeight)
+            {
+                NodeCount = 1;
+                TotalWeight = NewWeight;
+            }
+
+            public BandedWeightRow(int NewWeight)
+            {
+                NodeCount = 1;
+                TotalWeight = NewWeight;
+            }           
+        }
+
+        /*
         private double EvaluatePotentialMove(Board CurrentBoard, int Turn, int SimulationDepth = 1)
         {
-            /*if (SimulationCycles % 5000 == 0)
-                Console.WriteLine("Simuldation Depth:" + SimulationDepth);*/
-
             if (SimulationDepth >= Properties.Settings.Default.MaxDepth)
             {
                 return (0);
@@ -173,6 +224,56 @@ namespace Reversi
                     return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight * -1));
             }
         }
+        */
+
+        private void EvaluatePotentialMove(ref List<BandedWeightRow> BandedWeightTable,Board CurrentBoard, int Turn, int SimulationDepth = 0)
+        {
+            if (SimulationDepth < Properties.Settings.Default.MaxDepth)
+            {
+                // If there are still moves left for the current player, start a new simulation for each of them
+                if (CurrentBoard.MovePossible(Turn))
+                {
+                    Point[] PossibleMoves = CurrentBoard.AvailableMoves(Turn);
+                    Board SimulationBoard;
+
+                    for (int lc = 0; lc < PossibleMoves.Length; lc++)
+                    {
+                        // Make a copy of the current board
+                        SimulationBoard = new Board(CurrentBoard);
+
+                        // Place the current move on the new board
+                        SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
+
+                        BandedWeightTable[SimulationDepth].NodeCount += 1;
+                        BandedWeightTable[SimulationDepth].TotalWeight += BoardValueMask[PossibleMoves[lc].X, PossibleMoves[lc].Y];
+
+                        //BandedWeightTable = 
+                        EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
+
+                        // Start a simulation for the next player with the updated board
+                        //TotalWeight += WeightMove(PossibleMoves[lc].X, PossibleMoves[lc].Y, SimulationDepth) + ;
+                    }
+                    //return (BandedWeightTable);
+                }
+                // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
+                else if (CurrentBoard.MovePossible(Turn == WHITE ? BLACK : WHITE))
+                {
+                    EvaluatePotentialMove(ref BandedWeightTable, CurrentBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
+                }
+                // If there are no moves left in the game, collapse the simulation
+                else
+                {
+                    BandedWeightTable[SimulationDepth].NodeCount += 1;
+
+                    if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == WHITE ? BLACK : WHITE))
+                        BandedWeightTable[SimulationDepth].TotalWeight += Properties.Settings.Default.VictoryWeight;
+                    else
+                        BandedWeightTable[SimulationDepth].TotalWeight += Properties.Settings.Default.VictoryWeight * -1;
+
+                    //return (BandedWeightTable);
+                }
+            }
+        }
 
         public String DumpSimulationInfo()
         {
@@ -183,6 +284,12 @@ namespace Reversi
                     "Total Leaf Nodes: " + LeafTotal + "\n" +
                     "Total Black Winners: " + BlackWinnerTotal + "\n" +
                     "Total White Winners: " + WhiteWinnerTotal + "\n");
+        }
+
+        // Infiniate list iterator for the parallel foreach loop
+        private static IEnumerable<bool> IterateUntilFalse(Func<bool> condition)
+        {
+            while (condition()) yield return true;
         }
 
         public void BuildAIDatabase(BackgroundWorker WorkerThread, int BoardSize = 8, Boolean VisualizeResults = false, Boolean DisplayDebug = true)
@@ -224,7 +331,8 @@ namespace Reversi
             // Seed the work list with the root node
             WorkNodes.Enqueue(RootNodeID);
 
-            while (WorkNodes.Count > 0)
+            //Parallel.ForEach(IterateUntilFalse(WorkNodes.Count > 0), =>
+            while(WorkNodes.Count > 0)
             {
 
                 /////////////////////////////////////////////////////////////

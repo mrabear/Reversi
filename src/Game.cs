@@ -91,9 +91,7 @@ namespace Reversi
             }
 
             if (IsComplete)
-            {
                 ReversiForm.ShowWinner(Winner);
-            }
 
             return (IsComplete);
         }
