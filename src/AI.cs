@@ -183,49 +183,6 @@ namespace Reversi
             }           
         }
 
-        /*
-        private double EvaluatePotentialMove(Board CurrentBoard, int Turn, int SimulationDepth = 1)
-        {
-            if (SimulationDepth >= Properties.Settings.Default.MaxDepth)
-            {
-                return (0);
-            }
-            // If there are still moves left for the current player, start a new simulation for each of them
-            else if (CurrentBoard.MovePossible(Turn))
-            {
-                Point[] PossibleMoves = CurrentBoard.AvailableMoves(Turn);
-                double TotalWeight = 0;
-                Board SimulationBoard;
-
-                for (int lc = 0; lc < PossibleMoves.Length; lc++)
-                {
-                    // Make a copy of the current board
-                    SimulationBoard = new Board(CurrentBoard);
-
-                    // Place the current move on the new board
-                    SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
-
-                    // Start a simulation for the next player with the updated board
-                    TotalWeight += WeightMove(PossibleMoves[lc].X, PossibleMoves[lc].Y, SimulationDepth) + EvaluatePotentialMove(SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
-                }
-                return (TotalWeight);
-            }
-            // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
-            else if (CurrentBoard.MovePossible(Turn == WHITE ? BLACK : WHITE))
-            {
-                return (EvaluatePotentialMove(CurrentBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1));
-            }
-            // If there are no moves left in the game, collapse the simulation
-            else
-            {
-                if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == WHITE ? BLACK : WHITE))
-                    return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight));
-                else
-                    return (WeightMove(-1, -1, SimulationDepth, Properties.Settings.Default.VictoryWeight * -1));
-            }
-        }
-        */
-
         private void EvaluatePotentialMove(ref List<BandedWeightRow> BandedWeightTable,Board CurrentBoard, int Turn, int SimulationDepth = 0)
         {
             if (SimulationDepth < Properties.Settings.Default.MaxDepth)
@@ -247,13 +204,9 @@ namespace Reversi
                         BandedWeightTable[SimulationDepth].NodeCount += 1;
                         BandedWeightTable[SimulationDepth].TotalWeight += BoardValueMask[PossibleMoves[lc].X, PossibleMoves[lc].Y];
 
-                        //BandedWeightTable = 
-                        EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
-
                         // Start a simulation for the next player with the updated board
-                        //TotalWeight += WeightMove(PossibleMoves[lc].X, PossibleMoves[lc].Y, SimulationDepth) + ;
+                        EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
                     }
-                    //return (BandedWeightTable);
                 }
                 // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
                 else if (CurrentBoard.MovePossible(Turn == WHITE ? BLACK : WHITE))
@@ -269,8 +222,6 @@ namespace Reversi
                         BandedWeightTable[SimulationDepth].TotalWeight += Properties.Settings.Default.VictoryWeight;
                     else
                         BandedWeightTable[SimulationDepth].TotalWeight += Properties.Settings.Default.VictoryWeight * -1;
-
-                    //return (BandedWeightTable);
                 }
             }
         }
