@@ -44,12 +44,12 @@ namespace Reversi
         private int[,] BoardValueMask = new int[,]
             {
 	            {5,2,4,4,4,4,2,5},
-   	            {2,0,1,1,1,1,0,2},
-   	            {4,1,3,2,2,3,1,4},
-   	            {4,1,2,0,0,2,1,4},
-   	            {4,1,2,0,0,2,1,4},
-   	            {4,1,3,2,2,3,1,4},
-   	            {2,0,1,1,1,1,0,2},
+   	            {2,0,0,0,0,0,0,2},
+   	            {4,0,3,1,1,3,0,4},
+   	            {4,0,1,0,0,1,0,4},
+   	            {4,0,1,0,0,1,0,4},
+   	            {4,0,3,1,1,3,0,4},
+   	            {2,0,0,0,0,0,0,2},
 	            {5,2,4,4,4,4,2,5}
             };
 
@@ -97,11 +97,11 @@ namespace Reversi
             {
                 SimBoard.CopyBoard(SourceGame.getGameBoard());
                 SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
-                
-                List<BandedWeightRow> EvalResult = new List<BandedWeightRow>(Properties.Settings.Default.MaxDepth);
 
-                for (int index = 0; index < Properties.Settings.Default.MaxDepth; index++)
-                    EvalResult.Add(new BandedWeightRow());
+                double[] EvalResult = new double[Properties.Settings.Default.MaxDepth];
+
+/*                for (int index = 0; index < Properties.Settings.Default.MaxDepth; index++)
+                    EvalResult.Add(new BandedWeightRow());*/
 
                 EvaluatePotentialMove(ref EvalResult, SimBoard, SourceGame.getCurrentTurn());
 
@@ -111,7 +111,7 @@ namespace Reversi
                 lock (this)
                 {
                     MoveResults.Add(CurrentPoint, MoveWeight);
-                    Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight);
+                    Console.WriteLine("### Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight);
                 }
             } );
 
@@ -121,7 +121,7 @@ namespace Reversi
                     ChosenMove = ResultMove;
             }
 
-            Console.WriteLine("#### Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen");
+            Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen");
 
             NextMove = ChosenMove;
             ProcessingTurn = false;
@@ -135,25 +135,33 @@ namespace Reversi
             return ((SimulationDepth % 2 == 0 ? -1 : 1) * (WeightOverride != 0 ? WeightOverride : BoardValueMask[X, Y]) * ((MaxStep - SimStep) / MaxStep));
         }
 
-        private double WeightMove(List<BandedWeightRow> BandedWeightTable)
+        private double WeightMove(double[] BandedWeightTable)
         {
-            double MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
-            double Penalty, Average, WeightedTotal = 0;
+            double CurrentStep, MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
+            double Penalty, WeightedTotal = 0;
             int Sign;
 
-            for (int SimDepth = 0; SimDepth < BandedWeightTable.Count; SimDepth++)
+            for (int SimDepth = 0; SimDepth < BandedWeightTable.Length ; SimDepth++)
             {
+                // Current weighted tier 
+                CurrentStep = Math.Floor((double)SimDepth / 2);
+
                 // The penalty to assign to this simulation depth
-                Penalty = (MaxStep - Math.Floor((double)SimDepth / 2)) / MaxStep;
+                //Penalty = (( MaxStep - CurrentStep ) / Math.Pow( MaxStep, 2 ));
+
+                // 0.7*e^(-0.293*x)
+                Penalty = CurrentStep == 0 ? 1 : 0.5 * Math.Exp(-1 * CurrentStep);
 
                 // The sign to apply to this analysis (+ for beneficial moves, - for opponent moves)
-                Sign = (SimDepth % 2 == 0 ? -1 : 1);
+                Sign = (SimDepth % 2 == 0 ? 1 : -1);
 
                 // The average of all of the values for the current simulation depth
-                Average = (BandedWeightTable[SimDepth].TotalWeight / BandedWeightTable[SimDepth].NodeCount);
+                //Average = (BandedWeightTable[SimDepth].TotalWeight / BandedWeightTable[SimDepth].NodeCount);
 
                 // The end calculation
-                WeightedTotal += Sign * Average * Penalty;
+                WeightedTotal += Sign * BandedWeightTable[SimDepth] * Penalty;
+
+                Console.WriteLine("###### Depth=" + SimDepth + " Step=" + CurrentStep + "\t(w:" + (Sign * BandedWeightTable[SimDepth] * Penalty) + ")\t=\t(s:" + Sign + ")\t*\t(a:" + BandedWeightTable[SimDepth] + ")\t*\t(p:" + Penalty + ")");
             }
 
             return (WeightedTotal);
@@ -183,7 +191,7 @@ namespace Reversi
             }           
         }
 
-        private void EvaluatePotentialMove(ref List<BandedWeightRow> BandedWeightTable,Board CurrentBoard, int Turn, int SimulationDepth = 0)
+        private void EvaluatePotentialMove(ref double[] BandedWeightTable,Board CurrentBoard, int Turn, int SimulationDepth = 0)
         {
             if (SimulationDepth < Properties.Settings.Default.MaxDepth)
             {
@@ -192,20 +200,30 @@ namespace Reversi
                 {
                     Point[] PossibleMoves = CurrentBoard.AvailableMoves(Turn);
                     Board SimulationBoard;
+                    Point BestPoint = PossibleMoves[0];
 
-                    for (int lc = 0; lc < PossibleMoves.Length; lc++)
+                    // If it is the opponents turn only pick their best moves
+                    if ( (SimulationDepth % 2 != 0) )
+                        foreach (Point CurrentPoint in PossibleMoves)
+                            if (BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > BoardValueMask[BestPoint.X, BestPoint.Y])
+                                BestPoint = CurrentPoint;
+
+                    for (int index = 0; index < PossibleMoves.Length; index++)
                     {
-                        // Make a copy of the current board
-                        SimulationBoard = new Board(CurrentBoard);
+                        if (BoardValueMask[PossibleMoves[index].X, PossibleMoves[index].Y] >= BoardValueMask[BestPoint.X, BestPoint.Y])
+                        {
+                            // Make a copy of the current board
+                            SimulationBoard = new Board(CurrentBoard);
 
-                        // Place the current move on the new board
-                        SimulationBoard.PutPiece(PossibleMoves[lc].X, PossibleMoves[lc].Y, Turn);
+                            // Place the current move on the new board
+                            SimulationBoard.PutPiece(PossibleMoves[index].X, PossibleMoves[index].Y, Turn);
 
-                        BandedWeightTable[SimulationDepth].NodeCount += 1;
-                        BandedWeightTable[SimulationDepth].TotalWeight += BoardValueMask[PossibleMoves[lc].X, PossibleMoves[lc].Y];
+                            if (BoardValueMask[PossibleMoves[index].X, PossibleMoves[index].Y] > BandedWeightTable[SimulationDepth])
+                                BandedWeightTable[SimulationDepth] = BoardValueMask[PossibleMoves[index].X, PossibleMoves[index].Y];
 
-                        // Start a simulation for the next player with the updated board
-                        EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
+                            // Start a simulation for the next player with the updated board
+                            EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
+                        }
                     }
                 }
                 // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
@@ -216,12 +234,10 @@ namespace Reversi
                 // If there are no moves left in the game, collapse the simulation
                 else
                 {
-                    BandedWeightTable[SimulationDepth].NodeCount += 1;
-
                     if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(color == WHITE ? BLACK : WHITE))
-                        BandedWeightTable[SimulationDepth].TotalWeight += Properties.Settings.Default.VictoryWeight;
+                        BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VictoryWeight;
                     else
-                        BandedWeightTable[SimulationDepth].TotalWeight += Properties.Settings.Default.VictoryWeight * -1;
+                        BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VictoryWeight * -1;
                 }
             }
         }

@@ -824,7 +824,7 @@ namespace Reversi
 
         public static int getAIDifficulty() { return AIDifficulty; }
         public static void setAIDifficulty(int setAIDifficulty) { AIDifficulty = setAIDifficulty; }
-        
+ 
         public static void StartAITurnWorker()
         {
             gAITurnWorker.RunWorkerAsync();
