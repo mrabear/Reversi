@@ -100,18 +100,20 @@ namespace Reversi
 
                 double[] EvalResult = new double[Properties.Settings.Default.MaxDepth];
 
-/*                for (int index = 0; index < Properties.Settings.Default.MaxDepth; index++)
-                    EvalResult.Add(new BandedWeightRow());*/
-
                 EvaluatePotentialMove(ref EvalResult, SimBoard, SourceGame.getCurrentTurn());
-
-                double MoveWeight = WeightMove(EvalResult);
 
                 // Serializes the theads to make sure the update functions properly
                 lock (this)
                 {
+                    Console.WriteLine(" Depth| Sign * Value *  Weight  =  Score");
+                    Console.WriteLine("|------------------------------------------|");
+
+                    double MoveWeight = WeightMove(EvalResult);
+
+                    Console.WriteLine("|------------------------------------------|");
+
                     MoveResults.Add(CurrentPoint, MoveWeight);
-                    Console.WriteLine("### Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight);
+                    Console.WriteLine("\t Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ")\t\tscore=" + MoveWeight + "\n");
                 }
             } );
 
@@ -138,7 +140,7 @@ namespace Reversi
         private double WeightMove(double[] BandedWeightTable)
         {
             double CurrentStep, MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
-            double Penalty, WeightedTotal = 0;
+            double Penalty, SubTotal, WeightedTotal = 0;
             int Sign;
 
             for (int SimDepth = 0; SimDepth < BandedWeightTable.Length ; SimDepth++)
@@ -150,18 +152,20 @@ namespace Reversi
                 //Penalty = (( MaxStep - CurrentStep ) / Math.Pow( MaxStep, 2 ));
 
                 // 0.7*e^(-0.293*x)
-                Penalty = CurrentStep == 0 ? 1 : 0.5 * Math.Exp(-1 * CurrentStep);
+                Penalty = ( CurrentStep == 0 ) ? 1 : 0.5 * Math.Exp(-1 * CurrentStep);
 
                 // The sign to apply to this analysis (+ for beneficial moves, - for opponent moves)
                 Sign = (SimDepth % 2 == 0 ? 1 : -1);
 
                 // The average of all of the values for the current simulation depth
                 //Average = (BandedWeightTable[SimDepth].TotalWeight / BandedWeightTable[SimDepth].NodeCount);
+                SubTotal = Sign * BandedWeightTable[SimDepth] * Penalty;
 
                 // The end calculation
-                WeightedTotal += Sign * BandedWeightTable[SimDepth] * Penalty;
-
-                Console.WriteLine("###### Depth=" + SimDepth + " Step=" + CurrentStep + "\t(w:" + (Sign * BandedWeightTable[SimDepth] * Penalty) + ")\t=\t(s:" + Sign + ")\t*\t(a:" + BandedWeightTable[SimDepth] + ")\t*\t(p:" + Penalty + ")");
+                WeightedTotal += SubTotal;
+                //"  0  |  0   *   0   * 1.00000 =  1.00000"
+                //"  0  |  0 *  0 *  1.00000 =  3.00000"
+                Console.WriteLine(String.Format("|  " + SimDepth.ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
             }
 
             return (WeightedTotal);
