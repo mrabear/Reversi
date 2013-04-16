@@ -96,6 +96,9 @@ namespace Reversi
         private Label whiteScoreBoard;
         private Label blackScoreBoard;
         private BackgroundWorker AITurnWorker;
+        private PictureBox redDebugPieceImg;
+        private PictureBox greenDebugPieceImg;
+        private PictureBox yellowDebugPieceImg;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -166,6 +169,9 @@ namespace Reversi
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
             this.AITurnWorker = new System.ComponentModel.BackgroundWorker();
+            this.redDebugPieceImg = new System.Windows.Forms.PictureBox();
+            this.greenDebugPieceImg = new System.Windows.Forms.PictureBox();
+            this.yellowDebugPieceImg = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -174,6 +180,9 @@ namespace Reversi
             this.AIInfoTabControl.SuspendLayout();
             this.AIDBTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.redDebugPieceImg)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.greenDebugPieceImg)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.yellowDebugPieceImg)).BeginInit();
             this.SuspendLayout();
             // 
             // BoardPicture
@@ -720,10 +729,46 @@ namespace Reversi
             this.AITurnWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnMonitor_ProgressChanged);
             this.AITurnWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnMonitor_RunWorkerCompleted);
             // 
+            // redDebugPieceImg
+            // 
+            this.redDebugPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("redDebugPieceImg.Image")));
+            this.redDebugPieceImg.InitialImage = null;
+            this.redDebugPieceImg.Location = new System.Drawing.Point(261, 126);
+            this.redDebugPieceImg.Name = "redDebugPieceImg";
+            this.redDebugPieceImg.Size = new System.Drawing.Size(38, 38);
+            this.redDebugPieceImg.TabIndex = 30;
+            this.redDebugPieceImg.TabStop = false;
+            this.redDebugPieceImg.Visible = false;
+            // 
+            // greenDebugPieceImg
+            // 
+            this.greenDebugPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("greenDebugPieceImg.Image")));
+            this.greenDebugPieceImg.InitialImage = null;
+            this.greenDebugPieceImg.Location = new System.Drawing.Point(261, 165);
+            this.greenDebugPieceImg.Name = "greenDebugPieceImg";
+            this.greenDebugPieceImg.Size = new System.Drawing.Size(38, 38);
+            this.greenDebugPieceImg.TabIndex = 31;
+            this.greenDebugPieceImg.TabStop = false;
+            this.greenDebugPieceImg.Visible = false;
+            // 
+            // yellowDebugPieceImg
+            // 
+            this.yellowDebugPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("yellowDebugPieceImg.Image")));
+            this.yellowDebugPieceImg.InitialImage = null;
+            this.yellowDebugPieceImg.Location = new System.Drawing.Point(261, 206);
+            this.yellowDebugPieceImg.Name = "yellowDebugPieceImg";
+            this.yellowDebugPieceImg.Size = new System.Drawing.Size(38, 38);
+            this.yellowDebugPieceImg.TabIndex = 32;
+            this.yellowDebugPieceImg.TabStop = false;
+            this.yellowDebugPieceImg.Visible = false;
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(741, 433);
+            this.Controls.Add(this.yellowDebugPieceImg);
+            this.Controls.Add(this.greenDebugPieceImg);
+            this.Controls.Add(this.redDebugPieceImg);
             this.Controls.Add(this.whiteScoreBoardTitle);
             this.Controls.Add(this.blackScoreBoardTitle);
             this.Controls.Add(this.CurrentTurnImage);
@@ -752,6 +797,9 @@ namespace Reversi
             this.AIDBTab.ResumeLayout(false);
             this.AIDBTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.redDebugPieceImg)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.greenDebugPieceImg)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.yellowDebugPieceImg)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -773,6 +821,14 @@ namespace Reversi
             gCurrentTurnLabel = CurrentTurnLabel;
             gAITurnWorker = AITurnWorker;
 
+            gYellowDebugPieceImage = yellowDebugPieceImg.Image;
+            gRedDebugPieceImage = redDebugPieceImg.Image;
+            gGreenDebugPieceImage = greenDebugPieceImg.Image;
+
+            gBoardImage = BoardPicture.Image;
+            gWhitePieceImage = whitePieceImg.Image;
+            gBlackPieceImage = blackPieceImg.Image;
+
             AITurnWorker.WorkerSupportsCancellation = true;
             AITurnWorker.WorkerReportsProgress = true;
 
@@ -783,15 +839,22 @@ namespace Reversi
         #region Global Variables
 
         // Color constants
-        private static int BLACK = Properties.Settings.Default.BLACK;
-        private static int WHITE = Properties.Settings.Default.WHITE;
-        private static int EMPTY = Properties.Settings.Default.EMPTY;
+        private static int BLACK  = Properties.Settings.Default.BLACK;
+        private static int WHITE  = Properties.Settings.Default.WHITE;
+        private static int EMPTY  = Properties.Settings.Default.EMPTY;
+        private static int YELLOW = Properties.Settings.Default.YELLOW;
+        private static int RED    = Properties.Settings.Default.RED;
+        private static int GREEN  = Properties.Settings.Default.GREEN;
 
         // Static handles to graphical assets
         private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
-        private static Image BlackPieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("blackPieceImg.Image")));
-        private static Image WhitePieceImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("whitePieceImg.Image")));
-        private static Image BoardImage = ((System.Drawing.Image)(imgResourceHandle.GetObject("BoardPicture.Image")));
+        private static Image gBlackPieceImage;
+        private static Image gWhitePieceImage;
+        private static Image gBoardImage;
+
+        private static Image gYellowDebugPieceImage;
+        private static Image gRedDebugPieceImage;
+        private static Image gGreenDebugPieceImage;
 
         // Static handles to form objects
         private static RichTextBox gDebugText = new RichTextBox();
@@ -868,20 +931,41 @@ namespace Reversi
 
         public static void DrawPiece(int Color, int X, int Y)
         {
-            gBoardGFX.DrawImage(Color == Properties.Settings.Default.WHITE ? WhitePieceImage : BlackPieceImage, X * 40 + 1, Y * 40 + 1, WhitePieceImage.Width, WhitePieceImage.Height);
+            gBoardGFX.DrawImage(Color == Properties.Settings.Default.WHITE ? gWhitePieceImage : gBlackPieceImage, X * 40 + 1, Y * 40 + 1, gWhitePieceImage.Width, gWhitePieceImage.Height);
         }
 
         public static void ResetBoardImage()
         {
-            gBoardGFX.DrawImage(BoardImage, 0, 0, BoardImage.Width, BoardImage.Height);
+            gBoardGFX.DrawImage(gBoardImage, 0, 0, gBoardImage.Width, gBoardImage.Height);
+        }
+
+        public static Image getTurnImage(int turn)
+        {
+            if (turn == WHITE)
+                return( gWhitePieceImage );
+            else if (turn == BLACK)
+                return( gBlackPieceImage );
+            else if (turn == YELLOW)
+                return( gYellowDebugPieceImage );
+            else if (turn == GREEN)
+                return( gGreenDebugPieceImage );
+            else
+                return( gRedDebugPieceImage );
         }
 
         public static void UpdateTurnImage(int turn)
         {
-            if (turn == Properties.Settings.Default.WHITE)
-                gCurrentTurnImage.CreateGraphics().DrawImage(WhitePieceImage, 0, 0, WhitePieceImage.Width, WhitePieceImage.Height);
-            else
-                gCurrentTurnImage.CreateGraphics().DrawImage(BlackPieceImage, 0, 0, BlackPieceImage.Width, BlackPieceImage.Height);
+            if (turn == WHITE)
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage( turn ), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
+            else if (turn == BLACK)
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
+            else if (turn == YELLOW)
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
+            else if (turn == RED)
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
+            else if (turn == GREEN)
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
+
         }
 
         public static void ShowWinner(int WinningColor)

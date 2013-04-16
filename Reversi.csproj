@@ -120,10 +120,13 @@
     </Compile>
     <Compile Include="src\SimulationNode.cs" />
     <Content Include="img\blackpiece.png" />
+    <Content Include="img\green_debug.png" />
+    <Content Include="img\red_debug.png" />
     <Content Include="img\reversi_grid.png" />
     <Content Include="img\reversi_inactive_grid.png" />
     <Content Include="img\whitepiece.png" />
     <Content Include="img\reversi_large.ico" />
+    <Content Include="img\yellow_debug.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -133,7 +136,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\app.config" />
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

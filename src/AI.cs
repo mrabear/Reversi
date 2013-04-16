@@ -18,9 +18,12 @@ namespace Reversi
     public class AI
     {
         // Color constants
-        private static int BLACK = Properties.Settings.Default.BLACK;
-        private static int WHITE = Properties.Settings.Default.WHITE;
-        private static int EMPTY = Properties.Settings.Default.EMPTY;
+        private static int BLACK  = Properties.Settings.Default.BLACK;
+        private static int WHITE  = Properties.Settings.Default.WHITE;
+        private static int EMPTY  = Properties.Settings.Default.EMPTY;
+        private static int YELLOW = Properties.Settings.Default.YELLOW;
+        private static int RED    = Properties.Settings.Default.RED;
+        private static int GREEN  = Properties.Settings.Default.GREEN;
 
         private Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
 
@@ -43,14 +46,14 @@ namespace Reversi
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
-	            {5,2,4,4,4,4,2,5},
+	            {9,2,5,5,5,5,2,9},
    	            {2,0,0,0,0,0,0,2},
-   	            {4,0,3,1,1,3,0,4},
-   	            {4,0,1,0,0,1,0,4},
-   	            {4,0,1,0,0,1,0,4},
-   	            {4,0,3,1,1,3,0,4},
+   	            {5,0,3,1,1,3,0,5},
+   	            {5,0,1,0,0,1,0,5},
+   	            {5,0,1,0,0,1,0,5},
+   	            {5,0,3,1,1,3,0,6},
    	            {2,0,0,0,0,0,0,2},
-	            {5,2,4,4,4,4,2,5}
+	            {9,2,5,5,5,5,2,9}
             };
 
         public AI(int AIcolor)
@@ -91,8 +94,18 @@ namespace Reversi
 
             Point ChosenMove = PossibleMoves[0];
             Board SimBoard = new Board(SourceGame.getGameBoard());
+            Board DebugBoard = new Board(SourceGame.getGameBoard());
             Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
-            
+
+
+
+            foreach (Point CurrentPoint in PossibleMoves)
+                ReversiForm.DrawPiece(YELLOW, CurrentPoint.X, CurrentPoint.Y);
+
+            Thread.Sleep(2500);
+
+            Console.WriteLine("#### New Turn Analysis ####\nCurrentBoard:\n" + SimBoard.ToString() + "" );
+
             Parallel.ForEach(PossibleMoves, CurrentPoint =>
             {
                 SimBoard.CopyBoard(SourceGame.getGameBoard());
@@ -123,18 +136,10 @@ namespace Reversi
                     ChosenMove = ResultMove;
             }
 
-            Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen");
+            Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
 
             NextMove = ChosenMove;
             ProcessingTurn = false;
-        }
-
-        private double WeightMove(int X, int Y, int SimulationDepth, int WeightOverride = 0)
-        {
-            double SimStep = Math.Floor((double)SimulationDepth / 2);
-            double MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
-
-            return ((SimulationDepth % 2 == 0 ? -1 : 1) * (WeightOverride != 0 ? WeightOverride : BoardValueMask[X, Y]) * ((MaxStep - SimStep) / MaxStep));
         }
 
         private double WeightMove(double[] BandedWeightTable)
@@ -163,8 +168,7 @@ namespace Reversi
 
                 // The end calculation
                 WeightedTotal += SubTotal;
-                //"  0  |  0   *   0   * 1.00000 =  1.00000"
-                //"  0  |  0 *  0 *  1.00000 =  3.00000"
+
                 Console.WriteLine(String.Format("|  " + SimDepth.ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
             }
 
@@ -195,6 +199,11 @@ namespace Reversi
             }           
         }
 
+        private double ScoreMove(Board CurrentBoard, Point NewPiece)
+        {
+            return BoardValueMask[NewPiece.X, NewPiece.Y];
+        }
+
         private void EvaluatePotentialMove(ref double[] BandedWeightTable,Board CurrentBoard, int Turn, int SimulationDepth = 0)
         {
             if (SimulationDepth < Properties.Settings.Default.MaxDepth)
@@ -209,12 +218,12 @@ namespace Reversi
                     // If it is the opponents turn only pick their best moves
                     if ( (SimulationDepth % 2 != 0) )
                         foreach (Point CurrentPoint in PossibleMoves)
-                            if (BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > BoardValueMask[BestPoint.X, BestPoint.Y])
+                            if (ScoreMove( CurrentBoard, CurrentPoint ) > ScoreMove( CurrentBoard, BestPoint ))
                                 BestPoint = CurrentPoint;
 
                     for (int index = 0; index < PossibleMoves.Length; index++)
                     {
-                        if (BoardValueMask[PossibleMoves[index].X, PossibleMoves[index].Y] >= BoardValueMask[BestPoint.X, BestPoint.Y])
+                        if (ScoreMove(CurrentBoard, PossibleMoves[index]) >= ScoreMove( CurrentBoard, BestPoint ))
                         {
                             // Make a copy of the current board
                             SimulationBoard = new Board(CurrentBoard);
@@ -222,8 +231,8 @@ namespace Reversi
                             // Place the current move on the new board
                             SimulationBoard.PutPiece(PossibleMoves[index].X, PossibleMoves[index].Y, Turn);
 
-                            if (BoardValueMask[PossibleMoves[index].X, PossibleMoves[index].Y] > BandedWeightTable[SimulationDepth])
-                                BandedWeightTable[SimulationDepth] = BoardValueMask[PossibleMoves[index].X, PossibleMoves[index].Y];
+                            if (ScoreMove(CurrentBoard, PossibleMoves[index]) > BandedWeightTable[SimulationDepth])
+                                BandedWeightTable[SimulationDepth] = ScoreMove(CurrentBoard, PossibleMoves[index]);
 
                             // Start a simulation for the next player with the updated board
                             EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, Turn == WHITE ? BLACK : WHITE, SimulationDepth + 1);
