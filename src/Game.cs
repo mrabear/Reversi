@@ -38,7 +38,7 @@ namespace Reversi
             AI = new AI(BLACK);
 
             // Reset the board image to clear any pieces from previous games
-            ReversiForm.ResetBoardImage();
+            ReversiForm.ClearBoardPieces();
 
             // Reset the board that tracks which pieces have been drawn on the screen
             ReversiForm.setLastDrawnBoard( BoardSize );

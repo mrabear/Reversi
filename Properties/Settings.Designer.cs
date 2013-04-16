@@ -103,5 +103,17 @@ namespace Reversi.Properties {
                 return ((int)(this["GREEN"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        public int GridSize {
+            get {
+                return ((int)(this["GridSize"]));
+            }
+            set {
+                this["GridSize"] = value;
+            }
+        }
     }
 }

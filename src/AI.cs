@@ -94,15 +94,12 @@ namespace Reversi
 
             Point ChosenMove = PossibleMoves[0];
             Board SimBoard = new Board(SourceGame.getGameBoard());
-            Board DebugBoard = new Board(SourceGame.getGameBoard());
             Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
-
-
 
             foreach (Point CurrentPoint in PossibleMoves)
                 ReversiForm.DrawPiece(YELLOW, CurrentPoint.X, CurrentPoint.Y);
 
-            Thread.Sleep(2500);
+            Thread.Sleep(2000);
 
             Console.WriteLine("#### New Turn Analysis ####\nCurrentBoard:\n" + SimBoard.ToString() + "" );
 
@@ -131,13 +128,14 @@ namespace Reversi
             } );
 
             foreach(Point ResultMove in MoveResults.Keys)
-            {
                 if (MoveResults[ResultMove] > MoveResults[ChosenMove])
                     ChosenMove = ResultMove;
-            }
 
             Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
 
+            ReversiForm.ClearBoardPieces(PossibleMoves);
+
+            Thread.Sleep(1000);
             NextMove = ChosenMove;
             ProcessingTurn = false;
         }

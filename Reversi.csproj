@@ -120,6 +120,7 @@
     </Compile>
     <Compile Include="src\SimulationNode.cs" />
     <Content Include="img\blackpiece.png" />
+    <Content Include="img\blankpiece.png" />
     <Content Include="img\green_debug.png" />
     <Content Include="img\red_debug.png" />
     <Content Include="img\reversi_grid.png" />

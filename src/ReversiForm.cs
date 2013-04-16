@@ -99,6 +99,7 @@ namespace Reversi
         private PictureBox redDebugPieceImg;
         private PictureBox greenDebugPieceImg;
         private PictureBox yellowDebugPieceImg;
+        private PictureBox emptyPieceImg;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -172,6 +173,7 @@ namespace Reversi
             this.redDebugPieceImg = new System.Windows.Forms.PictureBox();
             this.greenDebugPieceImg = new System.Windows.Forms.PictureBox();
             this.yellowDebugPieceImg = new System.Windows.Forms.PictureBox();
+            this.emptyPieceImg = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -183,6 +185,7 @@ namespace Reversi
             ((System.ComponentModel.ISupportInitialize)(this.redDebugPieceImg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.greenDebugPieceImg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowDebugPieceImg)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).BeginInit();
             this.SuspendLayout();
             // 
             // BoardPicture
@@ -762,10 +765,22 @@ namespace Reversi
             this.yellowDebugPieceImg.TabStop = false;
             this.yellowDebugPieceImg.Visible = false;
             // 
+            // emptyPieceImg
+            // 
+            this.emptyPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("emptyPieceImg.Image")));
+            this.emptyPieceImg.InitialImage = null;
+            this.emptyPieceImg.Location = new System.Drawing.Point(261, 246);
+            this.emptyPieceImg.Name = "emptyPieceImg";
+            this.emptyPieceImg.Size = new System.Drawing.Size(38, 38);
+            this.emptyPieceImg.TabIndex = 33;
+            this.emptyPieceImg.TabStop = false;
+            this.emptyPieceImg.Visible = false;
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(741, 433);
+            this.Controls.Add(this.emptyPieceImg);
             this.Controls.Add(this.yellowDebugPieceImg);
             this.Controls.Add(this.greenDebugPieceImg);
             this.Controls.Add(this.redDebugPieceImg);
@@ -800,6 +815,7 @@ namespace Reversi
             ((System.ComponentModel.ISupportInitialize)(this.redDebugPieceImg)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.greenDebugPieceImg)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.yellowDebugPieceImg)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -828,6 +844,11 @@ namespace Reversi
             gBoardImage = BoardPicture.Image;
             gWhitePieceImage = whitePieceImg.Image;
             gBlackPieceImage = blackPieceImg.Image;
+            gEmptyPieceImage = emptyPieceImg.Image;
+
+            boardPieceImageSize = blackPieceImg.Width;
+
+            boardGridSize = Properties.Settings.Default.GridSize;
 
             AITurnWorker.WorkerSupportsCancellation = true;
             AITurnWorker.WorkerReportsProgress = true;
@@ -850,6 +871,7 @@ namespace Reversi
         private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
         private static Image gBlackPieceImage;
         private static Image gWhitePieceImage;
+        private static Image gEmptyPieceImage;
         private static Image gBoardImage;
 
         private static Image gYellowDebugPieceImage;
@@ -864,6 +886,10 @@ namespace Reversi
         private static Label gCurrentTurnLabel;
         private static PictureBox gCurrentTurnImage;
         private static BackgroundWorker gAITurnWorker;
+
+        // Piece dimensions
+        private static int boardPieceImageSize;
+        private static int boardGridSize;
 
         // The board used to track what has been drawn on the screen
         private static Board LastDrawnBoard = new Board();
@@ -907,19 +933,19 @@ namespace Reversi
         }
 
         // Redraw the piece images on the board
-        public static void RefreshPieces()
+        public static void RefreshPieces(bool FullRefresh = false)
         {
-            RefreshPieces(gCurrentGame.getGameBoard());
+            RefreshPieces(gCurrentGame.getGameBoard(), FullRefresh);
         }
 
-        public static void RefreshPieces(Board SourceBoard)
+        public static void RefreshPieces(Board SourceBoard, bool FullRefresh = false)
         {
             for (int Y = 0; Y < SourceBoard.getBoardSize(); Y++)
             {
                 for (int X = 0; X < SourceBoard.getBoardSize(); X++)
                 {
                     if (SourceBoard.ColorAt(X, Y) != Properties.Settings.Default.EMPTY)
-                        if (getLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y))
+                        if ((getLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) && (!FullRefresh))
                         {
                             // Draw the new piece
                             DrawPiece(SourceBoard.ColorAt(X, Y), X, Y);
@@ -929,43 +955,44 @@ namespace Reversi
             getLastDrawnBoard().CopyBoard(SourceBoard.getBoardPieces());
         }
 
-        public static void DrawPiece(int Color, int X, int Y)
+        public static void DrawPiece(int color, int X, int Y)
         {
-            gBoardGFX.DrawImage(Color == Properties.Settings.Default.WHITE ? gWhitePieceImage : gBlackPieceImage, X * 40 + 1, Y * 40 + 1, gWhitePieceImage.Width, gWhitePieceImage.Height);
+            gBoardGFX.DrawImage(getTurnImage(color), X * boardGridSize + 1, Y * boardGridSize + 1, boardPieceImageSize, boardPieceImageSize);
         }
 
-        public static void ResetBoardImage()
+        public static void ClearBoardPieces()
         {
-            gBoardGFX.DrawImage(gBoardImage, 0, 0, gBoardImage.Width, gBoardImage.Height);
+            gBoardGFX.DrawImage(gBoardImage, 0, 0, boardPieceImageSize, boardPieceImageSize);
         }
 
-        public static Image getTurnImage(int turn)
+        public static void ClearBoardPieces(Point[] PieceList)
         {
-            if (turn == WHITE)
-                return( gWhitePieceImage );
-            else if (turn == BLACK)
-                return( gBlackPieceImage );
-            else if (turn == YELLOW)
-                return( gYellowDebugPieceImage );
-            else if (turn == GREEN)
-                return( gGreenDebugPieceImage );
+            foreach (Point CurrentPoint in PieceList)
+                ReversiForm.DrawPiece(EMPTY, CurrentPoint.X, CurrentPoint.Y);
+        }
+
+        public static Image getTurnImage(int color)
+        {
+            if (color == WHITE)
+                return (gWhitePieceImage);
+            else if (color == BLACK)
+                return (gBlackPieceImage);
+            else if (color == YELLOW)
+                return (gYellowDebugPieceImage);
+            else if (color == GREEN)
+                return (gGreenDebugPieceImage);
+            else if (color == RED)
+                return (gRedDebugPieceImage);
             else
-                return( gRedDebugPieceImage );
+                return (gEmptyPieceImage);
         }
 
-        public static void UpdateTurnImage(int turn)
+        public static void UpdateTurnImage(int color)
         {
-            if (turn == WHITE)
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage( turn ), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
-            else if (turn == BLACK)
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
-            else if (turn == YELLOW)
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
-            else if (turn == RED)
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
-            else if (turn == GREEN)
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(turn), 0, 0, gWhitePieceImage.Width, gWhitePieceImage.Height);
-
+            if (color == WHITE)
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(color), 0, 0, boardPieceImageSize, boardPieceImageSize);
+            else
+                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(color), 0, 0, boardPieceImageSize, boardPieceImageSize);
         }
 
         public static void ShowWinner(int WinningColor)
@@ -1253,8 +1280,8 @@ namespace Reversi
         // Responds to the MouseUp event on the board image, processes the click as a placed piece
         private void PlaceUserPiece(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            int x = (e.X + 1) / 40;
-            int y = (e.Y + 1) / 40;
+            int x = (e.X + 1) / boardGridSize;
+            int y = (e.Y + 1) / boardGridSize;
 
             // Don't process the mouse click if there is a turn already being processed
             if (!gCurrentGame.getTurnInProgress())
@@ -1266,8 +1293,8 @@ namespace Reversi
         {
             gridDimensionLabel.Text = getBoardSize() + "x" + getBoardSize();
 
-            BoardPicture.Width = 40 * getBoardSize();
-            BoardPicture.Height = 40 * getBoardSize();
+            BoardPicture.Width = boardGridSize * getBoardSize();
+            BoardPicture.Height = boardGridSize * getBoardSize();
 
             StartNewGame();
         }
