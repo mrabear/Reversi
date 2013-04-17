@@ -78,13 +78,15 @@ namespace Reversi
                         Console.WriteLine("|------------------------------------------|");
 
                         MoveResults.Add(CurrentPoint, MoveWeight);
+
+                        ReversiForm.HighlightPiece(Color.Red, CurrentPoint, MoveWeight.ToString("0.00"));
+
                         Console.WriteLine("\t Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ")\t\tscore=" + MoveWeight + "\n");
                     }
                 });
 
                 foreach (Point ResultMove in MoveResults.Keys)
                 {
-                    ReversiForm.HighlightPiece(Color.Red, ResultMove, MoveResults[ResultMove].ToString("0.00"));
                     if (MoveResults[ResultMove] > MoveResults[ChosenMove])
                         ChosenMove = ResultMove;
                 }
