@@ -11,10 +11,6 @@ namespace Reversi
     // Description: Stores the game board and all of the methods to manipulate it
     public class Board
     {
-        private static int BLACK = Properties.Settings.Default.BLACK;
-        private static int WHITE = Properties.Settings.Default.WHITE;
-        private static int EMPTY = Properties.Settings.Default.EMPTY;
-
         // The array of pieces that represents the board state
         private int[,] BoardPieces;
 
@@ -116,9 +112,9 @@ namespace Reversi
         public int ColorAt(int x, int y)
         {
             if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
-                return EMPTY;
+                return ReversiApplication.EMPTY;
 
-            return (BoardPieces[x, y]);
+            return(BoardPieces[x, y]);
         }
 
         // Attempts to process the implications of a legal move and updates the board if ProcessMove = true
@@ -127,13 +123,13 @@ namespace Reversi
             int CurrentTurn = color;
             int NextTurn;
 
-            if (CurrentTurn == WHITE)
-                NextTurn = BLACK;
+            if (CurrentTurn == ReversiApplication.WHITE)
+                NextTurn = ReversiApplication.BLACK;
             else
-                NextTurn = WHITE;
+                NextTurn = ReversiApplication.WHITE;
 
             // Check for already existing piece
-            if (ColorAt(x, y) != EMPTY)
+            if (ColorAt(x, y) != ReversiApplication.EMPTY)
                 return false;
 
             Boolean findStatus = false;
@@ -200,8 +196,8 @@ namespace Reversi
             int foundMoves = 0;
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == EMPTY)
-                        if (MakeMove(X, Y, CurrentTurn, false))
+                    if (ColorAt(X, Y) == ReversiApplication.EMPTY)
+                        if (MakeMove(X, Y, CurrentTurn, ProcessMove: false))
                         {
                             Moves[foundMoves] = new Point(X, Y);
                             foundMoves++;
@@ -219,8 +215,8 @@ namespace Reversi
         {
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == EMPTY)
-                        if (MakeMove(X, Y, color, false))
+                    if (ColorAt(X, Y) == ReversiApplication.EMPTY)
+                        if (MakeMove(X, Y, color, ProcessMove: false))
                             return true;
 
             return false;
@@ -229,10 +225,10 @@ namespace Reversi
         // Places a piece at the given location
         public void PutPiece(int x, int y, int color)
         {
-            if ((color == WHITE) || (color == BLACK))
+            if ((color == ReversiApplication.WHITE) || (color == ReversiApplication.BLACK))
                 BoardPieces[x, y] = color;
             else
-                BoardPieces[x, y] = EMPTY;
+                BoardPieces[x, y] = ReversiApplication.EMPTY;
         }
 
         // Empty the board
@@ -246,24 +242,24 @@ namespace Reversi
         {
             if (BoardSize == 8)
             {
-                PutPiece(3, 3, WHITE);
-                PutPiece(4, 4, WHITE);
-                PutPiece(3, 4, BLACK);
-                PutPiece(4, 3, BLACK);
+                PutPiece(3, 3, ReversiApplication.WHITE);
+                PutPiece(4, 4, ReversiApplication.WHITE);
+                PutPiece(3, 4, ReversiApplication.BLACK);
+                PutPiece(4, 3, ReversiApplication.BLACK);
             }
             else if (BoardSize == 6)
             {
-                PutPiece(2, 2, WHITE);
-                PutPiece(3, 3, WHITE);
-                PutPiece(2, 3, BLACK);
-                PutPiece(3, 2, BLACK);
+                PutPiece(2, 2, ReversiApplication.WHITE);
+                PutPiece(3, 3, ReversiApplication.WHITE);
+                PutPiece(2, 3, ReversiApplication.BLACK);
+                PutPiece(3, 2, ReversiApplication.BLACK);
             }
             else
             {
-                PutPiece(1, 1, WHITE);
-                PutPiece(2, 2, WHITE);
-                PutPiece(1, 2, BLACK);
-                PutPiece(2, 1, BLACK);
+                PutPiece(1, 1, ReversiApplication.WHITE);
+                PutPiece(2, 2, ReversiApplication.WHITE);
+                PutPiece(1, 2, ReversiApplication.BLACK);
+                PutPiece(2, 1, ReversiApplication.BLACK);
             }
         }
 

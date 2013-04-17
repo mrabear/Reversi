@@ -11,23 +11,23 @@ namespace Reversi
     // Represents a sinlge game state with N-number of connections to and from the tree of all possible game states
     public class SimulationNode
     {
-        private String NodeID;                 // The unique identifier of this node
+        private String NodeID;              // The unique identifier of this node
 
-        private Point[] AvailableMoves;         // The list available moves that haven't been simulated yet
+        private Point[] AvailableMoves;     // The list available moves that haven't been simulated yet
 
-        private Boolean isLeaf;                 // TRUE if the node represnts a game end state
-        private Boolean isTrunk;                // TRUE if the node is the initial game starting position
-        private Boolean isPassTurn;             // TRUE if the node represents a game board where the current player has to pass
+        private Boolean isLeaf;             // TRUE if the node represnts a game end state
+        private Boolean isTrunk;            // TRUE if the node is the initial game starting position
+        private Boolean isPassTurn;         // TRUE if the node represents a game board where the current player has to pass
 
-        private Board GameBoard;              // The board state that this node was generated from
+        private Board GameBoard;            // The board state that this node was generated from
 
         private int Turn;                   // The player who is moving in this node
 
         private int WhiteWins;              // The potential number of White victory states that this node can lead to
         private int BlackWins;              // The potential number of Black victory states that this node can lead to
 
-        private List<String> ChildNodes;      // The list of game nodes that can be created from the current one (i.e. player moves from the current state to one of the children)
-        private List<String> ParentNodes;     // The list of game nodes that can create the current one (i.e. player moves from one of the parent states to the current state)
+        private List<String> ChildNodes;    // The list of game nodes that can be created from the current one (i.e. player moves from the current state to one of the children)
+        private List<String> ParentNodes;   // The list of game nodes that can create the current one (i.e. player moves from one of the parent states to the current state)
 
         public SimulationNode(Board SourceBoard, int SourceTurn, Boolean SetTrunk = false, Boolean SetLeaf = false)
         {

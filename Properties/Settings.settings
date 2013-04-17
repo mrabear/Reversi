@@ -15,19 +15,10 @@
       <Value Profile="(Default)">0.1</Value>
     </Setting>
     <Setting Name="MaxDepth" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">6</Value>
-    </Setting>
-    <Setting Name="VictoryWeight" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">10</Value>
     </Setting>
-    <Setting Name="YELLOW" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">-1</Value>
-    </Setting>
-    <Setting Name="RED" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">-2</Value>
-    </Setting>
-    <Setting Name="GREEN" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">-3</Value>
+    <Setting Name="VictoryWeight" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">6</Value>
     </Setting>
     <Setting Name="GridSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">40</Value>

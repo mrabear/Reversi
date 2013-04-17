@@ -11,11 +11,6 @@ namespace Reversi
     // Description: Stores game state information and rules
     public class Game
     {
-        // Color constants
-        private static int BLACK = Properties.Settings.Default.BLACK;
-        private static int WHITE = Properties.Settings.Default.WHITE;
-        private static int EMPTY = Properties.Settings.Default.EMPTY;
-
         private int CurrentTurn;
         private int NextTurn;
         private int Difficulty;
@@ -29,13 +24,13 @@ namespace Reversi
 
         public Game(int BoardSize = 8)
         {
-            CurrentTurn = WHITE;
-            NextTurn = BLACK;
+            CurrentTurn = ReversiApplication.WHITE;
+            NextTurn = ReversiApplication.BLACK;
             Difficulty = ReversiForm.getAIDifficulty();
             VsComputer = ReversiForm.isVsComputer();
             GameBoard = new Board(BoardSize);
             IsComplete = false;
-            AI = new AI(BLACK);
+            AI = new AI(ReversiApplication.BLACK);
 
             // Reset the board image to clear any pieces from previous games
             ReversiForm.ClearBoardPieces();
@@ -65,29 +60,29 @@ namespace Reversi
         // Determines if there is a winner in the current game
         public Boolean DetermineWinner()
         {
-            int WhiteScore = GameBoard.FindScore(WHITE);
-            int BlackScore = GameBoard.FindScore(BLACK);
+            int WhiteScore = GameBoard.FindScore(ReversiApplication.WHITE);
+            int BlackScore = GameBoard.FindScore(ReversiApplication.BLACK);
 
             if (WhiteScore == 0)
             {
                 IsComplete = true;
-                Winner = BLACK;
+                Winner = ReversiApplication.BLACK;
             }
             else if (BlackScore == 0)
             {
                 IsComplete = true;
-                Winner = WHITE;
+                Winner = ReversiApplication.WHITE;
             }
             else if (((WhiteScore + BlackScore) == 64) ||
                 ((!GameBoard.MovePossible(CurrentTurn)) && (!GameBoard.MovePossible(NextTurn))))
             {
                 IsComplete = true;
                 if (BlackScore > WhiteScore)
-                    Winner = BLACK;
+                    Winner = ReversiApplication.BLACK;
                 else if (BlackScore < WhiteScore)
-                    Winner = WHITE;
+                    Winner = ReversiApplication.WHITE;
                 else
-                    Winner = EMPTY;
+                    Winner = ReversiApplication.EMPTY;
             }
 
             if (IsComplete)
@@ -118,7 +113,7 @@ namespace Reversi
                         SwitchTurn();
                     }
 
-                    ReversiForm.RefreshPieces();
+                    ReversiForm.RefreshPieces( FullRefresh: true );
                     ReversiForm.UpdateScoreBoard();
                 }
 
@@ -135,36 +130,35 @@ namespace Reversi
         {
             while (GameBoard.MovePossible(AI.getColor()))
             {
-                Point AIMove = AI.DetermineNextMove(this);
-                GameBoard.MakeMove(AIMove.X, AIMove.Y, CurrentTurn);
+                AI.MakeNextMove(this);
 
                 if (GameBoard.MovePossible(NextTurn))
                     break;
                 else
-                    ReversiForm.ReportAITurnWorkerProgress(0);
+                    ReversiForm.RefreshPieces(FullRefresh: true);
             }
         }
 
         public void SwitchTurn()
         {
-            if (CurrentTurn == WHITE)
+            if (CurrentTurn == ReversiApplication.WHITE)
             {
-                CurrentTurn = BLACK;
-                NextTurn = WHITE;
+                CurrentTurn = ReversiApplication.BLACK;
+                NextTurn = ReversiApplication.WHITE;
             }
             else
             {
-                CurrentTurn = WHITE;
-                NextTurn = BLACK;
+                CurrentTurn = ReversiApplication.WHITE;
+                NextTurn = ReversiApplication.BLACK;
             }
             ReversiForm.UpdateTurnImage(CurrentTurn);
         }
 
         public string GetTurnString(int color)
         {
-            if (color == WHITE)
+            if (color == ReversiApplication.WHITE)
                 return ("White");
-            else if (color == BLACK)
+            else if (color == ReversiApplication.BLACK)
                 return ("Black");
             else
                 return ("Illegal Color!");
