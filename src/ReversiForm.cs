@@ -56,8 +56,6 @@ namespace Reversi
         private System.Windows.Forms.MenuItem debugDropDownMenu;
         private System.Windows.Forms.MenuItem DebugSkip;
         private System.Windows.Forms.MenuItem DebugProcess;
-        public RichTextBox DebugAITrace;
-        private System.Windows.Forms.Label AITraceLabel;
 
         private System.Windows.Forms.MenuItem menuItem4;
         private System.Windows.Forms.MenuItem DebugScenario_NoWhite;
@@ -99,13 +97,15 @@ namespace Reversi
         private PictureBox emptyPieceImg;
         private PictureBox boardXaxisLabel;
         private PictureBox boardYaxisLabel;
-        private ComboBox simDepthDropDown;
-        private CheckBox visualizeAITurnSim;
-        private Label simDepthDDLabel;
-        private CheckBox debugLogCheckBox;
-        private Button clearDebugLogButton;
+        private Label simDepthTitle;
         private Button hideDebugButton;
-        private Panel debugPanel;
+        private TrackBar simulationDepthSlider;
+        private Label simDepthCountLabel;
+        private Label simDepthCount;
+        public RichTextBox DebugAITrace;
+        private Button clearDebugLogButton;
+        private Label AITraceLabel;
+        private CheckBox debugLogCheckBox;
         private PictureBox whitePieceImg;
         #endregion
 
@@ -139,8 +139,6 @@ namespace Reversi
             this.DebugScenario_NoWhite = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoBlack = new System.Windows.Forms.MenuItem();
             this.DebugScenario_TieGame = new System.Windows.Forms.MenuItem();
-            this.DebugAITrace = new System.Windows.Forms.RichTextBox();
-            this.AITraceLabel = new System.Windows.Forms.Label();
             this.BuildAIDBButton = new System.Windows.Forms.Button();
             this.visualizeCheckbox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -169,9 +167,7 @@ namespace Reversi
             this.AIInfoTabControl = new System.Windows.Forms.TabControl();
             this.AIDBTab = new System.Windows.Forms.TabPage();
             this.AISimTab = new System.Windows.Forms.TabPage();
-            this.visualizeAITurnSim = new System.Windows.Forms.CheckBox();
-            this.simDepthDDLabel = new System.Windows.Forms.Label();
-            this.simDepthDropDown = new System.Windows.Forms.ComboBox();
+            this.simDepthTitle = new System.Windows.Forms.Label();
             this.CurrentTurnLabel = new System.Windows.Forms.Label();
             this.CurrentTurnImage = new System.Windows.Forms.PictureBox();
             this.blackScoreBoardTitle = new System.Windows.Forms.Label();
@@ -182,10 +178,14 @@ namespace Reversi
             this.emptyPieceImg = new System.Windows.Forms.PictureBox();
             this.boardXaxisLabel = new System.Windows.Forms.PictureBox();
             this.boardYaxisLabel = new System.Windows.Forms.PictureBox();
-            this.debugLogCheckBox = new System.Windows.Forms.CheckBox();
-            this.clearDebugLogButton = new System.Windows.Forms.Button();
             this.hideDebugButton = new System.Windows.Forms.Button();
-            this.debugPanel = new System.Windows.Forms.Panel();
+            this.simulationDepthSlider = new System.Windows.Forms.TrackBar();
+            this.simDepthCount = new System.Windows.Forms.Label();
+            this.simDepthCountLabel = new System.Windows.Forms.Label();
+            this.DebugAITrace = new System.Windows.Forms.RichTextBox();
+            this.clearDebugLogButton = new System.Windows.Forms.Button();
+            this.AITraceLabel = new System.Windows.Forms.Label();
+            this.debugLogCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
@@ -198,7 +198,7 @@ namespace Reversi
             ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).BeginInit();
-            this.debugPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).BeginInit();
             this.SuspendLayout();
             // 
             // BoardPicture
@@ -359,26 +359,6 @@ namespace Reversi
             this.DebugScenario_TieGame.Index = 2;
             this.DebugScenario_TieGame.Text = "Tie Game";
             // 
-            // DebugAITrace
-            // 
-            this.DebugAITrace.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DebugAITrace.HideSelection = false;
-            this.DebugAITrace.Location = new System.Drawing.Point(2, 31);
-            this.DebugAITrace.Name = "DebugAITrace";
-            this.DebugAITrace.Size = new System.Drawing.Size(357, 414);
-            this.DebugAITrace.TabIndex = 5;
-            this.DebugAITrace.Text = "";
-            // 
-            // AITraceLabel
-            // 
-            this.AITraceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AITraceLabel.Location = new System.Drawing.Point(94, 10);
-            this.AITraceLabel.Name = "AITraceLabel";
-            this.AITraceLabel.Size = new System.Drawing.Size(175, 16);
-            this.AITraceLabel.TabIndex = 6;
-            this.AITraceLabel.Text = "AI Debug Messages";
-            this.AITraceLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
             // BuildAIDBButton
             // 
             this.BuildAIDBButton.Location = new System.Drawing.Point(6, 22);
@@ -392,15 +372,19 @@ namespace Reversi
             // visualizeCheckbox
             // 
             this.visualizeCheckbox.AutoSize = true;
+            this.visualizeCheckbox.BackColor = System.Drawing.Color.Transparent;
             this.visualizeCheckbox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.visualizeCheckbox.Checked = true;
             this.visualizeCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.visualizeCheckbox.Location = new System.Drawing.Point(129, 56);
+            this.visualizeCheckbox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.visualizeCheckbox.Location = new System.Drawing.Point(659, 7);
+            this.visualizeCheckbox.Margin = new System.Windows.Forms.Padding(0);
             this.visualizeCheckbox.Name = "visualizeCheckbox";
-            this.visualizeCheckbox.Size = new System.Drawing.Size(106, 17);
+            this.visualizeCheckbox.Size = new System.Drawing.Size(99, 19);
             this.visualizeCheckbox.TabIndex = 8;
-            this.visualizeCheckbox.Text = "visualize process";
-            this.visualizeCheckbox.UseVisualStyleBackColor = true;
+            this.visualizeCheckbox.Text = "Visualizations";
+            this.visualizeCheckbox.UseVisualStyleBackColor = false;
+            this.visualizeCheckbox.CheckedChanged += new System.EventHandler(this.visualizeCheckbox_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -410,7 +394,6 @@ namespace Reversi
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.anaylzeDBButton);
             this.groupBox1.Controls.Add(this.BuildAIDBButton);
-            this.groupBox1.Controls.Add(this.visualizeCheckbox);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(244, 107);
@@ -422,7 +405,7 @@ namespace Reversi
             // 
             this.gridDimensionLabel.AutoSize = true;
             this.gridDimensionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.gridDimensionLabel.Location = new System.Drawing.Point(200, 33);
+            this.gridDimensionLabel.Location = new System.Drawing.Point(200, 51);
             this.gridDimensionLabel.Name = "gridDimensionLabel";
             this.gridDimensionLabel.Size = new System.Drawing.Size(28, 16);
             this.gridDimensionLabel.TabIndex = 15;
@@ -438,7 +421,7 @@ namespace Reversi
             "6",
             "7",
             "8"});
-            this.gridSizeDropDown.Location = new System.Drawing.Point(147, 29);
+            this.gridSizeDropDown.Location = new System.Drawing.Point(147, 47);
             this.gridSizeDropDown.Name = "gridSizeDropDown";
             this.gridSizeDropDown.Size = new System.Drawing.Size(41, 21);
             this.gridSizeDropDown.TabIndex = 14;
@@ -446,7 +429,7 @@ namespace Reversi
             // 
             // dumpDBInfoButton
             // 
-            this.dumpDBInfoButton.Location = new System.Drawing.Point(127, 78);
+            this.dumpDBInfoButton.Location = new System.Drawing.Point(75, 78);
             this.dumpDBInfoButton.Name = "dumpDBInfoButton";
             this.dumpDBInfoButton.Size = new System.Drawing.Size(108, 23);
             this.dumpDBInfoButton.TabIndex = 13;
@@ -458,7 +441,7 @@ namespace Reversi
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(134, 13);
+            this.label1.Location = new System.Drawing.Point(134, 27);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(104, 13);
             this.label1.TabIndex = 10;
@@ -640,15 +623,16 @@ namespace Reversi
             this.AIInfoTabControl.Controls.Add(this.AIDBTab);
             this.AIInfoTabControl.Controls.Add(this.AISimTab);
             this.AIInfoTabControl.HotTrack = true;
-            this.AIInfoTabControl.Location = new System.Drawing.Point(383, 10);
+            this.AIInfoTabControl.Location = new System.Drawing.Point(383, 8);
             this.AIInfoTabControl.Name = "AIInfoTabControl";
             this.AIInfoTabControl.SelectedIndex = 0;
-            this.AIInfoTabControl.Size = new System.Drawing.Size(375, 436);
+            this.AIInfoTabControl.Size = new System.Drawing.Size(375, 431);
             this.AIInfoTabControl.TabIndex = 24;
             // 
             // AIDBTab
             // 
             this.AIDBTab.BackColor = System.Drawing.Color.Transparent;
+            this.AIDBTab.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.AIDBTab.Controls.Add(this.groupBox1);
             this.AIDBTab.Controls.Add(this.RAMUsageBar);
             this.AIDBTab.Controls.Add(this.RAMLabel);
@@ -670,61 +654,27 @@ namespace Reversi
             // AISimTab
             // 
             this.AISimTab.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.AISimTab.Controls.Add(this.visualizeAITurnSim);
-            this.AISimTab.Controls.Add(this.simDepthDDLabel);
-            this.AISimTab.Controls.Add(this.simDepthDropDown);
+            this.AISimTab.Controls.Add(this.simDepthCountLabel);
+            this.AISimTab.Controls.Add(this.simDepthCount);
+            this.AISimTab.Controls.Add(this.simulationDepthSlider);
+            this.AISimTab.Controls.Add(this.simDepthTitle);
             this.AISimTab.Location = new System.Drawing.Point(4, 22);
             this.AISimTab.Name = "AISimTab";
             this.AISimTab.Padding = new System.Windows.Forms.Padding(3);
-            this.AISimTab.Size = new System.Drawing.Size(367, 410);
+            this.AISimTab.Size = new System.Drawing.Size(367, 405);
             this.AISimTab.TabIndex = 1;
             this.AISimTab.Text = "AI Game Simulations";
             this.AISimTab.UseVisualStyleBackColor = true;
             // 
-            // visualizeAITurnSim
+            // simDepthTitle
             // 
-            this.visualizeAITurnSim.AutoSize = true;
-            this.visualizeAITurnSim.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.visualizeAITurnSim.Checked = true;
-            this.visualizeAITurnSim.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.visualizeAITurnSim.Location = new System.Drawing.Point(238, 11);
-            this.visualizeAITurnSim.Name = "visualizeAITurnSim";
-            this.visualizeAITurnSim.Size = new System.Drawing.Size(106, 17);
-            this.visualizeAITurnSim.TabIndex = 37;
-            this.visualizeAITurnSim.Text = "visualize process";
-            this.visualizeAITurnSim.UseVisualStyleBackColor = true;
-            this.visualizeAITurnSim.CheckedChanged += new System.EventHandler(this.visualizeAITurnSim_CheckedChanged);
-            // 
-            // simDepthDDLabel
-            // 
-            this.simDepthDDLabel.AutoSize = true;
-            this.simDepthDDLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.simDepthDDLabel.Location = new System.Drawing.Point(10, 19);
-            this.simDepthDDLabel.Name = "simDepthDDLabel";
-            this.simDepthDDLabel.Size = new System.Drawing.Size(103, 13);
-            this.simDepthDDLabel.TabIndex = 36;
-            this.simDepthDDLabel.Text = "Simulation Depth";
-            // 
-            // simDepthDropDown
-            // 
-            this.simDepthDropDown.FormattingEnabled = true;
-            this.simDepthDropDown.Items.AddRange(new object[] {
-            "   2 turns deep",
-            "   4 turns deep",
-            "   6 turns deep",
-            "   8 turns deep",
-            " 10 turns deep",
-            " 12 turns deep",
-            " 14 turns deep",
-            " 16 turns deep",
-            " 18 turns deep",
-            " 20 turns deep"});
-            this.simDepthDropDown.Location = new System.Drawing.Point(119, 15);
-            this.simDepthDropDown.MaxDropDownItems = 13;
-            this.simDepthDropDown.Name = "simDepthDropDown";
-            this.simDepthDropDown.Size = new System.Drawing.Size(97, 21);
-            this.simDepthDropDown.TabIndex = 0;
-            this.simDepthDropDown.SelectedIndexChanged += new System.EventHandler(this.simDepthDropDown_SelectedIndexChanged);
+            this.simDepthTitle.AutoSize = true;
+            this.simDepthTitle.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.simDepthTitle.Location = new System.Drawing.Point(6, 4);
+            this.simDepthTitle.Name = "simDepthTitle";
+            this.simDepthTitle.Size = new System.Drawing.Size(147, 23);
+            this.simDepthTitle.TabIndex = 36;
+            this.simDepthTitle.Text = "Simulation Depth";
             // 
             // CurrentTurnLabel
             // 
@@ -824,30 +774,6 @@ namespace Reversi
             this.boardYaxisLabel.TabIndex = 35;
             this.boardYaxisLabel.TabStop = false;
             // 
-            // debugLogCheckBox
-            // 
-            this.debugLogCheckBox.AutoSize = true;
-            this.debugLogCheckBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.debugLogCheckBox.Checked = true;
-            this.debugLogCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.debugLogCheckBox.Location = new System.Drawing.Point(8, 11);
-            this.debugLogCheckBox.Name = "debugLogCheckBox";
-            this.debugLogCheckBox.Size = new System.Drawing.Size(86, 17);
-            this.debugLogCheckBox.TabIndex = 38;
-            this.debugLogCheckBox.Text = "Log Enabled";
-            this.debugLogCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // clearDebugLogButton
-            // 
-            this.clearDebugLogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clearDebugLogButton.Location = new System.Drawing.Point(302, 6);
-            this.clearDebugLogButton.Name = "clearDebugLogButton";
-            this.clearDebugLogButton.Size = new System.Drawing.Size(57, 23);
-            this.clearDebugLogButton.TabIndex = 36;
-            this.clearDebugLogButton.Text = "Clear";
-            this.clearDebugLogButton.UseVisualStyleBackColor = true;
-            this.clearDebugLogButton.Click += new System.EventHandler(this.clearDebugLogButton_Click);
-            // 
             // hideDebugButton
             // 
             this.hideDebugButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -860,23 +786,98 @@ namespace Reversi
             this.hideDebugButton.UseVisualStyleBackColor = true;
             this.hideDebugButton.Click += new System.EventHandler(this.hideDebugButton_Click);
             // 
-            // debugPanel
+            // simulationDepthSlider
             // 
-            this.debugPanel.Controls.Add(this.debugLogCheckBox);
-            this.debugPanel.Controls.Add(this.AITraceLabel);
-            this.debugPanel.Controls.Add(this.clearDebugLogButton);
-            this.debugPanel.Controls.Add(this.DebugAITrace);
-            this.debugPanel.Location = new System.Drawing.Point(758, -6);
-            this.debugPanel.Name = "debugPanel";
-            this.debugPanel.Size = new System.Drawing.Size(359, 452);
-            this.debugPanel.TabIndex = 39;
+            this.simulationDepthSlider.LargeChange = 2;
+            this.simulationDepthSlider.Location = new System.Drawing.Point(6, 29);
+            this.simulationDepthSlider.Maximum = 20;
+            this.simulationDepthSlider.Minimum = 2;
+            this.simulationDepthSlider.Name = "simulationDepthSlider";
+            this.simulationDepthSlider.Size = new System.Drawing.Size(299, 45);
+            this.simulationDepthSlider.SmallChange = 2;
+            this.simulationDepthSlider.TabIndex = 38;
+            this.simulationDepthSlider.TickFrequency = 2;
+            this.simulationDepthSlider.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.simulationDepthSlider.Value = 6;
+            this.simulationDepthSlider.Scroll += new System.EventHandler(this.simulationDepthSlider_Scroll);
+            // 
+            // simDepthCount
+            // 
+            this.simDepthCount.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.simDepthCount.Location = new System.Drawing.Point(305, 13);
+            this.simDepthCount.Name = "simDepthCount";
+            this.simDepthCount.Size = new System.Drawing.Size(49, 31);
+            this.simDepthCount.TabIndex = 40;
+            this.simDepthCount.Text = "20";
+            this.simDepthCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // simDepthCountLabel
+            // 
+            this.simDepthCountLabel.AutoSize = true;
+            this.simDepthCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.simDepthCountLabel.Location = new System.Drawing.Point(313, 40);
+            this.simDepthCountLabel.Name = "simDepthCountLabel";
+            this.simDepthCountLabel.Size = new System.Drawing.Size(38, 26);
+            this.simDepthCountLabel.TabIndex = 41;
+            this.simDepthCountLabel.Text = "Turns\r\nAhead";
+            // 
+            // DebugAITrace
+            // 
+            this.DebugAITrace.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.DebugAITrace.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.DebugAITrace.HideSelection = false;
+            this.DebugAITrace.Location = new System.Drawing.Point(760, 28);
+            this.DebugAITrace.Name = "DebugAITrace";
+            this.DebugAITrace.Size = new System.Drawing.Size(367, 411);
+            this.DebugAITrace.TabIndex = 5;
+            this.DebugAITrace.Text = "";
+            // 
+            // clearDebugLogButton
+            // 
+            this.clearDebugLogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.clearDebugLogButton.Location = new System.Drawing.Point(764, 3);
+            this.clearDebugLogButton.Name = "clearDebugLogButton";
+            this.clearDebugLogButton.Size = new System.Drawing.Size(57, 23);
+            this.clearDebugLogButton.TabIndex = 36;
+            this.clearDebugLogButton.Text = "Clear";
+            this.clearDebugLogButton.UseVisualStyleBackColor = true;
+            this.clearDebugLogButton.Click += new System.EventHandler(this.clearDebugLogButton_Click);
+            // 
+            // AITraceLabel
+            // 
+            this.AITraceLabel.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AITraceLabel.Location = new System.Drawing.Point(858, 2);
+            this.AITraceLabel.Name = "AITraceLabel";
+            this.AITraceLabel.Size = new System.Drawing.Size(175, 21);
+            this.AITraceLabel.TabIndex = 6;
+            this.AITraceLabel.Text = "Debug Log";
+            this.AITraceLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // debugLogCheckBox
+            // 
+            this.debugLogCheckBox.AutoSize = true;
+            this.debugLogCheckBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.debugLogCheckBox.Checked = true;
+            this.debugLogCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.debugLogCheckBox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.debugLogCheckBox.Location = new System.Drawing.Point(1061, 5);
+            this.debugLogCheckBox.Name = "debugLogCheckBox";
+            this.debugLogCheckBox.Size = new System.Drawing.Size(67, 19);
+            this.debugLogCheckBox.TabIndex = 38;
+            this.debugLogCheckBox.Text = "Logging";
+            this.debugLogCheckBox.UseVisualStyleBackColor = true;
             // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(1123, 451);
+            this.ClientSize = new System.Drawing.Size(1133, 446);
+            this.Controls.Add(this.debugLogCheckBox);
+            this.Controls.Add(this.visualizeCheckbox);
+            this.Controls.Add(this.AITraceLabel);
             this.Controls.Add(this.hideDebugButton);
+            this.Controls.Add(this.clearDebugLogButton);
             this.Controls.Add(this.emptyPieceImg);
+            this.Controls.Add(this.DebugAITrace);
             this.Controls.Add(this.whiteScoreBoardTitle);
             this.Controls.Add(this.blackScoreBoardTitle);
             this.Controls.Add(this.CurrentTurnImage);
@@ -891,7 +892,6 @@ namespace Reversi
             this.Controls.Add(this.boardXaxisLabel);
             this.Controls.Add(this.boardYaxisLabel);
             this.Controls.Add(this.Title);
-            this.Controls.Add(this.debugPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -913,9 +913,9 @@ namespace Reversi
             ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).EndInit();
-            this.debugPanel.ResumeLayout(false);
-            this.debugPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -954,9 +954,9 @@ namespace Reversi
 
             gridSizeDropDown.SelectedIndex = 4;
 
-            AIInfoTabControl.SelectTab(AISimTab);
+            updateMaxDepth();
 
-            simDepthDropDown.SelectedIndex = 2;
+            AIInfoTabControl.SelectTab(AISimTab);
 
             unusedGrid.SendToBack();
         }
@@ -1038,8 +1038,9 @@ namespace Reversi
             ReversiApplication.resetCurrentGame(getBoardSize());
             gCurrentGame = ReversiApplication.getCurrentGame();
 
-            gCurrentGame.getAI().setMaxDepth(getSimDepthSelected());
-            gCurrentGame.getAI().setVisualizeProcess(visualizeAITurnSim.Checked);
+            gCurrentGame.getAI().setMaxDepth(simulationDepthSlider.Value);
+
+            gCurrentGame.getAI().setVisualizeProcess(visualizeCheckbox.Checked);
 
             RefreshPieces(FullRefresh: true);
 
@@ -1501,19 +1502,23 @@ namespace Reversi
 
         #region AI Simulation Tab event handlers
 
-        private void simDepthDropDown_SelectedIndexChanged(object sender, EventArgs e)
+        private void simulationDepthSlider_Scroll(object sender, EventArgs e)
         {
-            gCurrentGame.getAI().setMaxDepth(getSimDepthSelected());
+            if (simulationDepthSlider.Value % 2 != 0)
+                simulationDepthSlider.Value++;
+
+            updateMaxDepth();
         }
 
-        public int getSimDepthSelected()
+        private void updateMaxDepth()
         {
-            return ((simDepthDropDown.SelectedIndex + 1) * 2);
+            simDepthCount.Text = simulationDepthSlider.Value.ToString();
+            gCurrentGame.getAI().setMaxDepth(simulationDepthSlider.Value);
         }
 
-        private void visualizeAITurnSim_CheckedChanged(object sender, EventArgs e)
+        private void visualizeCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            gCurrentGame.getAI().setVisualizeProcess(visualizeAITurnSim.Checked);
+            gCurrentGame.getAI().setVisualizeProcess(visualizeCheckbox.Checked);
         }
 
         #endregion
