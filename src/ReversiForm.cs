@@ -167,6 +167,9 @@ namespace Reversi
             this.AIInfoTabControl = new System.Windows.Forms.TabControl();
             this.AIDBTab = new System.Windows.Forms.TabPage();
             this.AISimTab = new System.Windows.Forms.TabPage();
+            this.simDepthCountLabel = new System.Windows.Forms.Label();
+            this.simDepthCount = new System.Windows.Forms.Label();
+            this.simulationDepthSlider = new System.Windows.Forms.TrackBar();
             this.simDepthTitle = new System.Windows.Forms.Label();
             this.CurrentTurnLabel = new System.Windows.Forms.Label();
             this.CurrentTurnImage = new System.Windows.Forms.PictureBox();
@@ -179,9 +182,6 @@ namespace Reversi
             this.boardXaxisLabel = new System.Windows.Forms.PictureBox();
             this.boardYaxisLabel = new System.Windows.Forms.PictureBox();
             this.hideDebugButton = new System.Windows.Forms.Button();
-            this.simulationDepthSlider = new System.Windows.Forms.TrackBar();
-            this.simDepthCount = new System.Windows.Forms.Label();
-            this.simDepthCountLabel = new System.Windows.Forms.Label();
             this.DebugAITrace = new System.Windows.Forms.RichTextBox();
             this.clearDebugLogButton = new System.Windows.Forms.Button();
             this.AITraceLabel = new System.Windows.Forms.Label();
@@ -194,11 +194,11 @@ namespace Reversi
             this.AIInfoTabControl.SuspendLayout();
             this.AIDBTab.SuspendLayout();
             this.AISimTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).BeginInit();
             this.SuspendLayout();
             // 
             // BoardPicture
@@ -647,7 +647,7 @@ namespace Reversi
             this.AIDBTab.Location = new System.Drawing.Point(4, 22);
             this.AIDBTab.Name = "AIDBTab";
             this.AIDBTab.Padding = new System.Windows.Forms.Padding(3);
-            this.AIDBTab.Size = new System.Drawing.Size(367, 410);
+            this.AIDBTab.Size = new System.Drawing.Size(367, 405);
             this.AIDBTab.TabIndex = 0;
             this.AIDBTab.Text = "AI Database";
             // 
@@ -665,6 +665,41 @@ namespace Reversi
             this.AISimTab.TabIndex = 1;
             this.AISimTab.Text = "AI Game Simulations";
             this.AISimTab.UseVisualStyleBackColor = true;
+            // 
+            // simDepthCountLabel
+            // 
+            this.simDepthCountLabel.AutoSize = true;
+            this.simDepthCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.simDepthCountLabel.Location = new System.Drawing.Point(313, 40);
+            this.simDepthCountLabel.Name = "simDepthCountLabel";
+            this.simDepthCountLabel.Size = new System.Drawing.Size(38, 26);
+            this.simDepthCountLabel.TabIndex = 41;
+            this.simDepthCountLabel.Text = "Turns\r\nAhead";
+            // 
+            // simDepthCount
+            // 
+            this.simDepthCount.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.simDepthCount.Location = new System.Drawing.Point(305, 13);
+            this.simDepthCount.Name = "simDepthCount";
+            this.simDepthCount.Size = new System.Drawing.Size(49, 31);
+            this.simDepthCount.TabIndex = 40;
+            this.simDepthCount.Text = "20";
+            this.simDepthCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // simulationDepthSlider
+            // 
+            this.simulationDepthSlider.LargeChange = 2;
+            this.simulationDepthSlider.Location = new System.Drawing.Point(6, 29);
+            this.simulationDepthSlider.Maximum = 20;
+            this.simulationDepthSlider.Minimum = 2;
+            this.simulationDepthSlider.Name = "simulationDepthSlider";
+            this.simulationDepthSlider.Size = new System.Drawing.Size(299, 45);
+            this.simulationDepthSlider.SmallChange = 2;
+            this.simulationDepthSlider.TabIndex = 38;
+            this.simulationDepthSlider.TickFrequency = 2;
+            this.simulationDepthSlider.TickStyle = System.Windows.Forms.TickStyle.Both;
+            this.simulationDepthSlider.Value = 6;
+            this.simulationDepthSlider.Scroll += new System.EventHandler(this.simulationDepthSlider_Scroll);
             // 
             // simDepthTitle
             // 
@@ -786,41 +821,6 @@ namespace Reversi
             this.hideDebugButton.UseVisualStyleBackColor = true;
             this.hideDebugButton.Click += new System.EventHandler(this.hideDebugButton_Click);
             // 
-            // simulationDepthSlider
-            // 
-            this.simulationDepthSlider.LargeChange = 2;
-            this.simulationDepthSlider.Location = new System.Drawing.Point(6, 29);
-            this.simulationDepthSlider.Maximum = 20;
-            this.simulationDepthSlider.Minimum = 2;
-            this.simulationDepthSlider.Name = "simulationDepthSlider";
-            this.simulationDepthSlider.Size = new System.Drawing.Size(299, 45);
-            this.simulationDepthSlider.SmallChange = 2;
-            this.simulationDepthSlider.TabIndex = 38;
-            this.simulationDepthSlider.TickFrequency = 2;
-            this.simulationDepthSlider.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.simulationDepthSlider.Value = 6;
-            this.simulationDepthSlider.Scroll += new System.EventHandler(this.simulationDepthSlider_Scroll);
-            // 
-            // simDepthCount
-            // 
-            this.simDepthCount.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.simDepthCount.Location = new System.Drawing.Point(305, 13);
-            this.simDepthCount.Name = "simDepthCount";
-            this.simDepthCount.Size = new System.Drawing.Size(49, 31);
-            this.simDepthCount.TabIndex = 40;
-            this.simDepthCount.Text = "20";
-            this.simDepthCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // simDepthCountLabel
-            // 
-            this.simDepthCountLabel.AutoSize = true;
-            this.simDepthCountLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.simDepthCountLabel.Location = new System.Drawing.Point(313, 40);
-            this.simDepthCountLabel.Name = "simDepthCountLabel";
-            this.simDepthCountLabel.Size = new System.Drawing.Size(38, 26);
-            this.simDepthCountLabel.TabIndex = 41;
-            this.simDepthCountLabel.Text = "Turns\r\nAhead";
-            // 
             // DebugAITrace
             // 
             this.DebugAITrace.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -870,7 +870,7 @@ namespace Reversi
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(1133, 446);
+            this.ClientSize = new System.Drawing.Size(1132, 447);
             this.Controls.Add(this.debugLogCheckBox);
             this.Controls.Add(this.visualizeCheckbox);
             this.Controls.Add(this.AITraceLabel);
@@ -909,11 +909,11 @@ namespace Reversi
             this.AIDBTab.PerformLayout();
             this.AISimTab.ResumeLayout(false);
             this.AISimTab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1451,14 +1451,16 @@ namespace Reversi
 
         private void hideDebugButton_Click(object sender, EventArgs e)
         {
+            reportDebugMessage(Width.ToString());
+
             if (Width > 400)
             {
-                Width = 400;
+                Width = 390;
                 hideDebugButton.Text = ">>\n>>\n>>";
             }
             else
             {
-                Width = 1139;
+                Width = 1148;
                 hideDebugButton.Text = "<<\n<<\n<<";
             }
         }
