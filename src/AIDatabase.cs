@@ -12,24 +12,20 @@ namespace Reversi
 {
     public class AIDatabase
     {
-        private Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
+        private static Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
 
-        private Dictionary<string, SimulationNode> NodeMasterList = new Dictionary<string, SimulationNode>();
+        private static Dictionary<string, SimulationNode> NodeMasterList = new Dictionary<string, SimulationNode>();
 
-        private Queue<String> WorkNodes = new Queue<String>();
-        private Queue<String> LeafNodes = new Queue<String>();
+        private static Queue<String> WorkNodes = new Queue<String>();
+        private static Queue<String> LeafNodes = new Queue<String>();
 
-        private int SimulationCycles = 0;
-        private int WhiteWinnerTotal = 0;
-        private int BlackWinnerTotal = 0;
-        private int TieTotal = 0;
-        private int LeafTotal = 0;
+        private static int SimulationCycles = 0;
+        private static int WhiteWinnerTotal = 0;
+        private static int BlackWinnerTotal = 0;
+        private static int TieTotal = 0;
+        private static int LeafTotal = 0;
 
         #region Getters and Setters
-
-        public int getNodeMasterListCount() { return NodeMasterList.Count; }
-        public int getWorkNodeCount() { return WorkNodes.Count; }
-        public int getLeafTotal() { return LeafTotal; }
 
         #endregion
 
@@ -56,17 +52,12 @@ namespace Reversi
         {
             /////////////////////////////////////////////////////////////
             //DEBUG BULLSHIT
-            /////////////////////////////////////////////////////////////
-            //SimulationDepth = 0;
             SimulationCycles = 0;
 
             DateTime SimulationClock = DateTime.Now;
 
-            if (DisplayDebug)
-            {
-                Console.WriteLine("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")");
-                WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n");
-            }
+            ReversiForm.reportDebugMessage("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n", overwrite: true );
+            ReversiForm.updateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
             /////////////////////////////////////////////////////////////
 
             // Reset the database and work queues
@@ -100,21 +91,15 @@ namespace Reversi
                 /////////////////////////////////////////////////////////////
                 SimulationCycles++;
 
-                if (DisplayDebug)
-                {
-                    //if (NodeMasterList.Count % 25000 == 0)
-                    //    Console.WriteLine("(" + NodeMasterList.Count + ") (" + WorkNodes.Count + " queued) (" + LeafTotal + " end states)"); 
-                }
-
                 // If the BackgroundWorker.CancellationPending property is true, cancel
                 if (WorkerThread.CancellationPending)
                 {
-                    Console.WriteLine("#####Database Build has been cancelled#####");
+                    ReversiForm.reportDebugMessage("#####Database Build has been cancelled#####", updateConsole: true );
                     break;
                 }
 
                 if (SimulationCycles % 75 == 0)
-                    WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "");
+                    ReversiForm.updateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
 
                 // Grab the next node ID off of the work queue
                 ParentNodeID = WorkNodes.Dequeue();
@@ -124,9 +109,6 @@ namespace Reversi
 
                 // Set the child turn to be the next player
                 ChildTurn = (ParentNode.getTurn() == ReversiApplication.WHITE) ? ReversiApplication.BLACK : ReversiApplication.WHITE;
-
-                //if (NodeMasterList.Count % 10 == 0)
-                //Console.WriteLine("Turn " + (ParentNode.Turn == WHITE ? "White" : "Black") + "\nScore: B-" + ParentNode.Board.FindScore(BLACK) + " W-" + ParentNode.Board.FindScore(WHITE)  + "\n======================\n" + ParentNode.Board.ToString() );
 
                 // Update the game board visual
                 if (VisualizeResults)
@@ -221,27 +203,22 @@ namespace Reversi
             /////////////////////////////////////////////////////////////
             if (DisplayDebug)
             {
-                TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                Console.WriteLine("===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
-                //gDebugTextBox.Text += "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo();
-                WorkerThread.ReportProgress(Convert.ToInt32(DateTime.Now.Subtract(SimulationClock).Ticks), "===============================\nAI DB Build Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n" + DumpSimulationInfo());
+                ReversiForm.updateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+                ReversiForm.reportDebugMessage("===============================\nAI DB Build Complete\nSimulation Time: " + DateTime.Now.Subtract(SimulationClock) + "\n\n" + DumpSimulationInfo(), updateConsole: true);
             }
         }
 
         // Analyze the database that has been built by the AIDatabase method
+        // LEGACY CODE THAT DOESN'T REALLY WORK
         public void AnalyzeAIDatabase(BackgroundWorker WorkerThread, Boolean VisualizeResults = false, RichTextBox gDebugTextBox = null, Boolean DisplayDebug = true)
         {
 
             /////////////////////////////////////////////////////////////
             //DEBUG BULLSHIT
-            /////////////////////////////////////////////////////////////
             DateTime SimulationClock = DateTime.Now;
 
             if (DisplayDebug)
-            {
-                Console.WriteLine("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")");
-                // DebugTextBox.Text += "===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")\n";
-            }
+                ReversiForm.reportDebugMessage("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")", updateConsole: true);
             /////////////////////////////////////////////////////////////
 
             // Reset all previous analysis values and queue all of the leaf nodes to process
@@ -259,12 +236,10 @@ namespace Reversi
 
             /////////////////////////////////////////////////////////////
             //DEBUG BULLSHIT
-            /////////////////////////////////////////////////////////////
             if (DisplayDebug)
             {
                 TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                Console.WriteLine("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)");
-                //gDebugTextBox.Text += "(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)\n";
+                ReversiForm.reportDebugMessage("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)", updateConsole: true);
             }
             /////////////////////////////////////////////////////////////
 
@@ -277,7 +252,7 @@ namespace Reversi
                 // If the BackgroundWorker.CancellationPending property is true, cancel
                 if (WorkerThread.CancellationPending)
                 {
-                    Console.WriteLine("#####Database Analysis has been cancelled#####");
+                    ReversiForm.reportDebugMessage("#####Database Analysis has been cancelled#####");
                     break;
                 }
 
@@ -319,12 +294,10 @@ namespace Reversi
 
             /////////////////////////////////////////////////////////////
             //DEBUG BULLSHIT
-            /////////////////////////////////////////////////////////////
             if (DisplayDebug)
             {
                 TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                Console.WriteLine("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n");
-                //gDebugTextBox.Text += "===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n";
+                ReversiForm.reportDebugMessage("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n", updateConsole: true);
             }
             /////////////////////////////////////////////////////////////
         }

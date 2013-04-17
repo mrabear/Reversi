@@ -18,6 +18,8 @@ namespace Reversi
     public class AI
     {
         private int color;
+        private static int MaxSimDepth;
+        private bool VisualizeProcess;
 
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
@@ -35,11 +37,22 @@ namespace Reversi
         public AI(int AIcolor)
         {
             color = AIcolor;
+            VisualizeProcess = false;
+            MaxSimDepth = Properties.Settings.Default.MaxDepth;
+        }
+
+        public AI(int AIcolor, int NewMaxDepth)
+        {
+            color = AIcolor;
+            VisualizeProcess = false;
+            MaxSimDepth = NewMaxDepth;
         }
 
         #region Getters and Setters
 
-        public int getColor() { return color; }
+        public int  getColor() { return color; }
+        public void setMaxDepth(int NewMaxDepth) { MaxSimDepth = NewMaxDepth; }
+        public void setVisualizeProcess(bool newVisualizeProcess) { VisualizeProcess = newVisualizeProcess; }
 
         #endregion
 
@@ -54,34 +67,36 @@ namespace Reversi
                 Board SimBoard = new Board(SourceGame.getGameBoard());
                 Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
 
-                ReversiForm.HighlightPiece(Color.Yellow, PossibleMoves);
+                if (VisualizeProcess)
+                    ReversiForm.HighlightPiece(Color.Yellow, PossibleMoves);
 
-                Console.WriteLine("#### New Turn Analysis ####\nCurrentBoard:\n" + SimBoard.ToString() + "");
+                ReversiForm.reportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
                 {
                     SimBoard.CopyBoard(SourceGame.getGameBoard());
                     SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
 
-                    double[] EvalResult = new double[Properties.Settings.Default.MaxDepth];
+                    double[] EvalResult = new double[MaxSimDepth];
 
                     EvaluatePotentialMove(ref EvalResult, SimBoard, SourceGame.getCurrentTurn());
 
                     // Serializes the theads to make sure the update functions properly
                     lock (this)
                     {
-                        Console.WriteLine(" Depth| Sign * Value *  Weight  =  Score");
-                        Console.WriteLine("|------------------------------------------|");
+                        ReversiForm.reportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
+                        ReversiForm.reportDebugMessage("|------------------------------------------|");
 
                         double MoveWeight = AnalyzeWeightTable(EvalResult);
 
-                        Console.WriteLine("|------------------------------------------|");
+                        ReversiForm.reportDebugMessage("|------------------------------------------|");
 
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
-                        ReversiForm.HighlightPiece(Color.Red, CurrentPoint, MoveWeight.ToString("0.00"));
+                        if( VisualizeProcess )
+                            ReversiForm.HighlightPiece(Color.Red, CurrentPoint, MoveWeight.ToString("0.00"));
 
-                        Console.WriteLine("\t Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ")\t\tscore=" + MoveWeight + "\n");
+                        ReversiForm.reportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
                 });
 
@@ -94,16 +109,18 @@ namespace Reversi
                 SourceGame.getGameBoard().MakeMove(ChosenMove.X, ChosenMove.Y, SourceGame.getCurrentTurn());
 
                 ReversiForm.RefreshPieces();
-                ReversiForm.HighlightPiece(Color.Green, ChosenMove, MoveResults[ChosenMove].ToString("0.00"));
 
-                Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
+                if (VisualizeProcess)
+                    ReversiForm.HighlightPiece(Color.Green, ChosenMove, MoveResults[ChosenMove].ToString("0.00"));
+
+                ReversiForm.reportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
         }
 
         // Called for each potential board state in our look ahead search
         private void EvaluatePotentialMove(ref double[] BandedWeightTable, Board CurrentBoard, int Turn, int SimulationDepth = 0)
         {
-            if (SimulationDepth < Properties.Settings.Default.MaxDepth)
+            if (SimulationDepth < MaxSimDepth)
             {
                 // If there are still moves left for the current player, start a new simulation for each of them
                 if (CurrentBoard.MovePossible(Turn))
@@ -155,7 +172,7 @@ namespace Reversi
         // Analyzes a list of banded rows and produces a single digit representing the value of the tree
         private double AnalyzeWeightTable(double[] BandedWeightTable)
         {
-            double CurrentStep, MaxStep = Math.Floor((double)Properties.Settings.Default.MaxDepth / 2);
+            double CurrentStep, MaxStep = Math.Floor((double)MaxSimDepth / 2);
             double Penalty, SubTotal, WeightedTotal = 0;
             int Sign;
 
@@ -177,7 +194,7 @@ namespace Reversi
                 // The end calculation
                 WeightedTotal += SubTotal;
 
-                Console.WriteLine(String.Format("|  " + SimDepth.ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
+                ReversiForm.reportDebugMessage(String.Format("|  " + SimDepth.ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
             }
 
             return (WeightedTotal);
