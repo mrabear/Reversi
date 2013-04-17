@@ -1450,7 +1450,7 @@ namespace Reversi
 
         private void hideDebugButton_Click(object sender, EventArgs e)
         {
-            if (Width == 1139)
+            if (Width > 400)
             {
                 Width = 400;
                 hideDebugButton.Text = ">>\n>>\n>>";
