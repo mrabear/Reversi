@@ -1455,13 +1455,15 @@ namespace Reversi
 
             if (Width > 400)
             {
-                Width = 390;
+                Width = 400;
                 hideDebugButton.Text = ">>\n>>\n>>";
+                AIInfoTabControl.Visible = false;
             }
             else
             {
                 Width = 1148;
                 hideDebugButton.Text = "<<\n<<\n<<";
+                AIInfoTabControl.Visible = true;
             }
         }
 
