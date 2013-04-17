@@ -188,7 +188,7 @@ namespace Reversi
             // BoardPicture
             // 
             this.BoardPicture.Image = ((System.Drawing.Image)(resources.GetObject("BoardPicture.Image")));
-            this.BoardPicture.Location = new System.Drawing.Point(38, 69);
+            this.BoardPicture.Location = new System.Drawing.Point(38, 61);
             this.BoardPicture.Name = "BoardPicture";
             this.BoardPicture.Size = new System.Drawing.Size(320, 320);
             this.BoardPicture.TabIndex = 0;
@@ -197,13 +197,13 @@ namespace Reversi
             // 
             // Title
             // 
-            this.Title.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Title.Location = new System.Drawing.Point(38, 5);
+            this.Title.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Title.Location = new System.Drawing.Point(38, -1);
             this.Title.Name = "Title";
-            this.Title.Size = new System.Drawing.Size(320, 32);
+            this.Title.Size = new System.Drawing.Size(320, 41);
             this.Title.TabIndex = 1;
             this.Title.Text = "Reversi";
-            this.Title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.Title.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // mainDropDownMenu
             // 
@@ -483,7 +483,7 @@ namespace Reversi
             // unusedGrid
             // 
             this.unusedGrid.Image = ((System.Drawing.Image)(resources.GetObject("unusedGrid.Image")));
-            this.unusedGrid.Location = new System.Drawing.Point(38, 69);
+            this.unusedGrid.Location = new System.Drawing.Point(38, 61);
             this.unusedGrid.Name = "unusedGrid";
             this.unusedGrid.Size = new System.Drawing.Size(320, 320);
             this.unusedGrid.TabIndex = 11;
@@ -565,7 +565,7 @@ namespace Reversi
             // 
             this.blackPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("blackPieceImg.Image")));
             this.blackPieceImg.InitialImage = null;
-            this.blackPieceImg.Location = new System.Drawing.Point(158, 189);
+            this.blackPieceImg.Location = new System.Drawing.Point(158, 181);
             this.blackPieceImg.Name = "blackPieceImg";
             this.blackPieceImg.Size = new System.Drawing.Size(38, 38);
             this.blackPieceImg.TabIndex = 20;
@@ -576,7 +576,7 @@ namespace Reversi
             // 
             this.whitePieceImg.Image = ((System.Drawing.Image)(resources.GetObject("whitePieceImg.Image")));
             this.whitePieceImg.InitialImage = null;
-            this.whitePieceImg.Location = new System.Drawing.Point(198, 230);
+            this.whitePieceImg.Location = new System.Drawing.Point(198, 222);
             this.whitePieceImg.Name = "whitePieceImg";
             this.whitePieceImg.Size = new System.Drawing.Size(38, 38);
             this.whitePieceImg.TabIndex = 21;
@@ -663,11 +663,11 @@ namespace Reversi
             // CurrentTurnLabel
             // 
             this.CurrentTurnLabel.BackColor = System.Drawing.Color.Transparent;
-            this.CurrentTurnLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CurrentTurnLabel.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CurrentTurnLabel.ForeColor = System.Drawing.Color.Black;
-            this.CurrentTurnLabel.Location = new System.Drawing.Point(35, 403);
+            this.CurrentTurnLabel.Location = new System.Drawing.Point(35, 390);
             this.CurrentTurnLabel.Name = "CurrentTurnLabel";
-            this.CurrentTurnLabel.Size = new System.Drawing.Size(107, 40);
+            this.CurrentTurnLabel.Size = new System.Drawing.Size(107, 49);
             this.CurrentTurnLabel.TabIndex = 3;
             this.CurrentTurnLabel.Text = "Current\r\nTurn";
             this.CurrentTurnLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -676,7 +676,7 @@ namespace Reversi
             // 
             this.CurrentTurnImage.Image = ((System.Drawing.Image)(resources.GetObject("CurrentTurnImage.Image")));
             this.CurrentTurnImage.InitialImage = null;
-            this.CurrentTurnImage.Location = new System.Drawing.Point(104, 404);
+            this.CurrentTurnImage.Location = new System.Drawing.Point(104, 396);
             this.CurrentTurnImage.Name = "CurrentTurnImage";
             this.CurrentTurnImage.Size = new System.Drawing.Size(38, 38);
             this.CurrentTurnImage.TabIndex = 25;
@@ -685,8 +685,8 @@ namespace Reversi
             // 
             // blackScoreBoardTitle
             // 
-            this.blackScoreBoardTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreBoardTitle.Location = new System.Drawing.Point(279, 398);
+            this.blackScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreBoardTitle.Location = new System.Drawing.Point(279, 390);
             this.blackScoreBoardTitle.Name = "blackScoreBoardTitle";
             this.blackScoreBoardTitle.Size = new System.Drawing.Size(79, 21);
             this.blackScoreBoardTitle.TabIndex = 26;
@@ -695,8 +695,8 @@ namespace Reversi
             // 
             // whiteScoreBoardTitle
             // 
-            this.whiteScoreBoardTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(180, 398);
+            this.whiteScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(180, 390);
             this.whiteScoreBoardTitle.Name = "whiteScoreBoardTitle";
             this.whiteScoreBoardTitle.Size = new System.Drawing.Size(79, 21);
             this.whiteScoreBoardTitle.TabIndex = 27;
@@ -705,8 +705,8 @@ namespace Reversi
             // 
             // whiteScoreBoard
             // 
-            this.whiteScoreBoard.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whiteScoreBoard.Location = new System.Drawing.Point(179, 416);
+            this.whiteScoreBoard.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.whiteScoreBoard.Location = new System.Drawing.Point(179, 404);
             this.whiteScoreBoard.Name = "whiteScoreBoard";
             this.whiteScoreBoard.Size = new System.Drawing.Size(79, 31);
             this.whiteScoreBoard.TabIndex = 28;
@@ -715,8 +715,8 @@ namespace Reversi
             // 
             // blackScoreBoard
             // 
-            this.blackScoreBoard.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreBoard.Location = new System.Drawing.Point(279, 416);
+            this.blackScoreBoard.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreBoard.Location = new System.Drawing.Point(279, 404);
             this.blackScoreBoard.Name = "blackScoreBoard";
             this.blackScoreBoard.Size = new System.Drawing.Size(79, 31);
             this.blackScoreBoard.TabIndex = 29;
@@ -733,7 +733,7 @@ namespace Reversi
             // 
             this.emptyPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("emptyPieceImg.Image")));
             this.emptyPieceImg.InitialImage = null;
-            this.emptyPieceImg.Location = new System.Drawing.Point(279, 270);
+            this.emptyPieceImg.Location = new System.Drawing.Point(279, 262);
             this.emptyPieceImg.Name = "emptyPieceImg";
             this.emptyPieceImg.Size = new System.Drawing.Size(38, 38);
             this.emptyPieceImg.TabIndex = 33;
@@ -743,7 +743,7 @@ namespace Reversi
             // boardXaxisLabel
             // 
             this.boardXaxisLabel.Image = ((System.Drawing.Image)(resources.GetObject("boardXaxisLabel.Image")));
-            this.boardXaxisLabel.Location = new System.Drawing.Point(38, 39);
+            this.boardXaxisLabel.Location = new System.Drawing.Point(45, 41);
             this.boardXaxisLabel.Name = "boardXaxisLabel";
             this.boardXaxisLabel.Size = new System.Drawing.Size(320, 29);
             this.boardXaxisLabel.TabIndex = 34;
@@ -752,7 +752,7 @@ namespace Reversi
             // boardYaxisLabel
             // 
             this.boardYaxisLabel.Image = ((System.Drawing.Image)(resources.GetObject("boardYaxisLabel.Image")));
-            this.boardYaxisLabel.Location = new System.Drawing.Point(9, 65);
+            this.boardYaxisLabel.Location = new System.Drawing.Point(13, 62);
             this.boardYaxisLabel.Name = "boardYaxisLabel";
             this.boardYaxisLabel.Size = new System.Drawing.Size(27, 323);
             this.boardYaxisLabel.TabIndex = 35;
@@ -762,8 +762,6 @@ namespace Reversi
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(760, 453);
-            this.Controls.Add(this.boardYaxisLabel);
-            this.Controls.Add(this.boardXaxisLabel);
             this.Controls.Add(this.emptyPieceImg);
             this.Controls.Add(this.whiteScoreBoardTitle);
             this.Controls.Add(this.blackScoreBoardTitle);
@@ -772,11 +770,13 @@ namespace Reversi
             this.Controls.Add(this.whitePieceImg);
             this.Controls.Add(this.blackPieceImg);
             this.Controls.Add(this.CurrentTurnLabel);
-            this.Controls.Add(this.Title);
             this.Controls.Add(this.BoardPicture);
             this.Controls.Add(this.unusedGrid);
             this.Controls.Add(this.whiteScoreBoard);
             this.Controls.Add(this.blackScoreBoard);
+            this.Controls.Add(this.boardXaxisLabel);
+            this.Controls.Add(this.boardYaxisLabel);
+            this.Controls.Add(this.Title);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
