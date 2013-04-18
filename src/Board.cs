@@ -4,6 +4,7 @@
 
 using System;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace Reversi
 {
@@ -106,6 +107,11 @@ namespace Reversi
         public String GetID()
         {
             return (BuildBoardString(true));
+        }
+
+        public int ColorAt(Point SourcePoint)
+        {
+            return( ColorAt( SourcePoint.X, SourcePoint.Y ));
         }
 
         // Returns the color at the given board location
@@ -275,6 +281,43 @@ namespace Reversi
             return score;
         }
 
-    }
+        public List<Point> MovesAround(Point CurrentPoint)
+        {
+            List<Point> MovesFound = new List<Point>();
 
+            if( CurrentPoint.X > 0 )
+            {
+                // Check the left three spots
+                if ( CurrentPoint.X > 0 ) 
+                {
+                    MovesFound.Add( new Point( CurrentPoint.X - 1, CurrentPoint.Y ));           // middle left (4)
+
+                    if (CurrentPoint.Y < BoardSize - 1)
+                        MovesFound.Add( new Point( CurrentPoint.X - 1, CurrentPoint.Y + 1 ));   // bottom left (7)
+            
+                    if ( CurrentPoint.Y > 0 )
+                        MovesFound.Add( new Point( CurrentPoint.X - 1, CurrentPoint.Y - 1 ));   // top left (1)
+                }
+            }
+
+            if (CurrentPoint.X < BoardSize - 1) 
+            {
+                MovesFound.Add( new Point( CurrentPoint.X + 1, CurrentPoint.Y ));               // middle right (6)
+
+                if (CurrentPoint.Y < BoardSize - 1)
+                    MovesFound.Add( new Point( CurrentPoint.X + 1, CurrentPoint.Y + 1 ));       // bottom right (9)
+            
+                if ( CurrentPoint.Y > 0 )
+                    MovesFound.Add( new Point( CurrentPoint.X + 1, CurrentPoint.Y - 1 ));       // top right (3)
+            }
+
+            if ( CurrentPoint.Y < BoardSize - 1 )
+                MovesFound.Add( new Point( CurrentPoint.X, CurrentPoint.Y + 1 ));               // bottom middle (8)
+
+            if ( CurrentPoint.Y > 0 )
+                MovesFound.Add( new Point( CurrentPoint.X, CurrentPoint.Y - 1 ));               // top middle (2)
+
+            return (MovesFound);
+        }
+    }
 }

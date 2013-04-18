@@ -3,6 +3,7 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1045,6 +1046,7 @@ namespace Reversi
             RefreshPieces(FullRefresh: true);
 
             UpdateTurnImage(gCurrentGame.getCurrentTurn());
+            UpdateScoreBoard();
         }
 
         #region Game Board graphical manipulation methods
@@ -1104,8 +1106,12 @@ namespace Reversi
         {
             gBoardGFX.DrawEllipse(new Pen(PieceColor, 3), X * boardGridSize + 3, Y * boardGridSize + 3, boardPieceImageSize - 6, boardPieceImageSize - 6);
 
+            StringFormat sf = new StringFormat();
+            sf.LineAlignment = StringAlignment.Center;
+            sf.Alignment = StringAlignment.Center;
+
             if( PieceLabel != "" )
-                gBoardGFX.DrawString(PieceLabel, new Font("Tahoma", (float)7, FontStyle.Regular), Brushes.White, X * boardGridSize + 5, Y * boardGridSize + 14);
+                gBoardGFX.DrawString(PieceLabel, new Font("Tahoma", (float)7, FontStyle.Regular), Brushes.White, new RectangleF(X * boardGridSize + 5, Y * boardGridSize + 14, boardGridSize - 10, boardGridSize - 28), sf);
         }
 
         public static Image getTurnImage(int color)
@@ -1451,8 +1457,6 @@ namespace Reversi
 
         private void hideDebugButton_Click(object sender, EventArgs e)
         {
-            reportDebugMessage(Width.ToString());
-
             if (Width > 400)
             {
                 Width = 400;
@@ -1517,7 +1521,7 @@ namespace Reversi
         private void updateMaxDepth()
         {
             simDepthCount.Text = simulationDepthSlider.Value.ToString();
-            gCurrentGame.getAI().setMaxDepth(simulationDepthSlider.Value);
+            gCurrentGame.getAI().setMaxDepth(simulationDepthSlider.Value - 1);
         }
 
         private void visualizeCheckbox_CheckedChanged(object sender, EventArgs e)

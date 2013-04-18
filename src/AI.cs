@@ -74,10 +74,11 @@ namespace Reversi
 
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
                 {
+                    double[] EvalResult = new double[MaxSimDepth + 1];
+                    EvalResult[0] = ScoreMove(SourceGame.getGameBoard(), CurrentPoint);
+
                     SimBoard.CopyBoard(SourceGame.getGameBoard());
                     SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
-
-                    double[] EvalResult = new double[MaxSimDepth];
 
                     EvaluatePotentialMove(ref EvalResult, SimBoard, SourceGame.getCurrentTurn());
 
@@ -94,7 +95,7 @@ namespace Reversi
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
                         if( VisualizeProcess )
-                            ReversiForm.HighlightPiece(Color.Red, CurrentPoint, MoveWeight.ToString("0.00"));
+                            ReversiForm.HighlightPiece(Color.DarkRed, CurrentPoint, MoveWeight.ToString("0.00"));
 
                         ReversiForm.reportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
@@ -118,7 +119,7 @@ namespace Reversi
         }
 
         // Called for each potential board state in our look ahead search
-        private void EvaluatePotentialMove(ref double[] BandedWeightTable, Board CurrentBoard, int Turn, int SimulationDepth = 0)
+        private void EvaluatePotentialMove(ref double[] BandedWeightTable, Board CurrentBoard, int Turn, int SimulationDepth = 1)
         {
             if (SimulationDepth < MaxSimDepth)
             {
@@ -127,30 +128,20 @@ namespace Reversi
                 {
                     Point[] PossibleMoves = CurrentBoard.AvailableMoves(Turn);
                     Board SimulationBoard;
-                    Point BestPoint = PossibleMoves[0];
-
-                    // If it is the opponents turn only pick their best moves
-                    if ((SimulationDepth % 2 != 0))
-                        foreach (Point CurrentPoint in PossibleMoves)
-                            if (ScoreMove(CurrentBoard, CurrentPoint) > ScoreMove(CurrentBoard, BestPoint))
-                                BestPoint = CurrentPoint;
 
                     for (int index = 0; index < PossibleMoves.Length; index++)
                     {
-                        if (ScoreMove(CurrentBoard, PossibleMoves[index]) >= ScoreMove(CurrentBoard, BestPoint))
-                        {
-                            // Make a copy of the current board
-                            SimulationBoard = new Board(CurrentBoard);
+                        // Make a copy of the current board
+                        SimulationBoard = new Board(CurrentBoard);
 
-                            // Place the current move on the new board
-                            SimulationBoard.PutPiece(PossibleMoves[index].X, PossibleMoves[index].Y, Turn);
+                        // Place the current move on the new board
+                        SimulationBoard.PutPiece(PossibleMoves[index].X, PossibleMoves[index].Y, Turn);
 
-                            if (ScoreMove(CurrentBoard, PossibleMoves[index]) > BandedWeightTable[SimulationDepth])
-                                BandedWeightTable[SimulationDepth] = ScoreMove(CurrentBoard, PossibleMoves[index]);
+                        if (ScoreMove(CurrentBoard, PossibleMoves[index]) > BandedWeightTable[SimulationDepth])
+                            BandedWeightTable[SimulationDepth] = ScoreMove(CurrentBoard, PossibleMoves[index]);
 
-                            // Start a simulation for the next player with the updated board
-                            EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, GetOtherTurn(Turn), SimulationDepth + 1);
-                        }
+                        // Start a simulation for the next player with the updated board
+                        EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, GetOtherTurn(Turn), SimulationDepth + 1);
                     }
                 }
                 // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
@@ -203,7 +194,13 @@ namespace Reversi
         // Returns the value of a single spot on the board
         private double ScoreMove(Board CurrentBoard, Point NewPiece)
         {
-            return BoardValueMask[NewPiece.X, NewPiece.Y];
+            double score = 0;
+
+            foreach (Point CurrentPoint in CurrentBoard.MovesAround(NewPiece))
+                if ((BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > score) && (CurrentBoard.ColorAt(CurrentPoint) == ReversiApplication.EMPTY))
+                    score = BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
+
+            return( score * -1 + BoardValueMask[NewPiece.X, NewPiece.Y] );
         }
 
         public int GetOtherTurn(int color)
