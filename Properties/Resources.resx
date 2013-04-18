@@ -121,6 +121,12 @@
   <data name="blackpiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\blackpiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="boardXaxis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\boardXaxis.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="boardYaxis" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\boardYaxis.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="reversi_grid" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\reversi_grid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

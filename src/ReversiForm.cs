@@ -672,7 +672,7 @@ namespace Reversi
             // 
             // CurrentTurnImage
             // 
-            this.CurrentTurnImage.Image = ((System.Drawing.Image)(resources.GetObject("CurrentTurnImage.Image")));
+            this.CurrentTurnImage.Image = global::Reversi.Properties.Resources.whitepiece;
             this.CurrentTurnImage.InitialImage = null;
             this.CurrentTurnImage.Location = new System.Drawing.Point(96, 396);
             this.CurrentTurnImage.Name = "CurrentTurnImage";
@@ -729,7 +729,7 @@ namespace Reversi
             // 
             // boardXaxisLabel
             // 
-            this.boardXaxisLabel.Image = ((System.Drawing.Image)(resources.GetObject("boardXaxisLabel.Image")));
+            this.boardXaxisLabel.Image = global::Reversi.Properties.Resources.boardXaxis;
             this.boardXaxisLabel.Location = new System.Drawing.Point(37, 41);
             this.boardXaxisLabel.Name = "boardXaxisLabel";
             this.boardXaxisLabel.Size = new System.Drawing.Size(320, 29);
@@ -738,7 +738,7 @@ namespace Reversi
             // 
             // boardYaxisLabel
             // 
-            this.boardYaxisLabel.Image = ((System.Drawing.Image)(resources.GetObject("boardYaxisLabel.Image")));
+            this.boardYaxisLabel.Image = global::Reversi.Properties.Resources.boardYaxis;
             this.boardYaxisLabel.Location = new System.Drawing.Point(5, 62);
             this.boardYaxisLabel.Name = "boardYaxisLabel";
             this.boardYaxisLabel.Size = new System.Drawing.Size(27, 323);
