@@ -132,7 +132,7 @@ namespace Reversi
             {
                 AI.MakeNextMove(this);
 
-                if (GameBoard.MovePossible(NextTurn))
+                if (GameBoard.MovePossible(AI.getColor() == ReversiApplication.BLACK ? ReversiApplication.WHITE : ReversiApplication.BLACK))
                     break;
                 else
                     ReversiForm.RefreshPieces(FullRefresh: true);
