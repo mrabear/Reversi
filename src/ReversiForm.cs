@@ -103,6 +103,7 @@ namespace Reversi
         private Button clearDebugLogButton;
         private Label AITraceLabel;
         private CheckBox debugLogCheckBox;
+        private Button newGameButton;
         private Panel BoardSurface;
         #endregion
 
@@ -179,6 +180,7 @@ namespace Reversi
             this.AITraceLabel = new System.Windows.Forms.Label();
             this.debugLogCheckBox = new System.Windows.Forms.CheckBox();
             this.BoardSurface = new System.Windows.Forms.Panel();
+            this.newGameButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.AIInfoTabControl.SuspendLayout();
             this.AIDBTab.SuspendLayout();
@@ -770,7 +772,6 @@ namespace Reversi
             // 
             // clearDebugLogButton
             // 
-            this.clearDebugLogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.clearDebugLogButton.Location = new System.Drawing.Point(764, 3);
             this.clearDebugLogButton.Name = "clearDebugLogButton";
             this.clearDebugLogButton.Size = new System.Drawing.Size(57, 23);
@@ -812,10 +813,21 @@ namespace Reversi
             this.BoardSurface.Paint += new System.Windows.Forms.PaintEventHandler(this.BoardSurface_Paint);
             this.BoardSurface.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlaceUserPiece);
             // 
+            // newGameButton
+            // 
+            this.newGameButton.Location = new System.Drawing.Point(278, 8);
+            this.newGameButton.Name = "newGameButton";
+            this.newGameButton.Size = new System.Drawing.Size(72, 23);
+            this.newGameButton.TabIndex = 40;
+            this.newGameButton.Text = "New Game";
+            this.newGameButton.UseVisualStyleBackColor = true;
+            this.newGameButton.Click += new System.EventHandler(this.newGameButton_Click);
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(1132, 447);
+            this.Controls.Add(this.newGameButton);
             this.Controls.Add(this.BoardSurface);
             this.Controls.Add(this.debugLogCheckBox);
             this.Controls.Add(this.visualizeCheckbox);
@@ -1522,5 +1534,10 @@ namespace Reversi
         }
 
         #endregion
+
+        private void newGameButton_Click(object sender, EventArgs e)
+        {
+            StartNewGame();
+        }
     }
 }
