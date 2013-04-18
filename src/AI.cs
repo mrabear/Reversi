@@ -24,14 +24,14 @@ namespace Reversi
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
-	            {9,5,5,5,5,5,5,9},
+	            {30,5,5,5,5,5,5,30},
    	            {5,0,0,0,0,0,0,5},
    	            {5,0,3,1,1,3,0,5},
    	            {5,0,1,0,0,1,0,5},
    	            {5,0,1,0,0,1,0,5},
    	            {5,0,3,1,1,3,0,5},
    	            {5,0,0,0,0,0,0,5},
-	            {9,5,5,5,5,5,5,9}
+	            {30,5,5,5,5,5,5,30}
             };
 
         public AI(int AIcolor)

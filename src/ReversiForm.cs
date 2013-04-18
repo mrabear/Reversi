@@ -38,7 +38,6 @@ namespace Reversi
         /// Required designer variable.
         /// </summary>
         private System.Windows.Forms.Label Title;
-        private PictureBox BoardPicture;
         private IContainer components;
         private System.Windows.Forms.Timer NewGameTimer;
         private System.Windows.Forms.MainMenu mainDropDownMenu;
@@ -73,7 +72,6 @@ namespace Reversi
         private BackgroundWorker DBAnalysisWorker;
         private ComboBox gridSizeDropDown;
         private Label gridDimensionLabel;
-        private PictureBox unusedGrid;
         private Label simTimerLabel;
         private Label nodeCounter;
         private Label workCounter;
@@ -81,7 +79,6 @@ namespace Reversi
         private Label workCounterLabel;
         private Label victoryCounterLabel;
         private Label victoryCounter;
-        private PictureBox blackPieceImg;
         private ProgressBar RAMUsageBar;
         private System.Windows.Forms.Timer RAMCheckTimer;
         private Label RAMLabel;
@@ -95,7 +92,6 @@ namespace Reversi
         private Label whiteScoreBoard;
         private Label blackScoreBoard;
         private BackgroundWorker AITurnWorker;
-        private PictureBox emptyPieceImg;
         private PictureBox boardXaxisLabel;
         private PictureBox boardYaxisLabel;
         private Label simDepthTitle;
@@ -107,7 +103,7 @@ namespace Reversi
         private Button clearDebugLogButton;
         private Label AITraceLabel;
         private CheckBox debugLogCheckBox;
-        private PictureBox whitePieceImg;
+        private Panel BoardSurface;
         #endregion
 
         /// <summary>
@@ -118,7 +114,6 @@ namespace Reversi
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
-            this.BoardPicture = new System.Windows.Forms.PictureBox();
             this.Title = new System.Windows.Forms.Label();
             this.mainDropDownMenu = new System.Windows.Forms.MainMenu(this.components);
             this.fileDropDownMenu = new System.Windows.Forms.MenuItem();
@@ -151,7 +146,6 @@ namespace Reversi
             this.DBBuildWorker = new System.ComponentModel.BackgroundWorker();
             this.cancelButton = new System.Windows.Forms.Button();
             this.DBAnalysisWorker = new System.ComponentModel.BackgroundWorker();
-            this.unusedGrid = new System.Windows.Forms.PictureBox();
             this.simTimerLabel = new System.Windows.Forms.Label();
             this.nodeCounter = new System.Windows.Forms.Label();
             this.workCounter = new System.Windows.Forms.Label();
@@ -159,8 +153,6 @@ namespace Reversi
             this.workCounterLabel = new System.Windows.Forms.Label();
             this.victoryCounterLabel = new System.Windows.Forms.Label();
             this.victoryCounter = new System.Windows.Forms.Label();
-            this.blackPieceImg = new System.Windows.Forms.PictureBox();
-            this.whitePieceImg = new System.Windows.Forms.PictureBox();
             this.NewGameTimer = new System.Windows.Forms.Timer(this.components);
             this.RAMUsageBar = new System.Windows.Forms.ProgressBar();
             this.RAMCheckTimer = new System.Windows.Forms.Timer(this.components);
@@ -179,7 +171,6 @@ namespace Reversi
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
             this.AITurnWorker = new System.ComponentModel.BackgroundWorker();
-            this.emptyPieceImg = new System.Windows.Forms.PictureBox();
             this.boardXaxisLabel = new System.Windows.Forms.PictureBox();
             this.boardYaxisLabel = new System.Windows.Forms.PictureBox();
             this.hideDebugButton = new System.Windows.Forms.Button();
@@ -187,30 +178,16 @@ namespace Reversi
             this.clearDebugLogButton = new System.Windows.Forms.Button();
             this.AITraceLabel = new System.Windows.Forms.Label();
             this.debugLogCheckBox = new System.Windows.Forms.CheckBox();
-            ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).BeginInit();
+            this.BoardSurface = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.blackPieceImg)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.whitePieceImg)).BeginInit();
             this.AIInfoTabControl.SuspendLayout();
             this.AIDBTab.SuspendLayout();
             this.AISimTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).BeginInit();
             this.SuspendLayout();
-            // 
-            // BoardPicture
-            // 
-            this.BoardPicture.Image = ((System.Drawing.Image)(resources.GetObject("BoardPicture.Image")));
-            this.BoardPicture.Location = new System.Drawing.Point(30, 61);
-            this.BoardPicture.Name = "BoardPicture";
-            this.BoardPicture.Size = new System.Drawing.Size(320, 320);
-            this.BoardPicture.TabIndex = 0;
-            this.BoardPicture.TabStop = false;
-            this.BoardPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PlaceUserPiece);
             // 
             // Title
             // 
@@ -483,16 +460,6 @@ namespace Reversi
             // 
             this.DBAnalysisWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.DBAnalysisWorker_DoWork);
             // 
-            // unusedGrid
-            // 
-            this.unusedGrid.Image = ((System.Drawing.Image)(resources.GetObject("unusedGrid.Image")));
-            this.unusedGrid.Location = new System.Drawing.Point(30, 61);
-            this.unusedGrid.Name = "unusedGrid";
-            this.unusedGrid.Size = new System.Drawing.Size(320, 320);
-            this.unusedGrid.TabIndex = 11;
-            this.unusedGrid.TabStop = false;
-            this.unusedGrid.Visible = false;
-            // 
             // simTimerLabel
             // 
             this.simTimerLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -563,28 +530,6 @@ namespace Reversi
             this.victoryCounter.TabIndex = 18;
             this.victoryCounter.Text = "0";
             this.victoryCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // blackPieceImg
-            // 
-            this.blackPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("blackPieceImg.Image")));
-            this.blackPieceImg.InitialImage = null;
-            this.blackPieceImg.Location = new System.Drawing.Point(150, 181);
-            this.blackPieceImg.Name = "blackPieceImg";
-            this.blackPieceImg.Size = new System.Drawing.Size(38, 38);
-            this.blackPieceImg.TabIndex = 20;
-            this.blackPieceImg.TabStop = false;
-            this.blackPieceImg.Visible = false;
-            // 
-            // whitePieceImg
-            // 
-            this.whitePieceImg.Image = ((System.Drawing.Image)(resources.GetObject("whitePieceImg.Image")));
-            this.whitePieceImg.InitialImage = null;
-            this.whitePieceImg.Location = new System.Drawing.Point(190, 222);
-            this.whitePieceImg.Name = "whitePieceImg";
-            this.whitePieceImg.Size = new System.Drawing.Size(38, 38);
-            this.whitePieceImg.TabIndex = 21;
-            this.whitePieceImg.TabStop = false;
-            this.whitePieceImg.Visible = false;
             // 
             // NewGameTimer
             // 
@@ -782,17 +727,6 @@ namespace Reversi
             this.AITurnWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnMonitor_ProgressChanged);
             this.AITurnWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnMonitor_RunWorkerCompleted);
             // 
-            // emptyPieceImg
-            // 
-            this.emptyPieceImg.Image = ((System.Drawing.Image)(resources.GetObject("emptyPieceImg.Image")));
-            this.emptyPieceImg.InitialImage = null;
-            this.emptyPieceImg.Location = new System.Drawing.Point(271, 262);
-            this.emptyPieceImg.Name = "emptyPieceImg";
-            this.emptyPieceImg.Size = new System.Drawing.Size(38, 38);
-            this.emptyPieceImg.TabIndex = 33;
-            this.emptyPieceImg.TabStop = false;
-            this.emptyPieceImg.Visible = false;
-            // 
             // boardXaxisLabel
             // 
             this.boardXaxisLabel.Image = ((System.Drawing.Image)(resources.GetObject("boardXaxisLabel.Image")));
@@ -869,26 +803,31 @@ namespace Reversi
             this.debugLogCheckBox.Text = "Logging";
             this.debugLogCheckBox.UseVisualStyleBackColor = true;
             // 
+            // BoardSurface
+            // 
+            this.BoardSurface.Location = new System.Drawing.Point(30, 61);
+            this.BoardSurface.Name = "BoardSurface";
+            this.BoardSurface.Size = new System.Drawing.Size(320, 320);
+            this.BoardSurface.TabIndex = 39;
+            this.BoardSurface.Paint += new System.Windows.Forms.PaintEventHandler(this.BoardSurface_Paint);
+            this.BoardSurface.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlaceUserPiece);
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.ClientSize = new System.Drawing.Size(1132, 447);
+            this.Controls.Add(this.BoardSurface);
             this.Controls.Add(this.debugLogCheckBox);
             this.Controls.Add(this.visualizeCheckbox);
             this.Controls.Add(this.AITraceLabel);
             this.Controls.Add(this.hideDebugButton);
             this.Controls.Add(this.clearDebugLogButton);
-            this.Controls.Add(this.emptyPieceImg);
             this.Controls.Add(this.DebugAITrace);
             this.Controls.Add(this.whiteScoreBoardTitle);
             this.Controls.Add(this.blackScoreBoardTitle);
             this.Controls.Add(this.CurrentTurnImage);
             this.Controls.Add(this.AIInfoTabControl);
-            this.Controls.Add(this.whitePieceImg);
-            this.Controls.Add(this.blackPieceImg);
             this.Controls.Add(this.CurrentTurnLabel);
-            this.Controls.Add(this.BoardPicture);
-            this.Controls.Add(this.unusedGrid);
             this.Controls.Add(this.whiteScoreBoard);
             this.Controls.Add(this.blackScoreBoard);
             this.Controls.Add(this.boardXaxisLabel);
@@ -900,12 +839,8 @@ namespace Reversi
             this.Menu = this.mainDropDownMenu;
             this.Name = "ReversiForm";
             this.Text = "Reversi";
-            ((System.ComponentModel.ISupportInitialize)(this.BoardPicture)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.unusedGrid)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.blackPieceImg)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.whitePieceImg)).EndInit();
             this.AIInfoTabControl.ResumeLayout(false);
             this.AIDBTab.ResumeLayout(false);
             this.AIDBTab.PerformLayout();
@@ -913,7 +848,6 @@ namespace Reversi
             this.AISimTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.emptyPieceImg)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).EndInit();
             this.ResumeLayout(false);
@@ -927,27 +861,28 @@ namespace Reversi
         public ReversiForm()
         {
             InitializeComponent();
-            gBoardGFX = BoardPicture.CreateGraphics();
+            gBoardGFX = BoardSurface.CreateGraphics();
 
             gDebugText = DebugAITrace;
             simTimerLabel.Text = "";
 
-            gWhiteScoreBoard = whiteScoreBoard;
-            gBlackScoreBoard = blackScoreBoard;
+            // Static global binds for important form elements
+            gWhiteScoreBoard  = whiteScoreBoard;
+            gBlackScoreBoard  = blackScoreBoard;
             gCurrentTurnImage = CurrentTurnImage;
             gCurrentTurnLabel = CurrentTurnLabel;
-            gAITurnWorker = AITurnWorker;
+            gAITurnWorker     = AITurnWorker;
             gDebugLogCheckBox = debugLogCheckBox;
-            gSimTimerLabel = simTimerLabel;
-            gNodeCounter = nodeCounter;
-            gWorkCounter = workCounter;
-            gVictoryCounter = victoryCounter;
-            gBoardImage = BoardPicture.Image;
-            gWhitePieceImage = whitePieceImg.Image;
-            gBlackPieceImage = blackPieceImg.Image;
-            gEmptyPieceImage = emptyPieceImg.Image;
+            gSimTimerLabel    = simTimerLabel;
+            gNodeCounter      = nodeCounter;
+            gWorkCounter      = workCounter;
+            gVictoryCounter   = victoryCounter;
 
-            boardPieceImageSize = blackPieceImg.Width;
+            gBoardImage      = Image.FromHbitmap(Properties.Resources.reversi_grid.GetHbitmap());
+            gWhitePieceImage = Image.FromHbitmap(Properties.Resources.whitepiece.GetHbitmap());
+            gBlackPieceImage = Image.FromHbitmap(Properties.Resources.blackpiece.GetHbitmap());
+
+            boardPieceImageSize = gBlackPieceImage.Width;
 
             boardGridSize = Properties.Settings.Default.GridSize;
 
@@ -959,17 +894,13 @@ namespace Reversi
             updateMaxDepth();
 
             AIInfoTabControl.SelectTab(AISimTab);
-
-            unusedGrid.SendToBack();
         }
 
         #region Global Variables
 
         // Static handles to graphical assets
-        private static System.ComponentModel.ComponentResourceManager imgResourceHandle = new System.ComponentModel.ComponentResourceManager(typeof(ReversiForm));
         private static Image gBlackPieceImage;
         private static Image gWhitePieceImage;
-        private static Image gEmptyPieceImage;
         private static Image gBoardImage;
 
         // Static handles to form objects
@@ -1054,10 +985,10 @@ namespace Reversi
 
         public static void UpdateScoreBoard()
         {
-            ReversiForm.gBlackScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(ReversiApplication.BLACK).ToString();
-            ReversiForm.gWhiteScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(ReversiApplication.WHITE).ToString();
-            ReversiForm.gBlackScoreBoard.Refresh();
-            ReversiForm.gWhiteScoreBoard.Refresh();
+            gBlackScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(ReversiApplication.BLACK).ToString();
+            gWhiteScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(ReversiApplication.WHITE).ToString();
+            gBlackScoreBoard.Refresh();
+            gWhiteScoreBoard.Refresh();
         }
 
         // Redraw the piece images on the board
@@ -1068,10 +999,12 @@ namespace Reversi
 
         public static void RefreshPieces(Board SourceBoard, bool FullRefresh = false)
         {
+            if (FullRefresh)
+                RedrawBoardImage();
+
             for (int Y = 0; Y < SourceBoard.getBoardSize(); Y++)
                 for (int X = 0; X < SourceBoard.getBoardSize(); X++)
-                    if (((SourceBoard.ColorAt(X, Y) != ReversiApplication.EMPTY) && 
-                         (getLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y))) || FullRefresh)
+                    if (( getLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
                         DrawPiece(SourceBoard.ColorAt(X, Y), X, Y);
 
             getLastDrawnBoard().CopyBoard(SourceBoard.getBoardPieces());
@@ -1084,12 +1017,13 @@ namespace Reversi
 
         public static void DrawPiece(int color, int X, int Y)
         {
-            gBoardGFX.DrawImage(getTurnImage(color), X * boardGridSize + 1, Y * boardGridSize + 1, boardPieceImageSize, boardPieceImageSize);
+            if(( color == ReversiApplication.WHITE ) || ( color == ReversiApplication.BLACK ))
+                gBoardGFX.DrawImage(getTurnImage(color), X * boardGridSize + 1, Y * boardGridSize + 1, boardPieceImageSize, boardPieceImageSize);
         }
 
-        public static void ClearBoardPieces()
+        public static void RedrawBoardImage()
         {
-            gBoardGFX.DrawImage(gBoardImage, 0, 0, boardPieceImageSize, boardPieceImageSize);
+            gBoardGFX.DrawImage(gBoardImage, 0, 0, gBoardImage.Width, gBoardImage.Height);
         }
 
         public static void HighlightPiece(Color PieceColor, Point[] PieceList )
@@ -1119,10 +1053,8 @@ namespace Reversi
         {
             if (color == ReversiApplication.WHITE)
                 return (gWhitePieceImage);
-            else if (color == ReversiApplication.BLACK)
-                return (gBlackPieceImage);
-            else
-                return (gEmptyPieceImage);
+            
+            return (gBlackPieceImage);
         }
 
         public static void UpdateTurnImage(int color)
@@ -1145,6 +1077,11 @@ namespace Reversi
                 gCurrentTurnLabel.Text = "Winner";
                 UpdateTurnImage(WinningColor);
             }
+        }
+
+        private void BoardSurface_Paint(object sender, PaintEventArgs e)
+        {
+            RefreshPieces(FullRefresh: true);
         }
 
         #endregion
@@ -1258,7 +1195,7 @@ namespace Reversi
             UpdateScoreBoard();
             UpdateTurnImage(gCurrentGame.getCurrentTurn());
             gCurrentGame.setCurrentTurn(ReversiApplication.BLACK);
-            ReversiForm.StartAITurnWorker();
+            StartAITurnWorker();
         }
 
         // Sets up the a new game with the middle of the board already filled in
@@ -1467,8 +1404,8 @@ namespace Reversi
         {
             gridDimensionLabel.Text = getBoardSize() + "x" + getBoardSize();
 
-            BoardPicture.Width = boardGridSize * getBoardSize();
-            BoardPicture.Height = boardGridSize * getBoardSize();
+            BoardSurface.Width = boardGridSize * getBoardSize();
+            BoardSurface.Height = boardGridSize * getBoardSize();
 
             StartNewGame();
         }
@@ -1480,14 +1417,17 @@ namespace Reversi
             NewGameTimer.Enabled = false;
         }
 
+        // Thread safe delegates for debug reporting
         public delegate void setDebugTextDelagate(string newText);
         public delegate void appendDebugTextDelagate(string newText);
 
+        // Thread safe way to clear the debug message box
         public static void clearDebugMessage()
         {
             gDebugText.Invoke(new setDebugTextDelagate(setDebugText), "");
         }
 
+        // Thread safe way to update the debug message box
         public static void reportDebugMessage(String newDebugMsg, bool updateConsole = false, bool updateWindow = true, bool overwrite = false)
         {
             if( gDebugLogCheckBox.Checked )
@@ -1500,11 +1440,13 @@ namespace Reversi
                 Console.WriteLine(newDebugMsg);
         }
 
+        // Clears the debug text box
         private void clearDebugLogButton_Click(object sender, EventArgs e)
         {
             clearDebugMessage();
         }
 
+        // Hides/Shows the debug panel
         private void hideDebugButton_Click(object sender, EventArgs e)
         {
             if (Width > 400)
@@ -1532,7 +1474,7 @@ namespace Reversi
 
         public static void ReportAITurnWorkerProgress(int progress = 0)
         {
-            ReversiForm.gAITurnWorker.ReportProgress(progress);
+            gAITurnWorker.ReportProgress(progress);
         }
 
         // Called asynchronously when it is time for the AI to wake up and do some work

@@ -122,11 +122,9 @@
     </Compile>
     <Compile Include="src\SimulationNode.cs" />
     <Content Include="img\blackpiece.png" />
-    <Content Include="img\blankpiece.png" />
     <Content Include="img\boardXaxis.png" />
     <Content Include="img\boardYaxis.png" />
     <Content Include="img\reversi_grid.png" />
-    <Content Include="img\reversi_inactive_grid.png" />
     <Content Include="img\whitepiece.png" />
     <Content Include="img\reversi_large.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -165,6 +163,9 @@
       <ProductName>Windows Installer 4.5</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

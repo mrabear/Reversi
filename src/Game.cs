@@ -32,7 +32,7 @@ namespace Reversi
             AI = new AI(ReversiApplication.BLACK);
 
             // Reset the board image to clear any pieces from previous games
-            ReversiForm.ClearBoardPieces();
+            ReversiForm.RedrawBoardImage();
 
             // Reset the board that tracks which pieces have been drawn on the screen
             ReversiForm.setLastDrawnBoard( BoardSize );
@@ -70,6 +70,10 @@ namespace Reversi
                     {
                         if (GameBoard.MakeMove(x, y, CurrentTurn))
                         {
+                            ReversiForm.RefreshPieces(FullRefresh: true);
+                            ReversiForm.UpdateScoreBoard();
+                            ReversiForm.ShowWinner(GameBoard.DetermineWinner());
+
                             SwitchTurn();
                         }
                     }
@@ -77,17 +81,12 @@ namespace Reversi
                     {
                         SwitchTurn();
                     }
-
-                    ReversiForm.RefreshPieces( FullRefresh: true );
-                    ReversiForm.UpdateScoreBoard();
                 }
 
                 if ((VsComputer) && (CurrentTurn == AI.getColor()))
                     ReversiForm.StartAITurnWorker();
                 else
                     TurnInProgress = false;
-
-                ReversiForm.ShowWinner( GameBoard.DetermineWinner() );
             }
         }
 
