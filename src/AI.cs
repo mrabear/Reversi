@@ -24,14 +24,14 @@ namespace Reversi
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
-	            {9,2,5,5,5,5,2,9},
-   	            {2,0,0,0,0,0,0,2},
+	            {9,5,5,5,5,5,5,9},
+   	            {5,0,0,0,0,0,0,5},
    	            {5,0,3,1,1,3,0,5},
    	            {5,0,1,0,0,1,0,5},
    	            {5,0,1,0,0,1,0,5},
-   	            {5,0,3,1,1,3,0,6},
-   	            {2,0,0,0,0,0,0,2},
-	            {9,2,5,5,5,5,2,9}
+   	            {5,0,3,1,1,3,0,5},
+   	            {5,0,0,0,0,0,0,5},
+	            {9,5,5,5,5,5,5,9}
             };
 
         public AI(int AIcolor)
@@ -61,7 +61,7 @@ namespace Reversi
         {
             Point[] PossibleMoves = SourceGame.getGameBoard().AvailableMoves(SourceGame.getCurrentTurn());
 
-            if (PossibleMoves.Length > 1)
+            if (PossibleMoves.Length > 0)
             {
                 Point ChosenMove = PossibleMoves[0];
                 Board SimBoard = new Board(SourceGame.getGameBoard());

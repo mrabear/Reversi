@@ -61,7 +61,7 @@ namespace Reversi
         private System.Windows.Forms.MenuItem menuItem4;
         private System.Windows.Forms.MenuItem DebugScenario_NoWhite;
         private System.Windows.Forms.MenuItem DebugScenario_NoBlack;
-        private System.Windows.Forms.MenuItem DebugScenario_TieGame;
+        private System.Windows.Forms.MenuItem DebugScenario_MidGame;
         private Button BuildAIDBButton;
         private CheckBox visualizeCheckbox;
         private GroupBox groupBox1;
@@ -139,7 +139,7 @@ namespace Reversi
             this.menuItem4 = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoWhite = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoBlack = new System.Windows.Forms.MenuItem();
-            this.DebugScenario_TieGame = new System.Windows.Forms.MenuItem();
+            this.DebugScenario_MidGame = new System.Windows.Forms.MenuItem();
             this.BuildAIDBButton = new System.Windows.Forms.Button();
             this.visualizeCheckbox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -341,7 +341,7 @@ namespace Reversi
             this.menuItem4.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.DebugScenario_NoWhite,
             this.DebugScenario_NoBlack,
-            this.DebugScenario_TieGame});
+            this.DebugScenario_MidGame});
             this.menuItem4.Text = "New Game Scenario";
             // 
             // DebugScenario_NoWhite
@@ -355,10 +355,11 @@ namespace Reversi
             this.DebugScenario_NoBlack.Index = 1;
             this.DebugScenario_NoBlack.Text = "Black cannot move";
             // 
-            // DebugScenario_TieGame
+            // DebugScenario_MidGame
             // 
-            this.DebugScenario_TieGame.Index = 2;
-            this.DebugScenario_TieGame.Text = "Tie Game";
+            this.DebugScenario_MidGame.Index = 2;
+            this.DebugScenario_MidGame.Text = "Mid Game";
+            this.DebugScenario_MidGame.Click += new System.EventHandler(this.DebugScenario_MidGame_Click);
             // 
             // BuildAIDBButton
             // 
@@ -1235,7 +1236,56 @@ namespace Reversi
         // Start a new game scenario where white cannot move
         private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
         {
+            StartNewGame();
+            gCurrentGame.getGameBoard().ClearBoard();
+            gCurrentGame.getGameBoard().PutPiece(0, 0, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 1, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 2, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 6, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 7, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(1, 0, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 1, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 2, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 3, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 4, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 5, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 6, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 7, ReversiApplication.WHITE);
+            RefreshPieces(FullRefresh: true);
+            UpdateScoreBoard();
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
+            gCurrentGame.setCurrentTurn(ReversiApplication.BLACK);
+            ReversiForm.StartAITurnWorker();
         }
+
+        // Sets up the a new game with the middle of the board already filled in
+        private void DebugScenario_MidGame_Click(object sender, EventArgs e)
+        {
+            StartNewGame();
+            gCurrentGame.getGameBoard().PutPiece(2, 2, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(2, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(2, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(2, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(3, 2, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(3, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(3, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(3, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 2, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(5, 2, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(5, 3, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(5, 4, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(5, 5, ReversiApplication.WHITE);
+            RefreshPieces(FullRefresh: true);
+            UpdateScoreBoard();
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
+        }
+
         #endregion
 
         #region AI Database Form & Event Handelers
