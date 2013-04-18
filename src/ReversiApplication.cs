@@ -14,6 +14,7 @@ namespace Reversi
         public static int WHITE = Properties.Settings.Default.WHITE;
         public static int BLACK = Properties.Settings.Default.BLACK;
         public static int EMPTY = Properties.Settings.Default.EMPTY;
+        public static int ERROR = Properties.Settings.Default.ERROR;
 
         private static ReversiForm MainForm;
         private static Game CurrentGame;

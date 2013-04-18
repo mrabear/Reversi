@@ -1140,7 +1140,7 @@ namespace Reversi
                 gCurrentTurnLabel.Text = "Tie";
                 gCurrentTurnImage.Visible = false;
             }
-            else
+            else if((WinningColor == ReversiApplication.BLACK) || (WinningColor == ReversiApplication.WHITE))
             {
                 gCurrentTurnLabel.Text = "Winner";
                 UpdateTurnImage(WinningColor);
@@ -1552,7 +1552,7 @@ namespace Reversi
         {
             gCurrentGame.SwitchTurn();
             UpdateScoreBoard();
-            gCurrentGame.DetermineWinner();
+            ShowWinner( gCurrentGame.getGameBoard().DetermineWinner() );
             gCurrentGame.setTurnInProgress(false);
         }
 

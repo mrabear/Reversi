@@ -77,15 +77,21 @@ namespace Reversi.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("40")]
         public int GridSize {
             get {
                 return ((int)(this["GridSize"]));
             }
-            set {
-                this["GridSize"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int ERROR {
+            get {
+                return ((int)(this["ERROR"]));
             }
         }
     }

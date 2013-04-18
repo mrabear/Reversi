@@ -16,7 +16,6 @@ namespace Reversi
         private int Difficulty;
         private Boolean VsComputer = true;
         private Board GameBoard;
-        private int Winner;
         private Boolean IsComplete = false;
         private Boolean ProcessMoves = true;
         private Boolean TurnInProgress = false;
@@ -57,40 +56,6 @@ namespace Reversi
 
         #endregion
 
-        // Determines if there is a winner in the current game
-        public Boolean DetermineWinner()
-        {
-            int WhiteScore = GameBoard.FindScore(ReversiApplication.WHITE);
-            int BlackScore = GameBoard.FindScore(ReversiApplication.BLACK);
-
-            if (WhiteScore == 0)
-            {
-                IsComplete = true;
-                Winner = ReversiApplication.BLACK;
-            }
-            else if (BlackScore == 0)
-            {
-                IsComplete = true;
-                Winner = ReversiApplication.WHITE;
-            }
-            else if (((WhiteScore + BlackScore) == 64) ||
-                ((!GameBoard.MovePossible(CurrentTurn)) && (!GameBoard.MovePossible(NextTurn))))
-            {
-                IsComplete = true;
-                if (BlackScore > WhiteScore)
-                    Winner = ReversiApplication.BLACK;
-                else if (BlackScore < WhiteScore)
-                    Winner = ReversiApplication.WHITE;
-                else
-                    Winner = ReversiApplication.EMPTY;
-            }
-
-            if (IsComplete)
-                ReversiForm.ShowWinner(Winner);
-
-            return (IsComplete);
-        }
-
         // Processes a single turn of gameplay, two if it is vs. AI
         public void ProcessTurn(int x, int y)
         {
@@ -122,7 +87,7 @@ namespace Reversi
                 else
                     TurnInProgress = false;
 
-                DetermineWinner();
+                ReversiForm.ShowWinner( GameBoard.DetermineWinner() );
             }
         }
 
@@ -160,6 +125,8 @@ namespace Reversi
                 return ("White");
             else if (color == ReversiApplication.BLACK)
                 return ("Black");
+            else if (color == ReversiApplication.EMPTY)
+                return ("Empty");
             else
                 return ("Illegal Color!");
         }

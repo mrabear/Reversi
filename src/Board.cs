@@ -216,8 +216,17 @@ namespace Reversi
             return FinalMoves;
         }
 
+        // Returns true if a move is possible for EITHER player
+        public bool MovePossible()
+        {
+            if ((MovePossible(ReversiApplication.BLACK)) || (MovePossible(ReversiApplication.WHITE)))
+                return (true);
+
+            return (false);
+        }
+
         // Returns true if a move is possible for the given player
-        public Boolean MovePossible(int color)
+        public bool MovePossible(int color)
         {
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
@@ -279,6 +288,29 @@ namespace Reversi
                         score++;
 
             return score;
+        }
+
+        // Determines if there is a winner in the current game
+        public int DetermineWinner()
+        {
+            if (!MovePossible())
+            {
+                int WhiteScore = FindScore(ReversiApplication.WHITE);
+                int BlackScore = FindScore(ReversiApplication.BLACK);
+
+                // Black Wins
+                if (BlackScore > WhiteScore)
+                    return (ReversiApplication.BLACK);
+                // White Wins
+                else if (BlackScore < WhiteScore)
+                    return (ReversiApplication.WHITE);
+                // Tie Game
+                else
+                    return (ReversiApplication.EMPTY);
+            }
+
+            // No victory
+            return (ReversiApplication.ERROR);
         }
 
         public List<Point> MovesAround(Point CurrentPoint)
