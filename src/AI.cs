@@ -75,7 +75,7 @@ namespace Reversi
                 //foreach (Point CurrentPoint in PossibleMoves)
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
                 {
-                    double[] EvalResult = new double[MaxSimDepth + 1];
+                    double[] EvalResult = new double[MaxSimDepth];
 
                     EvaluatePotentialMove(CurrentPoint, SimBoard, SourceGame.getCurrentTurn(), ref EvalResult);
 
@@ -120,7 +120,7 @@ namespace Reversi
         private void EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, int Turn, ref double[] BandedWeightTable, int SimulationDepth = 0)
         {
             // Look ahead to the impact of this move
-            if (SimulationDepth < MaxSimDepth)
+            if (SimulationDepth < MaxSimDepth - 1)
             {
                 // Capture the moves available prior to making this change (we'll ignore them later)
                 HashSet<Point> IgnoreList = new HashSet<Point>(CurrentBoard.AvailableMoves(GetOtherTurn(Turn)));
@@ -182,7 +182,7 @@ namespace Reversi
                 // The end calculation
                 WeightedTotal += SubTotal;
 
-                ReversiForm.reportDebugMessage(String.Format("|  " + SimDepth.ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
+                ReversiForm.reportDebugMessage(String.Format("|  " + (SimDepth + 1).ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
             }
 
             return (WeightedTotal);
