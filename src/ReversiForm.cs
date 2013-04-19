@@ -86,7 +86,6 @@ namespace Reversi
         private TabPage AIDBTab;
         private TabPage AISimTab;
         private Label CurrentTurnLabel;
-        private PictureBox CurrentTurnImage;
         private Label blackScoreBoardTitle;
         private Label whiteScoreBoardTitle;
         private Label whiteScoreBoard;
@@ -104,6 +103,7 @@ namespace Reversi
         private Label AITraceLabel;
         private CheckBox debugLogCheckBox;
         private Button newGameButton;
+        private Panel currentTurnImageSurface;
         private Panel BoardSurface;
         #endregion
 
@@ -166,14 +166,11 @@ namespace Reversi
             this.simulationDepthSlider = new System.Windows.Forms.TrackBar();
             this.simDepthTitle = new System.Windows.Forms.Label();
             this.CurrentTurnLabel = new System.Windows.Forms.Label();
-            this.CurrentTurnImage = new System.Windows.Forms.PictureBox();
             this.blackScoreBoardTitle = new System.Windows.Forms.Label();
             this.whiteScoreBoardTitle = new System.Windows.Forms.Label();
             this.whiteScoreBoard = new System.Windows.Forms.Label();
             this.blackScoreBoard = new System.Windows.Forms.Label();
             this.AITurnWorker = new System.ComponentModel.BackgroundWorker();
-            this.boardXaxisLabel = new System.Windows.Forms.PictureBox();
-            this.boardYaxisLabel = new System.Windows.Forms.PictureBox();
             this.hideDebugButton = new System.Windows.Forms.Button();
             this.DebugAITrace = new System.Windows.Forms.RichTextBox();
             this.clearDebugLogButton = new System.Windows.Forms.Button();
@@ -181,12 +178,14 @@ namespace Reversi
             this.debugLogCheckBox = new System.Windows.Forms.CheckBox();
             this.BoardSurface = new System.Windows.Forms.Panel();
             this.newGameButton = new System.Windows.Forms.Button();
+            this.boardXaxisLabel = new System.Windows.Forms.PictureBox();
+            this.boardYaxisLabel = new System.Windows.Forms.PictureBox();
+            this.currentTurnImageSurface = new System.Windows.Forms.Panel();
             this.groupBox1.SuspendLayout();
             this.AIInfoTabControl.SuspendLayout();
             this.AIDBTab.SuspendLayout();
             this.AISimTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).BeginInit();
             this.SuspendLayout();
@@ -194,7 +193,7 @@ namespace Reversi
             // Title
             // 
             this.Title.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Title.Location = new System.Drawing.Point(30, -1);
+            this.Title.Location = new System.Drawing.Point(103, -3);
             this.Title.Name = "Title";
             this.Title.Size = new System.Drawing.Size(320, 41);
             this.Title.TabIndex = 1;
@@ -358,7 +357,7 @@ namespace Reversi
             this.visualizeCheckbox.Checked = true;
             this.visualizeCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.visualizeCheckbox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.visualizeCheckbox.Location = new System.Drawing.Point(659, 7);
+            this.visualizeCheckbox.Location = new System.Drawing.Point(822, 7);
             this.visualizeCheckbox.Margin = new System.Windows.Forms.Padding(0);
             this.visualizeCheckbox.Name = "visualizeCheckbox";
             this.visualizeCheckbox.Size = new System.Drawing.Size(99, 19);
@@ -572,10 +571,10 @@ namespace Reversi
             this.AIInfoTabControl.Controls.Add(this.AIDBTab);
             this.AIInfoTabControl.Controls.Add(this.AISimTab);
             this.AIInfoTabControl.HotTrack = true;
-            this.AIInfoTabControl.Location = new System.Drawing.Point(383, 8);
+            this.AIInfoTabControl.Location = new System.Drawing.Point(546, 8);
             this.AIInfoTabControl.Name = "AIInfoTabControl";
             this.AIInfoTabControl.SelectedIndex = 0;
-            this.AIInfoTabControl.Size = new System.Drawing.Size(375, 431);
+            this.AIInfoTabControl.Size = new System.Drawing.Size(375, 259);
             this.AIInfoTabControl.TabIndex = 24;
             // 
             // AIDBTab
@@ -596,7 +595,7 @@ namespace Reversi
             this.AIDBTab.Location = new System.Drawing.Point(4, 22);
             this.AIDBTab.Name = "AIDBTab";
             this.AIDBTab.Padding = new System.Windows.Forms.Padding(3);
-            this.AIDBTab.Size = new System.Drawing.Size(367, 405);
+            this.AIDBTab.Size = new System.Drawing.Size(367, 233);
             this.AIDBTab.TabIndex = 0;
             this.AIDBTab.Text = "AI Database";
             // 
@@ -610,7 +609,7 @@ namespace Reversi
             this.AISimTab.Location = new System.Drawing.Point(4, 22);
             this.AISimTab.Name = "AISimTab";
             this.AISimTab.Padding = new System.Windows.Forms.Padding(3);
-            this.AISimTab.Size = new System.Drawing.Size(367, 405);
+            this.AISimTab.Size = new System.Drawing.Size(367, 233);
             this.AISimTab.TabIndex = 1;
             this.AISimTab.Text = "AI Game Simulations";
             this.AISimTab.UseVisualStyleBackColor = true;
@@ -663,65 +662,54 @@ namespace Reversi
             // CurrentTurnLabel
             // 
             this.CurrentTurnLabel.BackColor = System.Drawing.Color.Transparent;
-            this.CurrentTurnLabel.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CurrentTurnLabel.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CurrentTurnLabel.ForeColor = System.Drawing.Color.Black;
-            this.CurrentTurnLabel.Location = new System.Drawing.Point(34, 390);
+            this.CurrentTurnLabel.Location = new System.Drawing.Point(0, 547);
             this.CurrentTurnLabel.Name = "CurrentTurnLabel";
             this.CurrentTurnLabel.Size = new System.Drawing.Size(107, 49);
             this.CurrentTurnLabel.TabIndex = 3;
-            this.CurrentTurnLabel.Text = "Current\r\nTurn";
+            this.CurrentTurnLabel.Text = "Turn:";
             this.CurrentTurnLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // CurrentTurnImage
-            // 
-            this.CurrentTurnImage.Image = global::Reversi.Properties.Resources.whitepiece;
-            this.CurrentTurnImage.InitialImage = null;
-            this.CurrentTurnImage.Location = new System.Drawing.Point(96, 396);
-            this.CurrentTurnImage.Name = "CurrentTurnImage";
-            this.CurrentTurnImage.Size = new System.Drawing.Size(38, 38);
-            this.CurrentTurnImage.TabIndex = 25;
-            this.CurrentTurnImage.TabStop = false;
-            this.CurrentTurnImage.Visible = false;
             // 
             // blackScoreBoardTitle
             // 
-            this.blackScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreBoardTitle.Location = new System.Drawing.Point(271, 390);
+            this.blackScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreBoardTitle.Location = new System.Drawing.Point(343, 549);
             this.blackScoreBoardTitle.Name = "blackScoreBoardTitle";
-            this.blackScoreBoardTitle.Size = new System.Drawing.Size(79, 21);
+            this.blackScoreBoardTitle.Size = new System.Drawing.Size(112, 42);
             this.blackScoreBoardTitle.TabIndex = 26;
             this.blackScoreBoardTitle.Text = "Black:";
             this.blackScoreBoardTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // whiteScoreBoardTitle
             // 
-            this.whiteScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 12F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(172, 390);
+            this.whiteScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(169, 551);
             this.whiteScoreBoardTitle.Name = "whiteScoreBoardTitle";
-            this.whiteScoreBoardTitle.Size = new System.Drawing.Size(79, 21);
+            this.whiteScoreBoardTitle.Size = new System.Drawing.Size(121, 40);
             this.whiteScoreBoardTitle.TabIndex = 27;
             this.whiteScoreBoardTitle.Text = "White:";
             this.whiteScoreBoardTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // whiteScoreBoard
             // 
-            this.whiteScoreBoard.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whiteScoreBoard.Location = new System.Drawing.Point(171, 404);
+            this.whiteScoreBoard.Font = new System.Drawing.Font("Calibri", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.whiteScoreBoard.Location = new System.Drawing.Point(275, 554);
             this.whiteScoreBoard.Name = "whiteScoreBoard";
-            this.whiteScoreBoard.Size = new System.Drawing.Size(79, 31);
+            this.whiteScoreBoard.Size = new System.Drawing.Size(62, 40);
             this.whiteScoreBoard.TabIndex = 28;
             this.whiteScoreBoard.Text = "0";
-            this.whiteScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.whiteScoreBoard.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // blackScoreBoard
             // 
-            this.blackScoreBoard.Font = new System.Drawing.Font("Calibri", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreBoard.Location = new System.Drawing.Point(271, 404);
+            this.blackScoreBoard.Font = new System.Drawing.Font("Calibri", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.blackScoreBoard.Location = new System.Drawing.Point(438, 552);
             this.blackScoreBoard.Name = "blackScoreBoard";
-            this.blackScoreBoard.Size = new System.Drawing.Size(79, 31);
+            this.blackScoreBoard.Size = new System.Drawing.Size(64, 44);
             this.blackScoreBoard.TabIndex = 29;
             this.blackScoreBoard.Text = "0";
-            this.blackScoreBoard.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.blackScoreBoard.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // AITurnWorker
             // 
@@ -729,28 +717,10 @@ namespace Reversi
             this.AITurnWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.AITurnMonitor_ProgressChanged);
             this.AITurnWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.AITurnMonitor_RunWorkerCompleted);
             // 
-            // boardXaxisLabel
-            // 
-            this.boardXaxisLabel.Image = global::Reversi.Properties.Resources.boardXaxis;
-            this.boardXaxisLabel.Location = new System.Drawing.Point(37, 41);
-            this.boardXaxisLabel.Name = "boardXaxisLabel";
-            this.boardXaxisLabel.Size = new System.Drawing.Size(320, 29);
-            this.boardXaxisLabel.TabIndex = 34;
-            this.boardXaxisLabel.TabStop = false;
-            // 
-            // boardYaxisLabel
-            // 
-            this.boardYaxisLabel.Image = global::Reversi.Properties.Resources.boardYaxis;
-            this.boardYaxisLabel.Location = new System.Drawing.Point(5, 62);
-            this.boardYaxisLabel.Name = "boardYaxisLabel";
-            this.boardYaxisLabel.Size = new System.Drawing.Size(27, 323);
-            this.boardYaxisLabel.TabIndex = 35;
-            this.boardYaxisLabel.TabStop = false;
-            // 
             // hideDebugButton
             // 
             this.hideDebugButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hideDebugButton.Location = new System.Drawing.Point(354, 192);
+            this.hideDebugButton.Location = new System.Drawing.Point(517, 270);
             this.hideDebugButton.Margin = new System.Windows.Forms.Padding(0);
             this.hideDebugButton.Name = "hideDebugButton";
             this.hideDebugButton.Size = new System.Drawing.Size(25, 57);
@@ -764,15 +734,15 @@ namespace Reversi
             this.DebugAITrace.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.DebugAITrace.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DebugAITrace.HideSelection = false;
-            this.DebugAITrace.Location = new System.Drawing.Point(760, 28);
+            this.DebugAITrace.Location = new System.Drawing.Point(551, 303);
             this.DebugAITrace.Name = "DebugAITrace";
-            this.DebugAITrace.Size = new System.Drawing.Size(367, 411);
+            this.DebugAITrace.Size = new System.Drawing.Size(367, 290);
             this.DebugAITrace.TabIndex = 5;
             this.DebugAITrace.Text = "";
             // 
             // clearDebugLogButton
             // 
-            this.clearDebugLogButton.Location = new System.Drawing.Point(764, 3);
+            this.clearDebugLogButton.Location = new System.Drawing.Point(554, 274);
             this.clearDebugLogButton.Name = "clearDebugLogButton";
             this.clearDebugLogButton.Size = new System.Drawing.Size(57, 23);
             this.clearDebugLogButton.TabIndex = 36;
@@ -783,7 +753,7 @@ namespace Reversi
             // AITraceLabel
             // 
             this.AITraceLabel.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AITraceLabel.Location = new System.Drawing.Point(858, 2);
+            this.AITraceLabel.Location = new System.Drawing.Point(648, 273);
             this.AITraceLabel.Name = "AITraceLabel";
             this.AITraceLabel.Size = new System.Drawing.Size(175, 21);
             this.AITraceLabel.TabIndex = 6;
@@ -797,7 +767,7 @@ namespace Reversi
             this.debugLogCheckBox.Checked = true;
             this.debugLogCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.debugLogCheckBox.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.debugLogCheckBox.Location = new System.Drawing.Point(1061, 5);
+            this.debugLogCheckBox.Location = new System.Drawing.Point(851, 276);
             this.debugLogCheckBox.Name = "debugLogCheckBox";
             this.debugLogCheckBox.Size = new System.Drawing.Size(67, 19);
             this.debugLogCheckBox.TabIndex = 38;
@@ -808,14 +778,14 @@ namespace Reversi
             // 
             this.BoardSurface.Location = new System.Drawing.Point(30, 61);
             this.BoardSurface.Name = "BoardSurface";
-            this.BoardSurface.Size = new System.Drawing.Size(320, 320);
+            this.BoardSurface.Size = new System.Drawing.Size(480, 480);
             this.BoardSurface.TabIndex = 39;
             this.BoardSurface.Paint += new System.Windows.Forms.PaintEventHandler(this.BoardSurface_Paint);
             this.BoardSurface.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlaceUserPiece);
             // 
             // newGameButton
             // 
-            this.newGameButton.Location = new System.Drawing.Point(278, 8);
+            this.newGameButton.Location = new System.Drawing.Point(438, 8);
             this.newGameButton.Name = "newGameButton";
             this.newGameButton.Size = new System.Drawing.Size(72, 23);
             this.newGameButton.TabIndex = 40;
@@ -823,21 +793,45 @@ namespace Reversi
             this.newGameButton.UseVisualStyleBackColor = true;
             this.newGameButton.Click += new System.EventHandler(this.newGameButton_Click);
             // 
+            // boardXaxisLabel
+            // 
+            this.boardXaxisLabel.Image = global::Reversi.Properties.Resources.boardXaxis;
+            this.boardXaxisLabel.Location = new System.Drawing.Point(30, 41);
+            this.boardXaxisLabel.Name = "boardXaxisLabel";
+            this.boardXaxisLabel.Size = new System.Drawing.Size(473, 29);
+            this.boardXaxisLabel.TabIndex = 34;
+            this.boardXaxisLabel.TabStop = false;
+            // 
+            // boardYaxisLabel
+            // 
+            this.boardYaxisLabel.Image = global::Reversi.Properties.Resources.boardYaxis;
+            this.boardYaxisLabel.Location = new System.Drawing.Point(5, 62);
+            this.boardYaxisLabel.Name = "boardYaxisLabel";
+            this.boardYaxisLabel.Size = new System.Drawing.Size(27, 476);
+            this.boardYaxisLabel.TabIndex = 35;
+            this.boardYaxisLabel.TabStop = false;
+            // 
+            // currentTurnImageSurface
+            // 
+            this.currentTurnImageSurface.Location = new System.Drawing.Point(82, 554);
+            this.currentTurnImageSurface.Name = "currentTurnImageSurface";
+            this.currentTurnImageSurface.Size = new System.Drawing.Size(38, 38);
+            this.currentTurnImageSurface.TabIndex = 40;
+            this.currentTurnImageSurface.Paint += new System.Windows.Forms.PaintEventHandler(this.currentTurnImageSurface_Paint);
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(1132, 447);
-            this.Controls.Add(this.newGameButton);
+            this.ClientSize = new System.Drawing.Size(925, 603);
+            this.Controls.Add(this.currentTurnImageSurface);
             this.Controls.Add(this.BoardSurface);
+            this.Controls.Add(this.newGameButton);
             this.Controls.Add(this.debugLogCheckBox);
             this.Controls.Add(this.visualizeCheckbox);
             this.Controls.Add(this.AITraceLabel);
             this.Controls.Add(this.hideDebugButton);
             this.Controls.Add(this.clearDebugLogButton);
             this.Controls.Add(this.DebugAITrace);
-            this.Controls.Add(this.whiteScoreBoardTitle);
-            this.Controls.Add(this.blackScoreBoardTitle);
-            this.Controls.Add(this.CurrentTurnImage);
             this.Controls.Add(this.AIInfoTabControl);
             this.Controls.Add(this.CurrentTurnLabel);
             this.Controls.Add(this.whiteScoreBoard);
@@ -845,6 +839,8 @@ namespace Reversi
             this.Controls.Add(this.boardXaxisLabel);
             this.Controls.Add(this.boardYaxisLabel);
             this.Controls.Add(this.Title);
+            this.Controls.Add(this.whiteScoreBoardTitle);
+            this.Controls.Add(this.blackScoreBoardTitle);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -859,7 +855,6 @@ namespace Reversi
             this.AISimTab.ResumeLayout(false);
             this.AISimTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.simulationDepthSlider)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CurrentTurnImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardXaxisLabel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.boardYaxisLabel)).EndInit();
             this.ResumeLayout(false);
@@ -874,21 +869,22 @@ namespace Reversi
         {
             InitializeComponent();
             gBoardGFX = BoardSurface.CreateGraphics();
+            gCurrentTurnImageGFX = currentTurnImageSurface.CreateGraphics();
 
             gDebugText = DebugAITrace;
             simTimerLabel.Text = "";
 
             // Static global binds for important form elements
-            gWhiteScoreBoard  = whiteScoreBoard;
-            gBlackScoreBoard  = blackScoreBoard;
-            gCurrentTurnImage = CurrentTurnImage;
-            gCurrentTurnLabel = CurrentTurnLabel;
-            gAITurnWorker     = AITurnWorker;
-            gDebugLogCheckBox = debugLogCheckBox;
-            gSimTimerLabel    = simTimerLabel;
-            gNodeCounter      = nodeCounter;
-            gWorkCounter      = workCounter;
-            gVictoryCounter   = victoryCounter;
+            gWhiteScoreBoard    = whiteScoreBoard;
+            gBlackScoreBoard    = blackScoreBoard;
+            gCurrentTurnLabel   = CurrentTurnLabel;
+            gAITurnWorker       = AITurnWorker;
+            gDebugLogCheckBox   = debugLogCheckBox;
+            gSimTimerLabel      = simTimerLabel;
+            gNodeCounter        = nodeCounter;
+            gWorkCounter        = workCounter;
+            gVictoryCounter     = victoryCounter;
+            gCurrentTurnSurface = currentTurnImageSurface;
 
             gBoardImage      = Image.FromHbitmap(Properties.Resources.reversi_grid.GetHbitmap());
             gWhitePieceImage = Image.FromHbitmap(Properties.Resources.whitepiece.GetHbitmap());
@@ -921,7 +917,8 @@ namespace Reversi
         private static Label gWhiteScoreBoard;
         private static Label gBlackScoreBoard;
         private static Label gCurrentTurnLabel;
-        private static PictureBox gCurrentTurnImage;
+        private static Graphics gCurrentTurnImageGFX;
+        private static Panel gCurrentTurnSurface;
         private static BackgroundWorker gAITurnWorker;
         private static CheckBox gDebugLogCheckBox;
         private static Label gSimTimerLabel;
@@ -969,8 +966,8 @@ namespace Reversi
         {
             gBlackScoreBoard.Text = "0";
             gWhiteScoreBoard.Text = "0";
-            gCurrentTurnLabel.Text = "Current\nTurn";
-            gCurrentTurnImage.Visible = true;
+            gCurrentTurnLabel.Text = "Turn:";
+            gCurrentTurnSurface.Visible = true;
 
             // Reset the score board
             gBlackScoreBoard.Visible = true;
@@ -978,7 +975,6 @@ namespace Reversi
             CurrentTurnLabel.Visible = true;
             whiteScoreBoardTitle.Visible = true;
             blackScoreBoardTitle.Visible = true;
-            CurrentTurnImage.Visible = true;
 
             ReversiApplication.resetCurrentGame(getBoardSize());
             gCurrentGame = ReversiApplication.getCurrentGame();
@@ -1035,7 +1031,7 @@ namespace Reversi
 
         public static void RedrawBoardImage()
         {
-            gBoardGFX.DrawImage(gBoardImage, 0, 0, gBoardImage.Width, gBoardImage.Height);
+            gBoardGFX.DrawImage(gBoardImage, 0, 0, 480, 480);
         }
 
         public static void HighlightPiece(Color PieceColor, Point[] PieceList)
@@ -1051,14 +1047,14 @@ namespace Reversi
 
         public static void HighlightPiece(Color PieceColor, int X, int Y, String PieceLabel = "")
         {
-            gBoardGFX.DrawEllipse(new Pen(PieceColor, 3), X * boardGridSize + 3, Y * boardGridSize + 3, boardPieceImageSize - 6, boardPieceImageSize - 6);
+            gBoardGFX.DrawEllipse(new Pen(PieceColor, 4), X * boardGridSize + 5, Y * boardGridSize + 5, boardPieceImageSize - 8, boardPieceImageSize - 8);
 
             StringFormat sf = new StringFormat();
             sf.LineAlignment = StringAlignment.Center;
             sf.Alignment = StringAlignment.Center;
 
             if( PieceLabel != "" )
-                gBoardGFX.DrawString(PieceLabel, new Font("Tahoma", (float)7, FontStyle.Regular), Brushes.White, new RectangleF(X * boardGridSize + 5, Y * boardGridSize + 14, boardGridSize - 10, boardGridSize - 28), sf);
+                gBoardGFX.DrawString(PieceLabel, new Font("Tahoma", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * boardGridSize + 5, Y * boardGridSize + 14, boardGridSize - 10, boardGridSize - 28), sf);
         }
 
         public static Image getTurnImage(int color)
@@ -1072,9 +1068,9 @@ namespace Reversi
         public static void UpdateTurnImage(int color)
         {
             if (color == ReversiApplication.WHITE)
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(color), 0, 0, boardPieceImageSize, boardPieceImageSize);
+                gCurrentTurnImageGFX.DrawImage(getTurnImage(color), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
             else
-                gCurrentTurnImage.CreateGraphics().DrawImage(getTurnImage(color), 0, 0, boardPieceImageSize, boardPieceImageSize);
+                gCurrentTurnImageGFX.DrawImage(getTurnImage(color), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
         }
 
         public static void ShowWinner(int WinningColor)
@@ -1082,11 +1078,11 @@ namespace Reversi
             if (WinningColor == ReversiApplication.EMPTY)
             {
                 gCurrentTurnLabel.Text = "Tie";
-                gCurrentTurnImage.Visible = false;
+                gCurrentTurnSurface.Visible = false;
             }
             else if((WinningColor == ReversiApplication.BLACK) || (WinningColor == ReversiApplication.WHITE))
             {
-                gCurrentTurnLabel.Text = "Winner";
+                gCurrentTurnLabel.Text = "Win!";
                 UpdateTurnImage(WinningColor);
             }
         }
@@ -1353,7 +1349,7 @@ namespace Reversi
             CurrentTurnLabel.Visible = false;
             whiteScoreBoardTitle.Visible = false;
             blackScoreBoardTitle.Visible = false;
-            CurrentTurnImage.Visible = false;
+            gCurrentTurnSurface.Visible = false;
         }
 
         private void RAMCheckTimer_Tick(object sender, EventArgs e)
@@ -1461,15 +1457,15 @@ namespace Reversi
         // Hides/Shows the debug panel
         private void hideDebugButton_Click(object sender, EventArgs e)
         {
-            if (Width > 400)
+            if (Width > 565)
             {
-                Width = 400;
+                Width = 565;
                 hideDebugButton.Text = ">>\n>>\n>>";
                 AIInfoTabControl.Visible = false;
             }
             else
             {
-                Width = 1148;
+                Width = 941;
                 hideDebugButton.Text = "<<\n<<\n<<";
                 AIInfoTabControl.Visible = true;
             }
@@ -1538,6 +1534,16 @@ namespace Reversi
         private void newGameButton_Click(object sender, EventArgs e)
         {
             StartNewGame();
+        }
+
+        private void CurrentTurnImage_Paint(object sender, PaintEventArgs e)
+        {
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
+        }
+
+        private void currentTurnImageSurface_Paint(object sender, PaintEventArgs e)
+        {
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
         }
     }
 }

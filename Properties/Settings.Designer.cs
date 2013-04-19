@@ -79,7 +79,7 @@ namespace Reversi.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
         public int GridSize {
             get {
                 return ((int)(this["GridSize"]));
