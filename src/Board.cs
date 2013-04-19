@@ -213,7 +213,7 @@ namespace Reversi
             for (int index = 0; index < FinalMoves.Length; index++)
                 FinalMoves[index] = Moves[index];
 
-            return FinalMoves;
+            return(FinalMoves);
         }
 
         // Returns true if a move is possible for EITHER player

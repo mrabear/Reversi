@@ -1038,7 +1038,7 @@ namespace Reversi
             gBoardGFX.DrawImage(gBoardImage, 0, 0, gBoardImage.Width, gBoardImage.Height);
         }
 
-        public static void HighlightPiece(Color PieceColor, Point[] PieceList )
+        public static void HighlightPiece(Color PieceColor, Point[] PieceList)
         {
             foreach (Point CurrentPiece in PieceList)
                 HighlightPiece(PieceColor, CurrentPiece.X, CurrentPiece.Y );
@@ -1442,7 +1442,7 @@ namespace Reversi
         // Thread safe way to update the debug message box
         public static void reportDebugMessage(String newDebugMsg, bool updateConsole = false, bool updateWindow = true, bool overwrite = false)
         {
-            if( gDebugLogCheckBox.Checked )
+            if( gDebugLogCheckBox.Checked && updateWindow )
                 if ( overwrite )
                     gDebugText.Invoke(new setDebugTextDelagate(setDebugText), newDebugMsg + Environment.NewLine);
                 else

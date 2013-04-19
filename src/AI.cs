@@ -24,14 +24,14 @@ namespace Reversi
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
-	            {30,5,5,5,5,5,5,30},
+	            {9,5,5,5,5,5,5,9},
    	            {5,0,0,0,0,0,0,5},
    	            {5,0,3,1,1,3,0,5},
    	            {5,0,1,0,0,1,0,5},
    	            {5,0,1,0,0,1,0,5},
    	            {5,0,3,1,1,3,0,5},
    	            {5,0,0,0,0,0,0,5},
-	            {30,5,5,5,5,5,5,30}
+	            {9,5,5,5,5,5,5,9}
             };
 
         public AI(int AIcolor)
@@ -72,15 +72,12 @@ namespace Reversi
 
                 ReversiForm.reportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
+                //foreach (Point CurrentPoint in PossibleMoves)
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
                 {
                     double[] EvalResult = new double[MaxSimDepth + 1];
-                    EvalResult[0] = ScoreMove(SourceGame.getGameBoard(), CurrentPoint);
 
-                    SimBoard.CopyBoard(SourceGame.getGameBoard());
-                    SimBoard.PutPiece(CurrentPoint.X, CurrentPoint.Y, SourceGame.getCurrentTurn());
-
-                    EvaluatePotentialMove(ref EvalResult, SimBoard, SourceGame.getCurrentTurn());
+                    EvaluatePotentialMove(CurrentPoint, SimBoard, SourceGame.getCurrentTurn(), ref EvalResult);
 
                     // Serializes the theads to make sure the update functions properly
                     lock (this)
@@ -94,12 +91,13 @@ namespace Reversi
 
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
-                        if( VisualizeProcess )
+                        if (VisualizeProcess)
                             ReversiForm.HighlightPiece(Color.DarkRed, CurrentPoint, MoveWeight.ToString("0.00"));
 
                         ReversiForm.reportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
                 });
+                //}
 
                 foreach (Point ResultMove in MoveResults.Keys)
                 {
@@ -119,40 +117,39 @@ namespace Reversi
         }
 
         // Called for each potential board state in our look ahead search
-        private void EvaluatePotentialMove(ref double[] BandedWeightTable, Board CurrentBoard, int Turn, int SimulationDepth = 1)
+        private void EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, int Turn, ref double[] BandedWeightTable, int SimulationDepth = 0)
         {
+            // Look ahead to the impact of this move
             if (SimulationDepth < MaxSimDepth)
             {
+                // Capture the moves available prior to making this change (we'll ignore them later)
+                HashSet<Point> IgnoreList = new HashSet<Point>(CurrentBoard.AvailableMoves(GetOtherTurn(Turn)));
+                Board SimulationBoard = new Board(CurrentBoard);
+
+                // Perform the requested move
+                SimulationBoard.PutPiece(SourceMove.X, SourceMove.Y, Turn);
+
+                // Score the result
+                if (ScoreMove(SimulationBoard, SourceMove) > BandedWeightTable[SimulationDepth])
+                    BandedWeightTable[SimulationDepth] = ScoreMove(SimulationBoard, SourceMove);
+
                 // If there are still moves left for the current player, start a new simulation for each of them
-                if (CurrentBoard.MovePossible(Turn))
+                if (SimulationBoard.MovePossible(Turn))
                 {
-                    Point[] PossibleMoves = CurrentBoard.AvailableMoves(Turn);
-                    Board SimulationBoard;
-
-                    for (int index = 0; index < PossibleMoves.Length; index++)
-                    {
-                        // Make a copy of the current board
-                        SimulationBoard = new Board(CurrentBoard);
-
-                        // Place the current move on the new board
-                        SimulationBoard.PutPiece(PossibleMoves[index].X, PossibleMoves[index].Y, Turn);
-
-                        if (ScoreMove(CurrentBoard, PossibleMoves[index]) > BandedWeightTable[SimulationDepth])
-                            BandedWeightTable[SimulationDepth] = ScoreMove(CurrentBoard, PossibleMoves[index]);
-
-                        // Start a simulation for the next player with the updated board
-                        EvaluatePotentialMove(ref BandedWeightTable, SimulationBoard, GetOtherTurn(Turn), SimulationDepth + 1);
-                    }
+                    // Start a simulation for the next player with the updated board
+                    foreach( Point CurrentMove in SimulationBoard.AvailableMoves(Turn) )
+                        //if (!IgnoreList.Contains(CurrentMove))
+                        EvaluatePotentialMove(CurrentMove, SimulationBoard, GetOtherTurn(Turn), ref BandedWeightTable, SimulationDepth + 1);
                 }
                 // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
-                else if (CurrentBoard.MovePossible(GetOtherTurn( Turn )))
+                else if (SimulationBoard.MovePossible(GetOtherTurn(Turn)))
                 {
-                    EvaluatePotentialMove(ref BandedWeightTable, CurrentBoard, GetOtherTurn(Turn), SimulationDepth + 1);
+                    EvaluatePotentialMove(SourceMove, SimulationBoard, GetOtherTurn(Turn), ref BandedWeightTable, SimulationDepth + 1);
                 }
                 // If there are no moves left in the game, collapse the simulation
                 else
                 {
-                    if (CurrentBoard.FindScore(color) > CurrentBoard.FindScore(GetOtherTurn(Turn)))
+                    if (SimulationBoard.FindScore(color) > SimulationBoard.FindScore(GetOtherTurn(Turn)))
                         BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VictoryWeight;
                     else
                         BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VictoryWeight * -1;
@@ -196,9 +193,11 @@ namespace Reversi
         {
             double score = 0;
 
+            /*
             foreach (Point CurrentPoint in CurrentBoard.MovesAround(NewPiece))
                 if ((BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > score) && (CurrentBoard.ColorAt(CurrentPoint) == ReversiApplication.EMPTY))
                     score = BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
+            */
 
             return( score * -1 + BoardValueMask[NewPiece.X, NewPiece.Y] );
         }
