@@ -240,7 +240,6 @@ namespace Reversi
             // 
             // PvPMenu
             // 
-            this.PvPMenu.Checked = true;
             this.PvPMenu.Index = 0;
             this.PvPMenu.Text = "Player vs Player";
             this.PvPMenu.Click += new System.EventHandler(this.PvPMenu_Click);

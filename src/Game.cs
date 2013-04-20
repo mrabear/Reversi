@@ -137,6 +137,7 @@ namespace Reversi
                     {
                         SwitchTurn();
                     }
+                    //GraphicsUtil.MarkAvailableMoves(CurrentTurn);
                 }
 
                 if ((VsComputer) && (CurrentTurn == AI.GetColor()))
