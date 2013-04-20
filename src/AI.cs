@@ -21,6 +21,7 @@ namespace Reversi
         private int AITurn;
         private static int MaxSimDepth;
         private bool VisualizeProcess;
+        private object SpinLock;
 
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
@@ -44,6 +45,7 @@ namespace Reversi
             AITurn = AIcolor;
             VisualizeProcess = false;
             MaxSimDepth = Properties.Settings.Default.MaxDepth;
+            SpinLock = new object();
         }
 
         /// <summary>
@@ -56,6 +58,7 @@ namespace Reversi
             AITurn = AIcolor;
             VisualizeProcess = false;
             MaxSimDepth = NewMaxDepth;
+            SpinLock = new object();
         }
 
         #region Getters and Setters
@@ -94,7 +97,7 @@ namespace Reversi
                 Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
 
                 if (VisualizeProcess)
-                    ReversiForm.HighlightPiece(PossibleMoves, Color.Yellow);
+                    GraphicsUtil.HighlightPiece(PossibleMoves, Color.Yellow);
 
                 ReversiForm.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
@@ -106,7 +109,7 @@ namespace Reversi
                     EvaluatePotentialMove(CurrentPoint, SimBoard, AITurn, ref EvalResult);
 
                     // Serializes the theads to make sure the update functions properly
-                    lock (this)
+                    lock (SpinLock)
                     {
                         ReversiForm.ReportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
                         ReversiForm.ReportDebugMessage("|------------------------------------------|");
@@ -118,7 +121,7 @@ namespace Reversi
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
                         if (VisualizeProcess)
-                            ReversiForm.HighlightPiece(CurrentPoint, Color.DarkRed, MoveWeight.ToString("0.00"));
+                            GraphicsUtil.HighlightPiece(CurrentPoint, Color.DarkRed, MoveWeight.ToString("0.00"));
 
                         ReversiForm.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
@@ -133,10 +136,10 @@ namespace Reversi
 
                 SourceBoard.MakeMove(ChosenMove.X, ChosenMove.Y, AITurn);
 
-                ReversiForm.RefreshPieces();
+                GraphicsUtil.RefreshPieces();
 
                 if (VisualizeProcess)
-                    ReversiForm.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));
+                    GraphicsUtil.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));
 
                 ReversiForm.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
@@ -253,6 +256,5 @@ namespace Reversi
         {
             return (turn == ReversiApplication.WHITE ? ReversiApplication.BLACK : ReversiApplication.WHITE);
         }
-
     }
 }

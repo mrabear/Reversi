@@ -126,9 +126,9 @@ namespace Reversi
                     {
                         if (GameBoard.MakeMove(X, Y, CurrentTurn))
                         {
-                            ReversiForm.RefreshPieces(FullRefresh: true);
-                            ReversiForm.UpdateScoreBoard();
-                            ReversiForm.ShowWinner(GameBoard.DetermineWinner());
+                            GraphicsUtil.RefreshPieces(FullRefresh: true);
+                            GraphicsUtil.UpdateScoreBoard();
+                            GraphicsUtil.ShowWinner(GameBoard.DetermineWinner());
 
                             SwitchTurn();
                         }
@@ -158,7 +158,7 @@ namespace Reversi
                 if (GameBoard.MovePossible(AI.GetColor() == ReversiApplication.BLACK ? ReversiApplication.WHITE : ReversiApplication.BLACK))
                     break;
                 else
-                    ReversiForm.RefreshPieces(FullRefresh: true);
+                    GraphicsUtil.RefreshPieces(FullRefresh: true);
             }
         }
 
@@ -177,7 +177,7 @@ namespace Reversi
                 CurrentTurn = ReversiApplication.WHITE;
                 NextTurn = ReversiApplication.BLACK;
             }
-            ReversiForm.UpdateTurnImage(CurrentTurn);
+            GraphicsUtil.UpdateTurnImage(CurrentTurn);
         }
 
         /// <summary>

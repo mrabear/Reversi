@@ -67,7 +67,7 @@ namespace Reversi
             DateTime SimulationClock = DateTime.Now;
 
             ReversiForm.ReportDebugMessage("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n", overwrite: true );
-            ReversiForm.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+            GraphicsUtil.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
             /////////////////////////////////////////////////////////////
 
             // Reset the database and work queues
@@ -109,7 +109,7 @@ namespace Reversi
                 }
 
                 if (SimulationCycles % 75 == 0)
-                    ReversiForm.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+                    GraphicsUtil.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
 
                 // Grab the next node ID off of the work queue
                 ParentNodeID = WorkNodes.Dequeue();
@@ -122,7 +122,7 @@ namespace Reversi
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ReversiForm.RefreshPieces(ParentNode.getGameBoard());
+                    GraphicsUtil.RefreshPieces(ParentNode.getGameBoard());
 
                 if (ParentNode.getAvailableMoves().Length == 0)
                 {
@@ -213,7 +213,7 @@ namespace Reversi
             /////////////////////////////////////////////////////////////
             if (DisplayDebug)
             {
-                ReversiForm.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+                GraphicsUtil.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
                 ReversiForm.ReportDebugMessage("===============================\nAI DB Build Complete\nSimulation Time: " + DateTime.Now.Subtract(SimulationClock) + "\n\n" + DumpSimulationInfo(), updateConsole: true);
             }
         }
@@ -271,7 +271,7 @@ namespace Reversi
 
                 // Update the game board visual
                 if (VisualizeResults)
-                    ReversiForm.RefreshPieces(CurrentLeafNode.getGameBoard());
+                    GraphicsUtil.RefreshPieces(CurrentLeafNode.getGameBoard());
 
                 // Find who the winner of the leaf node is
                 if (CurrentLeafNode.getGameBoard().FindScore(ReversiApplication.WHITE) > CurrentLeafNode.getGameBoard().FindScore(ReversiApplication.BLACK))
