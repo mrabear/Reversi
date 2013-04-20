@@ -140,7 +140,7 @@ namespace Reversi
                 }
 
                 if ((VsComputer) && (CurrentTurn == AI.GetColor()))
-                    ReversiForm.StartAITurnWorker();
+                    FormUtil.StartAITurnWorker();
                 else
                     TurnInProgress = false;
             }

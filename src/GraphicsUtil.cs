@@ -1,5 +1,5 @@
 /// <summary>
-/// Reversi.Game.cs
+/// Reversi.ReversiForm.GraphicsUtil.cs
 /// </summary>
 
 using System;
@@ -10,12 +10,10 @@ using System.Management;
 namespace Reversi
 {
     /// <summary>
-    /// A subclass of ReversiForm, used to manipulate the various graphical assets
+    /// A subclass of ReversiForm, used to manipulate the game board and other graphics assets
     /// </summary>
     public class GraphicsUtil : ReversiForm
     {
-        #region Game Board graphical manipulation methods
-
         /// <summary>
         /// Updates the score board for both players
         /// </summary>
@@ -247,7 +245,7 @@ namespace Reversi
             // If RAM is running low, emergency stop any running jobs
             if ((float)gRAMUsageBar.Value / (float)gRAMUsageBar.Maximum < Properties.Settings.Default.MemoryFloor)
             {
-                ReversiForm.CancelAIWorkers();
+                FormUtil.CancelAIWorkers();
                 gDebugText.Text += "#####   DB Build Aborted: Memory floor reached (" + gRAMUsageBar.Value.ToString("0,0.") + " KB free)  #####";
             }
 
@@ -258,7 +256,5 @@ namespace Reversi
             RAMGfx.DrawLine(new Pen(Color.Red, 2), MemoryAbortLine, 0, MemoryAbortLine, gRAMUsageBar.Height);
             RAMGfx.DrawString("Abort   Line", new Font("Arial", (float)8, FontStyle.Regular), Brushes.White, new PointF(MemoryAbortLine - 34, 4));
         }
-
-        #endregion
     }
 }

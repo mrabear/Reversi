@@ -66,7 +66,7 @@ namespace Reversi
 
             DateTime SimulationClock = DateTime.Now;
 
-            ReversiForm.ReportDebugMessage("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n", overwrite: true );
+            FormUtil.ReportDebugMessage("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n", overwrite: true);
             GraphicsUtil.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
             /////////////////////////////////////////////////////////////
 
@@ -104,7 +104,7 @@ namespace Reversi
                 // If the BackgroundWorker.CancellationPending property is true, cancel
                 if (WorkerThread.CancellationPending)
                 {
-                    ReversiForm.ReportDebugMessage("#####Database Build has been cancelled#####", updateConsole: true);
+                    FormUtil.ReportDebugMessage("#####Database Build has been cancelled#####", updateConsole: true);
                     break;
                 }
 
@@ -214,7 +214,7 @@ namespace Reversi
             if (DisplayDebug)
             {
                 GraphicsUtil.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
-                ReversiForm.ReportDebugMessage("===============================\nAI DB Build Complete\nSimulation Time: " + DateTime.Now.Subtract(SimulationClock) + "\n\n" + DumpSimulationInfo(), updateConsole: true);
+                FormUtil.ReportDebugMessage("===============================\nAI DB Build Complete\nSimulation Time: " + DateTime.Now.Subtract(SimulationClock) + "\n\n" + DumpSimulationInfo(), updateConsole: true);
             }
         }
 
@@ -228,7 +228,7 @@ namespace Reversi
             DateTime SimulationClock = DateTime.Now;
 
             if (DisplayDebug)
-                ReversiForm.ReportDebugMessage("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")", updateConsole: true);
+                FormUtil.ReportDebugMessage("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")", updateConsole: true);
             /////////////////////////////////////////////////////////////
 
             // Reset all previous analysis values and queue all of the leaf nodes to process
@@ -249,7 +249,7 @@ namespace Reversi
             if (DisplayDebug)
             {
                 TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                ReversiForm.ReportDebugMessage("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)", updateConsole: true);
+                FormUtil.ReportDebugMessage("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)", updateConsole: true);
             }
             /////////////////////////////////////////////////////////////
 
@@ -262,7 +262,7 @@ namespace Reversi
                 // If the BackgroundWorker.CancellationPending property is true, cancel
                 if (WorkerThread.CancellationPending)
                 {
-                    ReversiForm.ReportDebugMessage("#####Database Analysis has been cancelled#####");
+                    FormUtil.ReportDebugMessage("#####Database Analysis has been cancelled#####");
                     break;
                 }
 
@@ -307,7 +307,7 @@ namespace Reversi
             if (DisplayDebug)
             {
                 TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                ReversiForm.ReportDebugMessage("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n", updateConsole: true);
+                FormUtil.ReportDebugMessage("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n", updateConsole: true);
             }
             /////////////////////////////////////////////////////////////
         }

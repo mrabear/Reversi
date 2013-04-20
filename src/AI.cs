@@ -99,7 +99,7 @@ namespace Reversi
                 if (VisualizeProcess)
                     GraphicsUtil.HighlightPiece(PossibleMoves, Color.Yellow);
 
-                ReversiForm.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
+                FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
                 //foreach (Point CurrentPoint in PossibleMoves)
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
@@ -111,19 +111,19 @@ namespace Reversi
                     // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
                     {
-                        ReversiForm.ReportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
-                        ReversiForm.ReportDebugMessage("|------------------------------------------|");
+                        FormUtil.ReportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
+                        FormUtil.ReportDebugMessage("|------------------------------------------|");
 
                         double MoveWeight = AnalyzeWeightTable(EvalResult);
 
-                        ReversiForm.ReportDebugMessage("|------------------------------------------|");
+                        FormUtil.ReportDebugMessage("|------------------------------------------|");
 
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
                         if (VisualizeProcess)
                             GraphicsUtil.HighlightPiece(CurrentPoint, Color.DarkRed, MoveWeight.ToString("0.00"));
 
-                        ReversiForm.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
+                        FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
                 });
                 //}
@@ -141,7 +141,7 @@ namespace Reversi
                 if (VisualizeProcess)
                     GraphicsUtil.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));
 
-                ReversiForm.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
+                FormUtil.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
         }
 
@@ -222,7 +222,7 @@ namespace Reversi
                 // The end calculation
                 WeightedTotal += SubTotal;
 
-                ReversiForm.ReportDebugMessage(String.Format("|  " + (SimDepth + 1).ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
+                FormUtil.ReportDebugMessage(String.Format("|  " + (SimDepth + 1).ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
             }
 
             return (WeightedTotal);

@@ -30,81 +30,79 @@ namespace Reversi
             base.Dispose(disposing);
         }
 
+        protected Label Title;
+
         #region Form Designer Variables
 
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.Windows.Forms.Label Title;
         private IContainer components;
-        private System.Windows.Forms.Timer NewGameTimer;
-        private System.Windows.Forms.MainMenu mainDropDownMenu;
-        private System.Windows.Forms.MenuItem FileDropDownMenu;
-        private System.Windows.Forms.MenuItem GameSetupDropDownMenu;
-        private System.Windows.Forms.MenuItem AIDifficultyMenu;
-        private System.Windows.Forms.MenuItem DiffMenu_Easy;
-        private System.Windows.Forms.MenuItem DiffMenu_Normal;
-        private System.Windows.Forms.MenuItem DiffMenu_Hard;
-        private System.Windows.Forms.MenuItem DiffMenu_VeryHard;
-        private System.Windows.Forms.MenuItem GameSetupMenuHorzBar1;
-        private System.Windows.Forms.MenuItem PvPMenu;
-        private System.Windows.Forms.MenuItem PvCMenu;
-        private System.Windows.Forms.MenuItem ExitMenu;
-        private System.Windows.Forms.MenuItem NewGameMenu;
-        private System.Windows.Forms.MenuItem DebugDropDownMenu;
-        private System.Windows.Forms.MenuItem DebugSkip;
-        private System.Windows.Forms.MenuItem DebugProcess;
-        private System.Windows.Forms.MenuItem NewDebugGameScenarios;
-        private System.Windows.Forms.MenuItem DebugScenario_NoWhite;
-        private System.Windows.Forms.MenuItem DebugScenario_NoBlack;
-        private System.Windows.Forms.MenuItem DebugScenario_MidGame;
-        private Button BuildAIDBButton;
-        private CheckBox VisualizeCheckbox;
-        private GroupBox DBBuilderButtonsBox;
-        private Button AnaylzeDBButton;
-        private Label GridSizeTitleLabel;
-        private Button DumpDBInfoButton;
-        private BackgroundWorker DBBuildWorker;
-        private Button CancelBuildButton;
-        private BackgroundWorker DBAnalysisWorker;
-        private ComboBox GridSizeDropDown;
-        private Label GridDimensionLabel;
-        private Label SimTimerLabel;
-        private Label NodeCounter;
-        private Label WorkCounter;
-        private Label NodeCounterLabel;
-        private Label WorkCounterLabel;
-        private Label VictoryCounterLabel;
-        private Label VictoryCounter;
-        private ProgressBar RAMUsageBar;
-        private System.Windows.Forms.Timer RAMCheckTimer;
-        private Label RAMLabel;
-        private TabControl AIInfoTabControl;
-        private TabPage AIDBTab;
-        private TabPage AISimTab;
-        private Label CurrentTurnLabel;
-        private Label BlackScoreBoardTitle;
-        private Label WhiteScoreBoardTitle;
-        private Label WhiteScoreBoard;
-        private Label BlackScoreBoard;
-        private BackgroundWorker AITurnWorker;
-        private PictureBox BoardXaxisLabel;
-        private PictureBox BoardYaxisLabel;
-        private Label SimDepthTitle;
-        private Button HideDebugButton;
-        private TrackBar SimulationDepthSlider;
-        private Label SimDepthCountLabel;
-        private Label SimDepthCount;
-        public RichTextBox DebugAITrace;
-        private Button ClearDebugLogButton;
-        private Label AITraceLabel;
-        private CheckBox DebugLogCheckBox;
-        private Button NewGameButton;
-        private Panel CurrentTurnImageSurface;
-        private MenuItem GameSetupMenuHorzBar2;
-        private MenuItem ShowAvailableMoves;
-        private Panel BoardSurface;
+        protected Timer NewGameTimer;
+        protected MainMenu mainDropDownMenu;
+        protected MenuItem FileDropDownMenu;
+        protected MenuItem GameSetupDropDownMenu;
+        protected MenuItem AIDifficultyMenu;
+        protected MenuItem DiffMenu_Easy;
+        protected MenuItem DiffMenu_Normal;
+        protected MenuItem DiffMenu_Hard;
+        protected MenuItem DiffMenu_VeryHard;
+        protected MenuItem GameSetupMenuHorzBar1;
+        protected MenuItem PvPMenu;
+        protected MenuItem PvCMenu;
+        protected MenuItem ExitMenu;
+        protected MenuItem NewGameMenu;
+        protected MenuItem DebugDropDownMenu;
+        protected MenuItem DebugSkip;
+        protected MenuItem DebugProcess;
+        protected MenuItem NewDebugGameScenarios;
+        protected MenuItem DebugScenario_NoWhite;
+        protected MenuItem DebugScenario_NoBlack;
+        protected MenuItem DebugScenario_MidGame;
+        protected Button BuildAIDBButton;
+        protected CheckBox VisualizeCheckbox;
+        protected GroupBox DBBuilderButtonsBox;
+        protected Button AnaylzeDBButton;
+        protected Label GridSizeTitleLabel;
+        protected Button DumpDBInfoButton;
+        protected BackgroundWorker DBBuildWorker;
+        protected Button CancelBuildButton;
+        protected BackgroundWorker DBAnalysisWorker;
+        protected ComboBox GridSizeDropDown;
+        protected Label GridDimensionLabel;
+        protected Label SimTimerLabel;
+        protected Label NodeCounter;
+        protected Label WorkCounter;
+        protected Label NodeCounterLabel;
+        protected Label WorkCounterLabel;
+        protected Label VictoryCounterLabel;
+        protected Label VictoryCounter;
+        protected ProgressBar RAMUsageBar;
+        protected Timer RAMCheckTimer;
+        protected Label RAMLabel;
+        protected TabControl AIInfoTabControl;
+        protected TabPage AIDBTab;
+        protected TabPage AISimTab;
+        protected Label CurrentTurnLabel;
+        protected Label BlackScoreBoardTitle;
+        protected Label WhiteScoreBoardTitle;
+        protected Label WhiteScoreBoard;
+        protected Label BlackScoreBoard;
+        protected BackgroundWorker AITurnWorker;
+        protected PictureBox BoardXaxisLabel;
+        protected PictureBox BoardYaxisLabel;
+        protected Label SimDepthTitle;
+        protected Button HideDebugButton;
+        protected TrackBar SimulationDepthSlider;
+        protected Label SimDepthCountLabel;
+        protected Label SimDepthCount;
         #endregion
+        protected RichTextBox DebugAITrace;
+        protected Button ClearDebugLogButton;
+        protected Label AITraceLabel;
+        protected CheckBox DebugLogCheckBox;
+        protected Button NewGameButton;
+        protected Panel CurrentTurnImageSurface;
+        protected MenuItem GameSetupMenuHorzBar2;
+        protected MenuItem ShowAvailableMoves;
+        protected Panel BoardSurface;
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -796,7 +794,7 @@ namespace Reversi
             this.BoardSurface.Size = new System.Drawing.Size(480, 480);
             this.BoardSurface.TabIndex = 39;
             this.BoardSurface.Paint += new System.Windows.Forms.PaintEventHandler(this.BoardSurface_Paint);
-            this.BoardSurface.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlaceUserPiece);
+            this.BoardSurface.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BoardSurface_MouseDown);
             // 
             // NewGameButton
             // 
@@ -887,35 +885,49 @@ namespace Reversi
             // Initialize the form (generated code)
             InitializeComponent();
 
-            // Esablish graphics handles
-            gBoardGFX = BoardSurface.CreateGraphics();
-            gCurrentTurnImageGFX = CurrentTurnImageSurface.CreateGraphics();
+            DatabaseFactory = new AIDatabase();
+            LastDrawnBoard = new Board();
 
-            // Static global binds for important form elements
-            gDebugText          = DebugAITrace;
-            gWhiteScoreBoard    = WhiteScoreBoard;
-            gBlackScoreBoard    = BlackScoreBoard;
-            gCurrentTurnLabel   = CurrentTurnLabel;
-            gAITurnWorker       = AITurnWorker;
-            gDebugLogCheckBox   = DebugLogCheckBox;
-            gSimTimerLabel      = SimTimerLabel;
-            gNodeCounter        = NodeCounter;
-            gWorkCounter        = WorkCounter;
-            gVictoryCounter     = VictoryCounter;
-            gCurrentTurnSurface = CurrentTurnImageSurface;
-            gShowAvailableMoves = ShowAvailableMoves;
-            gRAMUsageBar        = RAMUsageBar;
-            gDBBuildWorker      = DBBuildWorker;
-            gDBAnalysisWorker   = DBAnalysisWorker;
+            // Esablish graphics handles
+            gBoardGFX               = BoardSurface.CreateGraphics();
+            gCurrentTurnImageGFX    = CurrentTurnImageSurface.CreateGraphics();
+
+            // Static global binds for form elements
+            gDebugText              = DebugAITrace;
+            gWhiteScoreBoard        = WhiteScoreBoard;
+            gBlackScoreBoard        = BlackScoreBoard;
+            gCurrentTurnLabel       = CurrentTurnLabel;
+            gAITurnWorker           = AITurnWorker;
+            gDebugLogCheckBox       = DebugLogCheckBox;
+            gSimTimerLabel          = SimTimerLabel;
+            gNodeCounter            = NodeCounter;
+            gWorkCounter            = WorkCounter;
+            gVictoryCounter         = VictoryCounter;
+            gCurrentTurnSurface     = CurrentTurnImageSurface;
+            gShowAvailableMoves     = ShowAvailableMoves;
+            gRAMUsageBar            = RAMUsageBar;
+            gDBBuildWorker          = DBBuildWorker;
+            gDBAnalysisWorker       = DBAnalysisWorker;
+            gWhiteScoreBoardTitle   = WhiteScoreBoardTitle;
+            gBlackScoreBoardTitle   = BlackScoreBoardTitle;
+            gSimulationDepthSlider  = SimulationDepthSlider;
+            gVisualizeCheckbox      = VisualizeCheckbox;
+            gSimDepthCount          = SimDepthCount;
+            gCancelBuildButton      = CancelBuildButton;
+            gRAMLabel               = RAMLabel;
+            gRAMCheckTimer          = RAMCheckTimer;
+            gGridSizeDropDown       = GridSizeDropDown;
+            gGridDimensionLabel     = GridDimensionLabel;
+            gBoardSurface           = BoardSurface;
 
             // Game board and piece image handles
-            gBoardImage      = Image.FromHbitmap(Properties.Resources.reversi_grid.GetHbitmap());
-            gWhitePieceImage = Image.FromHbitmap(Properties.Resources.whitepiece.GetHbitmap());
-            gBlackPieceImage = Image.FromHbitmap(Properties.Resources.blackpiece.GetHbitmap());
+            gBoardImage             = Image.FromHbitmap(Properties.Resources.reversi_grid.GetHbitmap());
+            gWhitePieceImage        = Image.FromHbitmap(Properties.Resources.whitepiece.GetHbitmap());
+            gBlackPieceImage        = Image.FromHbitmap(Properties.Resources.blackpiece.GetHbitmap());
 
             // Graphic dimensions
-            BoardPieceImageSize = gBlackPieceImage.Width;
-            BoardGridSize = Properties.Settings.Default.GridSize;
+            BoardPieceImageSize     = gBlackPieceImage.Width;
+            BoardGridSize           = Properties.Settings.Default.GridSize;
 
             // AI Opponent worker thread settings
             AITurnWorker.WorkerSupportsCancellation = true;
@@ -924,8 +936,12 @@ namespace Reversi
             // Setup form elements
             GridSizeDropDown.SelectedIndex = 4;
             SimTimerLabel.Text = "";
-            UpdateMaxDepth();
+            FormUtil.UpdateMaxDepth();
             AIInfoTabControl.SelectTab(AISimTab);
+
+            // Setup game opponent
+            VSComputer = true;
+            AIDifficulty = 1;
 
             // Establish a static binding to the global game instance
             gCurrentGame = ReversiApplication.GetCurrentGame();
@@ -934,45 +950,56 @@ namespace Reversi
         #region Global Variables
 
         // Static handles to graphical assets
-        protected static Image gBlackPieceImage;
-        protected static Image gWhitePieceImage;
-        protected static Image gBoardImage;
+        protected static Image              gBlackPieceImage;
+        protected static Image              gWhitePieceImage;
+        protected static Image              gBoardImage;
+        protected static Graphics           gBoardGFX;
+        protected static Graphics           gCurrentTurnImageGFX;
 
         // Static handles to form objects
-        protected static RichTextBox gDebugText = new RichTextBox();
-        protected static Graphics gBoardGFX;
-        protected static Label gWhiteScoreBoard;
-        protected static Label gBlackScoreBoard;
-        protected static Label gCurrentTurnLabel;
-        protected static Graphics gCurrentTurnImageGFX;
-        protected static Panel gCurrentTurnSurface;
-        protected static BackgroundWorker gAITurnWorker;
-        protected static CheckBox gDebugLogCheckBox;
-        protected static Label gSimTimerLabel;
-        protected static Label gNodeCounter;
-        protected static Label gWorkCounter;
-        protected static Label gVictoryCounter;
-        protected static MenuItem gShowAvailableMoves;
-        protected static ProgressBar gRAMUsageBar;
-        protected static BackgroundWorker gDBBuildWorker;
-        protected static BackgroundWorker gDBAnalysisWorker;
+        protected static Panel              gCurrentTurnSurface;
+        protected static Panel              gBoardSurface;
+        protected static BackgroundWorker   gAITurnWorker;
+        protected static BackgroundWorker   gDBBuildWorker;
+        protected static BackgroundWorker   gDBAnalysisWorker;
+        protected static MenuItem           gShowAvailableMoves;
+        protected static CheckBox           gDebugLogCheckBox;
+        protected static CheckBox           gVisualizeCheckbox;
+        protected static Button             gCancelBuildButton;
+        protected static RichTextBox        gDebugText;
+        protected static ProgressBar        gRAMUsageBar;
+        protected static TrackBar           gSimulationDepthSlider;
+        protected static Timer              gRAMCheckTimer;
+        protected static ComboBox           gGridSizeDropDown;
+        protected static Label              gWhiteScoreBoard;
+        protected static Label              gBlackScoreBoard;
+        protected static Label              gCurrentTurnLabel;
+        protected static Label              gSimTimerLabel;
+        protected static Label              gNodeCounter;
+        protected static Label              gWorkCounter;
+        protected static Label              gVictoryCounter;
+        protected static Label              gWhiteScoreBoardTitle;
+        protected static Label              gBlackScoreBoardTitle;
+        protected static Label              gSimDepthCount;
+        protected static Label              gRAMLabel;
+        protected static Label              gGridDimensionLabel;
 
         // Piece dimensions
-        protected static int BoardPieceImageSize;
-        protected static int BoardGridSize;
+        protected static int                BoardPieceImageSize;
+        protected static int                BoardGridSize;
 
         // The AI Database
-        private AIDatabase DatabaseFactory = new AIDatabase();
+        protected static AIDatabase         DatabaseFactory;
 
         // The board used to track what has been drawn on the screen
-        private static Board LastDrawnBoard = new Board();
+        protected static Board              LastDrawnBoard;
 
         // The Global Game Object
-        protected static Game gCurrentGame;
+        protected static Game               gCurrentGame;
 
         // Flags that determine who is playing (ai or human)
-        private static Boolean VSComputer = true;
-        private static int AIDifficulty = 1;
+        protected static Boolean            VSComputer;
+        protected static int                AIDifficulty ;
 
         #endregion
 
@@ -1020,34 +1047,7 @@ namespace Reversi
  
         #endregion
 
-        /// <summary>
-        /// Resets the form elements to prepare for a new game
-        /// </summary>
-        private void StartNewGame()
-        {
-            gBlackScoreBoard.Text = "0";
-            gWhiteScoreBoard.Text = "0";
-            gCurrentTurnLabel.Text = "Turn:";
-            gCurrentTurnSurface.Visible = true;
-
-            // Reset the score board
-            gBlackScoreBoard.Visible = true;
-            gWhiteScoreBoard.Visible = true;
-            CurrentTurnLabel.Visible = true;
-            WhiteScoreBoardTitle.Visible = true;
-            BlackScoreBoardTitle.Visible = true;
-
-            ReversiApplication.ResetCurrentGame(GetCurrentBoardSize());
-            gCurrentGame = ReversiApplication.GetCurrentGame();
-
-            gCurrentGame.GetAI().SetMaxDepth(SimulationDepthSlider.Value);
-            gCurrentGame.GetAI().SetVisualizeProcess(VisualizeCheckbox.Checked);
-
-            GraphicsUtil.RefreshPieces(FullRefresh: true);
-            GraphicsUtil.MarkAvailableMoves(gCurrentGame.GetCurrentTurn());
-            GraphicsUtil.UpdateTurnImage(gCurrentGame.GetCurrentTurn());
-            GraphicsUtil.UpdateScoreBoard();
-        }
+        #region Form Event Handelers
 
         #region Drop Down Menu Event Handelers
 
@@ -1140,7 +1140,7 @@ namespace Reversi
         /// </summary>
         private void NewGameMenu_Click(object sender, System.EventArgs e)
         {
-            StartNewGame();
+            FormUtil.StartNewGame();
         }
 
         /// <summary>
@@ -1163,7 +1163,7 @@ namespace Reversi
         /// </summary>
         private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
         {
-            StartNewGame();
+            FormUtil.StartNewGame();
             gCurrentGame.GetGameBoard().ClearBoard();
             gCurrentGame.GetGameBoard().PutPiece(0, 0, ReversiApplication.BLACK);
             gCurrentGame.GetGameBoard().PutPiece(0, 1, ReversiApplication.BLACK);
@@ -1185,7 +1185,7 @@ namespace Reversi
             GraphicsUtil.UpdateScoreBoard();
             GraphicsUtil.UpdateTurnImage(gCurrentGame.GetCurrentTurn());
             gCurrentGame.SetCurrentTurn(ReversiApplication.BLACK);
-            StartAITurnWorker();
+            FormUtil.StartAITurnWorker();
         }
 
         /// <summary>
@@ -1193,7 +1193,7 @@ namespace Reversi
         /// </summary>
         private void DebugScenario_MidGame_Click(object sender, EventArgs e)
         {
-            StartNewGame();
+            FormUtil.StartNewGame();
             gCurrentGame.GetGameBoard().PutPiece(2, 2, ReversiApplication.WHITE);
             gCurrentGame.GetGameBoard().PutPiece(2, 3, ReversiApplication.BLACK);
             gCurrentGame.GetGameBoard().PutPiece(2, 4, ReversiApplication.BLACK);
@@ -1217,6 +1217,26 @@ namespace Reversi
 
         #endregion
 
+        #region Paint Event Handelers
+
+        /// <summary>
+        /// Called when the "Game Board" is repainted, refreshes the pieces
+        /// </summary>
+        public void BoardSurface_Paint(object sender, PaintEventArgs e)
+        {
+            GraphicsUtil.RefreshPieces(FullRefresh: true);
+        }
+
+        /// <summary>
+        /// Called when the "Current Turn Image" is repainted, refreshes the current turn image
+        /// </summary>
+        public void CurrentTurnImageSurface_Paint(object sender, PaintEventArgs e)
+        {
+            GraphicsUtil.UpdateTurnImage(gCurrentGame.GetCurrentTurn());
+        }
+
+        #endregion
+
         #region AI Database Form & Event Handelers
 
         /// <summary>
@@ -1224,8 +1244,8 @@ namespace Reversi
         /// </summary>
         private void BuildAIDBButton_Click(object sender, EventArgs e)
         {
-            SetupSimulationForm();
-            DBBuildWorker.RunWorkerAsync(GetCurrentBoardSize());
+            FormUtil.SetupSimulationForm();
+            DBBuildWorker.RunWorkerAsync(FormUtil.GetCurrentBoardSize());
         }
 
         /// <summary>
@@ -1233,18 +1253,7 @@ namespace Reversi
         /// </summary>
         private void DBBuildWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            StartBuildDB(Convert.ToInt32(e.Argument.ToString()));
-        }
-
-        /// <summary>
-        /// Starts the database build background worker
-        /// </summary>
-        private void StartBuildDB(int BoardSize = 4)
-        {
-            ReversiApplication.ResetCurrentGame(BoardSize);
-            gCurrentGame = ReversiApplication.GetCurrentGame();
-
-            DatabaseFactory.BuildAIDatabase(DBBuildWorker, BoardSize, VisualizeCheckbox.Checked, true);
+            FormUtil.StartBuildDB(Convert.ToInt32(e.Argument.ToString()));
         }
 
         /// <summary>
@@ -1268,7 +1277,7 @@ namespace Reversi
         /// </summary>
         private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            ClearSimulationForm();
+            FormUtil.ClearSimulationForm();
         }
 
         /// <summary>
@@ -1284,7 +1293,7 @@ namespace Reversi
         /// </summary>
         private void AnaylzeDBButton_Click(object sender, EventArgs e)
         {
-            SetupSimulationForm();
+            FormUtil.SetupSimulationForm();
             DBAnalysisWorker.RunWorkerAsync();
         }
 
@@ -1293,21 +1302,8 @@ namespace Reversi
         /// </summary>
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            CancelAIWorkers();
-            ClearSimulationForm();
-        }
-
-
-        /// <summary>
-        /// Cancels any of the background jobs that are currently running
-        /// </summary>
-        protected static void CancelAIWorkers()
-        {
-            if (gDBBuildWorker.IsBusy)
-                gDBBuildWorker.CancelAsync();
-           
-            if (gDBAnalysisWorker.IsBusy)
-                gDBAnalysisWorker.CancelAsync();
+            FormUtil.CancelAIWorkers();
+            FormUtil.ClearSimulationForm();
         }
 
         /// <summary>
@@ -1319,154 +1315,76 @@ namespace Reversi
             DatabaseFactory.AnalyzeAIDatabase(DBAnalysisWorker, VisualizeCheckbox.Checked, gDebugText, DisplayDebug);
         }
 
+        #endregion
+
+        #region AI Simulation Tab event handlers
+
         /// <summary>
-        /// Hides / Resets the form elements associated with the database builder
+        /// Responds to the simulation depth slider being moved
         /// </summary>
-        private void ClearSimulationForm()
+        private void SimulationDepthSlider_Scroll(object sender, EventArgs e)
         {
-            SimTimerLabel.Text = "";
-            CancelBuildButton.Visible = false;
-            RAMCheckTimer.Enabled = false;
-            RAMUsageBar.Visible = false;
-            RAMLabel.Visible = false;
-            RAMUsageBar.Maximum = 100;
+            if (SimulationDepthSlider.Value % 2 != 0)
+                SimulationDepthSlider.Value++;
+
+            FormUtil.UpdateMaxDepth();
         }
 
         /// <summary>
-        /// Displays the form elements associated with the database builder
+        /// Responds to the visulize checkbox being changed
         /// </summary>
-        private void SetupSimulationForm()
+        private void VisualizeCheckbox_CheckedChanged(object sender, EventArgs e)
         {
-            CancelBuildButton.Visible = true;
-            DBAnalysisWorker.WorkerSupportsCancellation = true;
-            DBAnalysisWorker.WorkerReportsProgress = true;
-            DBBuildWorker.WorkerSupportsCancellation = true;
-            DBBuildWorker.WorkerReportsProgress = true;
-            RAMCheckTimer.Enabled = true;
-            RAMUsageBar.Visible = true;
-            RAMLabel.Visible = true;
-            GraphicsUtil.UpdateRAMprogress();
-
-            // Reset the score board
-            gBlackScoreBoard.Visible = false;
-            gWhiteScoreBoard.Visible = false;
-            CurrentTurnLabel.Visible = false;
-            WhiteScoreBoardTitle.Visible = false;
-            BlackScoreBoardTitle.Visible = false;
-            gCurrentTurnSurface.Visible = false;
+            gCurrentGame.GetAI().SetVisualizeProcess(VisualizeCheckbox.Checked);
         }
 
         #endregion
 
-        #region Miscellaneous Form Level Methods
+        #region AI Turn BG Worker Event Handelers
+
 
         /// <summary>
-        /// Called when the "Game Board" is repainted, refreshes the pieces
+        /// Called asynchronously when it is time for the AI to wake up and do some work
         /// </summary>
-        public void BoardSurface_Paint(object sender, PaintEventArgs e)
+        private void AITurnMonitor_DoWork(object sender, DoWorkEventArgs e)
         {
-            GraphicsUtil.RefreshPieces(FullRefresh: true);
+            gCurrentGame.ProcessAITurn();
         }
 
         /// <summary>
-        /// Called when the "Current Turn Image" is repainted, refreshes the current turn image
+        /// Called every time the AI monitor has a move to render
         /// </summary>
-        public void CurrentTurnImageSurface_Paint(object sender, PaintEventArgs e)
+        private void AITurnMonitor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            GraphicsUtil.UpdateTurnImage(gCurrentGame.GetCurrentTurn());
+
         }
 
         /// <summary>
-        /// Returns an integer board size as selected on the form
+        /// Called mid-way through an AI turn analysis, used to report back progress
         /// </summary>
-        /// <returns>An integer board size as selected on the form</returns>
-        private int GetCurrentBoardSize()
+        public static void ReportAITurnWorkerProgress(int progress = 0)
         {
-            return (Convert.ToInt32(GridSizeDropDown.Items[GridSizeDropDown.SelectedIndex].ToString()));
+            gAITurnWorker.ReportProgress(progress);
         }
 
         /// <summary>
-        /// Responds to the "New Game" button being clicked
+        /// Called when the AI monitor has no more moves to place
         /// </summary>
-        private void NewGameButton_Click(object sender, EventArgs e)
+        public void AITurnMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            StartNewGame();
+            FormUtil.AIWorkerCompleted();
         }
 
-        /// <summary>
-        /// Responds to the MouseUp event on the board image, processes the click as a placed piece
-        /// </summary>
-        private void PlaceUserPiece(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            int x = (e.X + 1) / BoardGridSize;
-            int y = (e.Y + 1) / BoardGridSize;
+        #endregion
 
-            // Don't process the mouse click if there is a turn already being processed
-            if (!gCurrentGame.GetTurnInProgress())
-                gCurrentGame.ProcessTurn(x, y);
-        }
-        
+        #region Debug Form Element Event Handelers
+
         /// <summary>
         /// If the grid size drop down changes, updates the board with the new dimensions
         /// </summary>
         private void GridSizeDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int newBoardSize = GetCurrentBoardSize();
-
-            GridDimensionLabel.Text = newBoardSize + "x" + newBoardSize;
-
-            BoardSurface.Width = BoardGridSize * newBoardSize;
-            BoardSurface.Height = BoardGridSize * newBoardSize;
-
-            StartNewGame();
-        }
-
-        /// <summary>
-        /// Starts a new game 100ms after the form has loaded
-        /// </summary>
-        private void NewGameTimer_Tick(object sender, EventArgs e)
-        {
-            StartNewGame();
-            NewGameTimer.Enabled = false;
-        }
-
-        /// <summary>
-        /// Thread safe delegates for setting the debug window with the new text
-        /// </summary>
-        /// <param name="newText">The information to report</param>
-        private delegate void setDebugTextDelagate(string newText);
-
-        /// <summary>
-        /// Thread safe delegates for appending to the debug window with the new text
-        /// </summary>
-        /// <param name="newText">The information to report</param>
-        private delegate void appendDebugTextDelagate(string newText);
-
-        /// <summary>
-        /// Thread safe way to update the debug message box
-        /// </summary>
-        /// <param name="newDebugMsg">The information to report</param>
-        /// <param name="updateConsole">(optional: false) True to update the console</param>
-        /// <param name="updateWindow">(optional: true) True to update the debug window</param>
-        /// <param name="overwrite">(optional: false) To reset the debug window</param>
-        public static void ReportDebugMessage(String newDebugMsg, bool updateConsole = false, bool updateWindow = true, bool overwrite = false)
-        {
-            if( gDebugLogCheckBox.Checked && updateWindow )
-                if ( overwrite )
-                    gDebugText.Invoke(new setDebugTextDelagate(SetDebugText), newDebugMsg + Environment.NewLine);
-                else
-                    gDebugText.Invoke(new appendDebugTextDelagate(AppendDebugText), newDebugMsg + Environment.NewLine);
-
-            if (updateConsole)
-                Console.WriteLine(newDebugMsg);
-        }
-
-        /// <summary>
-        /// Thread safe way to clear the debug message box
-        /// </summary>
-        public static void ClearDebugMessage()
-        {
-            gDebugText.Invoke(new setDebugTextDelagate(SetDebugText), "");
+            FormUtil.ChangeGameBoardSize();
         }
 
         /// <summary>
@@ -1474,7 +1392,7 @@ namespace Reversi
         /// </summary>
         private void ClearDebugLogButton_Click(object sender, EventArgs e)
         {
-            ClearDebugMessage();
+            FormUtil.ClearDebugMessage();
         }
 
         /// <summary>
@@ -1502,83 +1420,34 @@ namespace Reversi
 
         #endregion
 
-        #region AI Turn BG Worker Event Handelers
+        #region Game FLow Event Handelers
 
         /// <summary>
-        /// Starts the AI turn worker job, which will analyze the board and make a move
+        /// Responds to the "New Game" button being clicked
         /// </summary>
-        public static void StartAITurnWorker()
+        private void NewGameButton_Click(object sender, EventArgs e)
         {
-            gAITurnWorker.RunWorkerAsync();
+            FormUtil.StartNewGame();
         }
 
         /// <summary>
-        /// Called mid-way through an AI turn analysis, used to report back progress
+        /// Responds to the mouse being pushed down on the game board, attempts to place a piece there
         /// </summary>
-        public static void ReportAITurnWorkerProgress(int progress = 0)
+        private void BoardSurface_MouseDown(object sender, MouseEventArgs e)
         {
-            gAITurnWorker.ReportProgress(progress);
+            FormUtil.PlaceUserPiece(e.X, e.Y);
         }
 
         /// <summary>
-        /// Called asynchronously when it is time for the AI to wake up and do some work
+        /// Starts a new game 100ms after the form has loaded
         /// </summary>
-        private void AITurnMonitor_DoWork(object sender, DoWorkEventArgs e)
+        private void NewGameTimer_Tick(object sender, EventArgs e)
         {
-            gCurrentGame.ProcessAITurn();
-        }
-
-        /// <summary>
-        /// Called every time the AI monitor has a move to render
-        /// </summary>
-        private void AITurnMonitor_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// Called when the AI monitor has no more moves to place
-        /// </summary>
-        public void AITurnMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            gCurrentGame.SetTurnInProgress(false);
-            gCurrentGame.SwitchTurn();
-            GraphicsUtil.UpdateScoreBoard();
-            GraphicsUtil.ShowWinner(gCurrentGame.GetGameBoard().DetermineWinner());
-            GraphicsUtil.MarkAvailableMoves(gCurrentGame.GetCurrentTurn());
+            FormUtil.StartNewGame();
+            NewGameTimer.Enabled = false;
         }
 
         #endregion
-
-        #region AI Simulation Tab event handlers
-
-        /// <summary>
-        /// Responds to the simulation depth slider being moved
-        /// </summary>
-        private void SimulationDepthSlider_Scroll(object sender, EventArgs e)
-        {
-            if (SimulationDepthSlider.Value % 2 != 0)
-                SimulationDepthSlider.Value++;
-
-            UpdateMaxDepth();
-        }
-
-        /// <summary>
-        /// Updates the current game and form elements with the current simulation max depth
-        /// </summary>
-        private void UpdateMaxDepth()
-        {
-            SimDepthCount.Text = SimulationDepthSlider.Value.ToString();
-            gCurrentGame.GetAI().SetMaxDepth(SimulationDepthSlider.Value - 1);
-        }
-
-        /// <summary>
-        /// Responds to the visulize checkbox being changed
-        /// </summary>
-        private void VisualizeCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
-            gCurrentGame.GetAI().SetVisualizeProcess(VisualizeCheckbox.Checked);
-        }
 
         #endregion
     }
