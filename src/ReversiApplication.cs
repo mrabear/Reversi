@@ -25,13 +25,13 @@ namespace Reversi
         /// Returns the global application game instance
         /// </summary>
         /// <returns>The current application game instance</returns>
-        public static Game getCurrentGame() { return CurrentGame; }
+        public static Game GetCurrentGame() { return CurrentGame; }
 
         /// <summary>
         /// Resets the global application game instance
         /// </summary>
         /// <param name="BoardSize">The size of the board to use in the new game</param>
-        public static void resetCurrentGame(int BoardSize = 8) { CurrentGame = new Game(BoardSize); }
+        public static void ResetCurrentGame(int BoardSize = 8) { CurrentGame = new Game(BoardSize); }
 
         /// <summary>
         /// The application entry point, starts a new form instance

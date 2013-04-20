@@ -58,12 +58,12 @@ namespace Reversi
         /// <summary>
         /// Returns the 2d list of game pieces
         /// </summary>
-        public int[,] getBoardPieces() { return BoardPieces; }
+        public int[,] GetBoardPieces() { return BoardPieces; }
 
         /// <summary>
         /// Returns the board size
         /// </summary>
-        public int getBoardSize() { return BoardSize; }
+        public int GetBoardSize() { return BoardSize; }
 
         #endregion
 

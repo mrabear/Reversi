@@ -18,7 +18,7 @@ namespace Reversi
     /// </summary>
     public class AI
     {
-        private int color;
+        private int AITurn;
         private static int MaxSimDepth;
         private bool VisualizeProcess;
 
@@ -41,7 +41,7 @@ namespace Reversi
         /// <param name="AIcolor">The color of the AI player</param>
         public AI(int AIcolor)
         {
-            color = AIcolor;
+            AITurn = AIcolor;
             VisualizeProcess = false;
             MaxSimDepth = Properties.Settings.Default.MaxDepth;
         }
@@ -53,7 +53,7 @@ namespace Reversi
         /// <param name="NewMaxDepth">The number of turns to look ahead (should be an even number)</param>
         public AI(int AIcolor, int NewMaxDepth)
         {
-            color = AIcolor;
+            AITurn = AIcolor;
             VisualizeProcess = false;
             MaxSimDepth = NewMaxDepth;
         }
@@ -63,19 +63,19 @@ namespace Reversi
         /// <summary>
         /// Returns the color of the AI opponent
         /// </summary>
-        public int  getColor() { return color; }
+        public int GetColor() { return AITurn; }
 
         /// <summary>
         /// Sets the maximum simulation depth
         /// </summary>
         /// <param name="NewMaxDepth">The maximum number of turns to look ahead</param>
-        public void setMaxDepth(int NewMaxDepth) { MaxSimDepth = NewMaxDepth; }
+        public void SetMaxDepth(int NewMaxDepth) { MaxSimDepth = NewMaxDepth; }
 
         /// <summary>
         /// Sets the VisualizeProcess flag
         /// </summary>
         /// <param name="newVisualizeProcess">True if the AI should display the move analysis results</param>
-        public void setVisualizeProcess(bool newVisualizeProcess) { VisualizeProcess = newVisualizeProcess; }
+        public void SetVisualizeProcess(bool newVisualizeProcess) { VisualizeProcess = newVisualizeProcess; }
 
         #endregion
 
@@ -85,7 +85,7 @@ namespace Reversi
         /// <param name="SourceBoard">The board to consider</param>
         public void MakeNextMove(Board SourceBoard)
         {
-            Point[] PossibleMoves = SourceBoard.AvailableMoves(color);
+            Point[] PossibleMoves = SourceBoard.AvailableMoves(AITurn);
 
             if (PossibleMoves.Length > 0)
             {
@@ -96,31 +96,31 @@ namespace Reversi
                 if (VisualizeProcess)
                     ReversiForm.HighlightPiece(PossibleMoves, Color.Yellow);
 
-                ReversiForm.reportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
+                ReversiForm.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
                 //foreach (Point CurrentPoint in PossibleMoves)
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
                 {
                     double[] EvalResult = new double[MaxSimDepth];
 
-                    EvaluatePotentialMove(CurrentPoint, SimBoard, color, ref EvalResult);
+                    EvaluatePotentialMove(CurrentPoint, SimBoard, AITurn, ref EvalResult);
 
                     // Serializes the theads to make sure the update functions properly
                     lock (this)
                     {
-                        ReversiForm.reportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
-                        ReversiForm.reportDebugMessage("|------------------------------------------|");
+                        ReversiForm.ReportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
+                        ReversiForm.ReportDebugMessage("|------------------------------------------|");
 
                         double MoveWeight = AnalyzeWeightTable(EvalResult);
 
-                        ReversiForm.reportDebugMessage("|------------------------------------------|");
+                        ReversiForm.ReportDebugMessage("|------------------------------------------|");
 
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
                         if (VisualizeProcess)
                             ReversiForm.HighlightPiece(CurrentPoint, Color.DarkRed, MoveWeight.ToString("0.00"));
 
-                        ReversiForm.reportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
+                        ReversiForm.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
                 });
                 //}
@@ -131,14 +131,14 @@ namespace Reversi
                         ChosenMove = ResultMove;
                 }
 
-                SourceBoard.MakeMove(ChosenMove.X, ChosenMove.Y, color);
+                SourceBoard.MakeMove(ChosenMove.X, ChosenMove.Y, AITurn);
 
                 ReversiForm.RefreshPieces();
 
                 if (VisualizeProcess)
                     ReversiForm.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));
 
-                ReversiForm.reportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
+                ReversiForm.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
         }
 
@@ -182,7 +182,7 @@ namespace Reversi
                 // If there are no moves left in the game, collapse the simulation
                 else
                 {
-                    if (SimulationBoard.FindScore(color) > SimulationBoard.FindScore(GetOtherTurn(Turn)))
+                    if (SimulationBoard.FindScore(AITurn) > SimulationBoard.FindScore(GetOtherTurn(Turn)))
                         BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VictoryWeight;
                     else
                         BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VictoryWeight * -1;
@@ -219,7 +219,7 @@ namespace Reversi
                 // The end calculation
                 WeightedTotal += SubTotal;
 
-                ReversiForm.reportDebugMessage(String.Format("|  " + (SimDepth + 1).ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
+                ReversiForm.ReportDebugMessage(String.Format("|  " + (SimDepth + 1).ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
             }
 
             return (WeightedTotal);

@@ -30,15 +30,15 @@ namespace Reversi
         {
             CurrentTurn = ReversiApplication.WHITE;
             NextTurn = ReversiApplication.BLACK;
-            Difficulty = ReversiForm.getAIDifficulty();
-            VsComputer = ReversiForm.isVsComputer();
+            Difficulty = ReversiForm.GetAIDifficulty();
+            VsComputer = ReversiForm.VsComputer();
             GameBoard = new Board(BoardSize);
             IsComplete = false;
             AI = new AI(ReversiApplication.BLACK);
 
             // Reset the board that tracks which pieces have been drawn on the screen
-            ReversiForm.setLastDrawnBoard( BoardSize );
-            ReversiForm.getLastDrawnBoard().ClearBoard();
+            ReversiForm.SetLastDrawnBoard( BoardSize );
+            ReversiForm.GetLastDrawnBoard().ClearBoard();
         }
 
         #region Getters and Setters
@@ -46,56 +46,56 @@ namespace Reversi
         /// <summary>
         /// Returns the current game turn
         /// </summary>
-        public int getCurrentTurn() { return CurrentTurn; }
+        public int GetCurrentTurn() { return CurrentTurn; }
 
         /// <summary>
         /// Sets the current game turn
         /// </summary>
         /// <param name="Turn">The current turn</param>
-        public void setCurrentTurn(int Turn) { CurrentTurn = Turn; }
+        public void SetCurrentTurn(int Turn) { CurrentTurn = Turn; }
 
         /// <summary>
         /// Returns the next turn
         /// </summary>
-        public int getNextTurn() { return NextTurn; }
+        public int GetNextTurn() { return NextTurn; }
 
         /// <summary>
         /// Sets the next turn
         /// </summary>
         /// <param name="Turn">The next move</param>
-        public void setNextTurn(int Turn) { NextTurn = Turn; }
+        public void SetNextTurn(int Turn) { NextTurn = Turn; }
 
         /// <summary>
         /// Returns the current game board
         /// </summary>
-        public Board getGameBoard() { return GameBoard; }
+        public Board GetGameBoard() { return GameBoard; }
 
         /// <summary>
         /// Returns True if the game is currently processing moves
         /// </summary>
-        public Boolean getProcessMoves() { return ProcessMoves; }
+        public Boolean GetProcessMoves() { return ProcessMoves; }
 
         /// <summary>
         /// Sets to True if the game is currently processing moves
         /// </summary>
         /// <param name="isMoveProcessing">Set to True if the game is processing a move</param>
-        public void setProcessMoves(Boolean isMoveProcessing) { ProcessMoves = isMoveProcessing; }
+        public void SetProcessMoves(Boolean isMoveProcessing) { ProcessMoves = isMoveProcessing; }
 
         /// <summary>
         /// Returns the AI opponent object
         /// </summary>
-        public AI getAI() { return AI; }
+        public AI GetAI() { return AI; }
 
         /// <summary>
         /// Returns the color of the AI opponent
         /// </summary>
-        public Boolean getTurnInProgress() { return TurnInProgress; }
+        public Boolean GetTurnInProgress() { return TurnInProgress; }
 
         /// <summary>
         /// Sets to True if the game is currently processing a turn
         /// </summary>
         /// <param name="isMoveProcessing">Set to True if the game is processing a turn</param>
-        public void setTurnInProgress(Boolean isTurninProgress) { TurnInProgress = isTurninProgress; }
+        public void SetTurnInProgress(Boolean isTurninProgress) { TurnInProgress = isTurninProgress; }
 
         #endregion
 
@@ -120,7 +120,7 @@ namespace Reversi
             if (!IsComplete)
             {
                 // As long as this isn't an AI turn, process the requested move
-                if (!((VsComputer) && (CurrentTurn == AI.getColor())) )
+                if (!((VsComputer) && (CurrentTurn == AI.GetColor())) )
                 {
                     if (GameBoard.MovePossible(CurrentTurn))
                     {
@@ -139,7 +139,7 @@ namespace Reversi
                     }
                 }
 
-                if ((VsComputer) && (CurrentTurn == AI.getColor()))
+                if ((VsComputer) && (CurrentTurn == AI.GetColor()))
                     ReversiForm.StartAITurnWorker();
                 else
                     TurnInProgress = false;
@@ -151,11 +151,11 @@ namespace Reversi
         /// </summary>
         public void ProcessAITurn()
         {
-            while (GameBoard.MovePossible(AI.getColor()))
+            while (GameBoard.MovePossible(AI.GetColor()))
             {
                 AI.MakeNextMove(GameBoard);
 
-                if (GameBoard.MovePossible(AI.getColor() == ReversiApplication.BLACK ? ReversiApplication.WHITE : ReversiApplication.BLACK))
+                if (GameBoard.MovePossible(AI.GetColor() == ReversiApplication.BLACK ? ReversiApplication.WHITE : ReversiApplication.BLACK))
                     break;
                 else
                     ReversiForm.RefreshPieces(FullRefresh: true);

@@ -66,8 +66,8 @@ namespace Reversi
 
             DateTime SimulationClock = DateTime.Now;
 
-            ReversiForm.reportDebugMessage("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n", overwrite: true );
-            ReversiForm.updateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+            ReversiForm.ReportDebugMessage("===============================\nBuilding AI Database (" + SimulationClock.ToLocalTime() + ")\n", overwrite: true );
+            ReversiForm.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
             /////////////////////////////////////////////////////////////
 
             // Reset the database and work queues
@@ -104,12 +104,12 @@ namespace Reversi
                 // If the BackgroundWorker.CancellationPending property is true, cancel
                 if (WorkerThread.CancellationPending)
                 {
-                    ReversiForm.reportDebugMessage("#####Database Build has been cancelled#####", updateConsole: true );
+                    ReversiForm.ReportDebugMessage("#####Database Build has been cancelled#####", updateConsole: true);
                     break;
                 }
 
                 if (SimulationCycles % 75 == 0)
-                    ReversiForm.updateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+                    ReversiForm.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
 
                 // Grab the next node ID off of the work queue
                 ParentNodeID = WorkNodes.Dequeue();
@@ -213,8 +213,8 @@ namespace Reversi
             /////////////////////////////////////////////////////////////
             if (DisplayDebug)
             {
-                ReversiForm.updateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
-                ReversiForm.reportDebugMessage("===============================\nAI DB Build Complete\nSimulation Time: " + DateTime.Now.Subtract(SimulationClock) + "\n\n" + DumpSimulationInfo(), updateConsole: true);
+                ReversiForm.UpdateDatabaseProgress(DateTime.Now.Subtract(SimulationClock), WorkNodes.Count, NodeMasterList.Count, LeafTotal);
+                ReversiForm.ReportDebugMessage("===============================\nAI DB Build Complete\nSimulation Time: " + DateTime.Now.Subtract(SimulationClock) + "\n\n" + DumpSimulationInfo(), updateConsole: true);
             }
         }
 
@@ -228,7 +228,7 @@ namespace Reversi
             DateTime SimulationClock = DateTime.Now;
 
             if (DisplayDebug)
-                ReversiForm.reportDebugMessage("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")", updateConsole: true);
+                ReversiForm.ReportDebugMessage("===============================\nAnalyzing AI Database (" + SimulationClock.ToLocalTime() + ")", updateConsole: true);
             /////////////////////////////////////////////////////////////
 
             // Reset all previous analysis values and queue all of the leaf nodes to process
@@ -249,7 +249,7 @@ namespace Reversi
             if (DisplayDebug)
             {
                 TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                ReversiForm.reportDebugMessage("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)", updateConsole: true);
+                ReversiForm.ReportDebugMessage("(" + SimulationElapsedTime.ToString() + ") Database Stats Reset (" + LeafNodes.Count + " leaf nodes queued)", updateConsole: true);
             }
             /////////////////////////////////////////////////////////////
 
@@ -262,7 +262,7 @@ namespace Reversi
                 // If the BackgroundWorker.CancellationPending property is true, cancel
                 if (WorkerThread.CancellationPending)
                 {
-                    ReversiForm.reportDebugMessage("#####Database Analysis has been cancelled#####");
+                    ReversiForm.ReportDebugMessage("#####Database Analysis has been cancelled#####");
                     break;
                 }
 
@@ -307,7 +307,7 @@ namespace Reversi
             if (DisplayDebug)
             {
                 TimeSpan SimulationElapsedTime = DateTime.Now.Subtract(SimulationClock);
-                ReversiForm.reportDebugMessage("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n", updateConsole: true);
+                ReversiForm.ReportDebugMessage("===============================\nAI DB Analysis Complete\nSimulation Time: " + SimulationElapsedTime.ToString() + "\n\n", updateConsole: true);
             }
             /////////////////////////////////////////////////////////////
         }
