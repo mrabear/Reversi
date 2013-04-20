@@ -1736,12 +1736,16 @@ namespace Reversi
                 Width = 565;
                 hideDebugButton.Text = ">>\n>>\n>>";
                 AIInfoTabControl.Visible = false;
+                DebugAITrace.Visible = false;
+                clearDebugLogButton.Visible = false;
             }
             else
             {
                 Width = 941;
                 hideDebugButton.Text = "<<\n<<\n<<";
                 AIInfoTabControl.Visible = true;
+                DebugAITrace.Visible = true;
+                clearDebugLogButton.Visible = true;
             }
         }
 
