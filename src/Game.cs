@@ -7,8 +7,9 @@ using System.Drawing;
 
 namespace Reversi
 {
-    // Class:       Game
-    // Description: Stores game state information and rules
+    /// <summary>
+    /// Manages Game state and mostly handles turn processing
+    /// </summary>
     public class Game
     {
         private int CurrentTurn;
@@ -21,6 +22,10 @@ namespace Reversi
         private Boolean TurnInProgress = false;
         private AI AI;
 
+        /// <summary>
+        /// Creates a new Game instance
+        /// </summary>
+        /// <param name="BoardSize">The size of the game board</param>
         public Game(int BoardSize = 8)
         {
             CurrentTurn = ReversiApplication.WHITE;
@@ -31,14 +36,9 @@ namespace Reversi
             IsComplete = false;
             AI = new AI(ReversiApplication.BLACK);
 
-            // Reset the board image to clear any pieces from previous games
-            ReversiForm.RedrawBoardImage();
-
             // Reset the board that tracks which pieces have been drawn on the screen
             ReversiForm.setLastDrawnBoard( BoardSize );
             ReversiForm.getLastDrawnBoard().ClearBoard();
-
-            ReversiForm.RefreshPieces(GameBoard);
         }
 
         #region Getters and Setters
@@ -56,8 +56,21 @@ namespace Reversi
 
         #endregion
 
-        // Processes a single turn of gameplay, two if it is vs. AI
-        public void ProcessTurn(int x, int y)
+        /// <summary>
+        /// Processes a single turn of gameplay, two if it is vs. AI
+        /// </summary>
+        /// <param name="Move">The move to process</param>
+        public void ProcessTurn(Point Move)
+        {
+            ProcessTurn(Move.X, Move.Y);
+        }
+
+        /// <summary>
+        /// Processes a single turn of gameplay, two if it is vs. AI
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        public void ProcessTurn(int X, int Y)
         {
             TurnInProgress = true;
 
@@ -68,7 +81,7 @@ namespace Reversi
                 {
                     if (GameBoard.MovePossible(CurrentTurn))
                     {
-                        if (GameBoard.MakeMove(x, y, CurrentTurn))
+                        if (GameBoard.MakeMove(X, Y, CurrentTurn))
                         {
                             ReversiForm.RefreshPieces(FullRefresh: true);
                             ReversiForm.UpdateScoreBoard();
@@ -90,11 +103,14 @@ namespace Reversi
             }
         }
 
+        /// <summary>
+        /// Processes a single AI turn
+        /// </summary>
         public void ProcessAITurn()
         {
             while (GameBoard.MovePossible(AI.getColor()))
             {
-                AI.MakeNextMove(this);
+                AI.MakeNextMove(GameBoard);
 
                 if (GameBoard.MovePossible(AI.getColor() == ReversiApplication.BLACK ? ReversiApplication.WHITE : ReversiApplication.BLACK))
                     break;
@@ -103,6 +119,9 @@ namespace Reversi
             }
         }
 
+        /// <summary>
+        /// Switches the current turn and updates the turn image
+        /// </summary>
         public void SwitchTurn()
         {
             if (CurrentTurn == ReversiApplication.WHITE)
@@ -118,6 +137,11 @@ namespace Reversi
             ReversiForm.UpdateTurnImage(CurrentTurn);
         }
 
+        /// <summary>
+        /// Returns a string representation of the current turn, used for display purposes
+        /// </summary>
+        /// <param name="color">The color to convert to a string</param>
+        /// <returns>A string representation of the current turn</returns>
         public string GetTurnString(int color)
         {
             if (color == ReversiApplication.WHITE)

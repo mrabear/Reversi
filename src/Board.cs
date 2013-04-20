@@ -8,8 +8,9 @@ using System.Collections.Generic;
 
 namespace Reversi
 {
-    // Class:       Board
-    // Description: Stores the game board and all of the methods to manipulate it
+    /// <summary>
+    /// Stores the game board and all of the methods to manipulate it
+    /// </summary>
     public class Board
     {
         // The array of pieces that represents the board state
@@ -18,7 +19,9 @@ namespace Reversi
         // The size of the board, which will always be BoardSize x BoardSize
         private int BoardSize;
 
-        // The default constructor creates an 8x8 board
+        /// <summary>
+        /// The default constructor creates an 8x8 board
+        /// </summary>
         public Board()
         {
             this.BoardSize = 8;
@@ -27,7 +30,10 @@ namespace Reversi
             PlaceStartingPieces();
         }
 
-        // Create an NxN board (min size 4)
+        /// <summary>
+        /// Create an NxN board (min size 4)
+        /// </summary>
+        /// <param name="SourceSize">The size of the board to create</param>
         public Board(int SourceSize)
         {
             BoardSize = Math.Max(4, SourceSize);
@@ -36,7 +42,10 @@ namespace Reversi
             PlaceStartingPieces();
         }
 
-        // Create a board using another board as a template
+        /// <summary>
+        /// Create a board using another board as a template
+        /// </summary>
+        /// <param name="SourceBoard">The board to use as a template</param>
         public Board(Board SourceBoard)
         {
             BoardSize = SourceBoard.BoardSize;
@@ -51,34 +60,62 @@ namespace Reversi
 
         #endregion
 
-        // Returns true if the piece is within the bounds of the game board
-        public Boolean InBounds(int x, int y)
+        /// <summary>
+        /// Returns true if the piece is within the bounds of the game board
+        /// </summary>
+        /// <param name="SourcePoint">The move to consider</param>
+        /// <returns>True if the move is located within the game board</returns>
+        public Boolean InBounds(Point SourcePoint)
         {
-            if ((x > BoardSize - 1) || (y > BoardSize - 1) || (x < 0) || (y < 0))
+            return(InBounds( SourcePoint.X, SourcePoint.Y ));
+        }
+
+        /// <summary>
+        /// Returns true if the piece is within the bounds of the game board
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        /// <returns>True if the move is located within the game board</returns>
+        public Boolean InBounds(int X, int Y)
+        {
+            if ((X > BoardSize - 1) || (Y > BoardSize - 1) || (X < 0) || (Y < 0))
                 return false;
             else
                 return true;
         }
 
-        // Copies the content of one board to another
+        /// <summary>
+        /// Copies the content of one board to another
+        /// </summary>
+        /// <param name="NewBoardPieces">The board array to use as a source</param>
         public void CopyBoard(int[,] NewBoardPieces)
         {
             Array.Copy(NewBoardPieces, BoardPieces, NewBoardPieces.Length);
         }
 
-        // Overload of copyboard that takes a source board as input
+        /// <summary>
+        /// Copies the content of one board to another
+        /// </summary>
+        /// <param name="NewBoardPieces">The board to use as a source</param>
         public void CopyBoard(Board SourceBoard)
         {
             CopyBoard(SourceBoard.BoardPieces);
         }
 
-        // Overrides the default ToString method to return a string representation of the board
+        /// <summary>
+        /// Overrides the default ToString method to return a string representation of the board
+        /// </summary>
+        /// <returns>The string representation of the board</returns>
         public override String ToString()
         {
             return (BuildBoardString());
         }
 
-        // Returns a string representation of the board
+        /// <summary>
+        /// Overrides the default ToString method to return a string representation of the board
+        /// </summary>
+        /// <param name="SingleLine">(optional) True to output a single line (instead of multiline row format)</param>
+        /// <returns>The string representation of the board</returns>
         public String BuildBoardString(Boolean SingleLine = false)
         {
             string boardString = "";
@@ -97,36 +134,60 @@ namespace Reversi
             return boardString;
         }
 
-        // Returns a unique identifier for a specific board state and turn
+        /// <summary>
+        /// Returns a unique identifier for a specific board state and turn
+        /// </summary>
+        /// <param name="CurrentTurn">The turn that this game state represents</param>
+        /// <returns>The string unique identifier for a specific board state and turn</returns>
         public String GetID(int CurrentTurn)
         {
             return (CurrentTurn + this.GetID());
         }
 
-        // Returns a unique identifier for a specific board state irrespective of turn
+        /// <summary>
+        /// Returns a unique identifier for a specific board state irrespective of turn
+        /// </summary>
+        /// <returns>The string unique identifier for a specific board state irrespective of turn</returns>
         public String GetID()
         {
             return (BuildBoardString(true));
         }
 
+        /// <summary>
+        /// Returns the color at a given point
+        /// </summary>
+        /// <param name="SourcePoint">The point to consider</param>
+        /// <returns>The color at the given point</returns>
         public int ColorAt(Point SourcePoint)
         {
             return( ColorAt( SourcePoint.X, SourcePoint.Y ));
         }
 
-        // Returns the color at the given board location
-        public int ColorAt(int x, int y)
+        /// <summary>
+        /// Returns the color at the given board location
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        /// <returns>The color at the given point</returns>
+        public int ColorAt(int X, int Y)
         {
-            if ((x < 0) || (x > BoardSize - 1) || (y < 0) || (y > BoardSize - 1))
-                return ReversiApplication.EMPTY;
+            if( !InBounds( X, Y ))
+                return ReversiApplication.ERROR;
 
-            return(BoardPieces[x, y]);
+            return(BoardPieces[X, Y]);
         }
 
-        // Attempts to process the implications of a legal move and updates the board if ProcessMove = true
-        public Boolean MakeMove(int x, int y, int color, Boolean ProcessMove = true)
+        /// <summary>
+        /// Attempts to process the implications of a legal move and updates the board if ProcessMove = true
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        /// <param name="color">The X value of the move</param>
+        /// <param name="ProcessMove">The Y value of the move</param>
+        /// <returns>The color at the given point</returns>
+        public Boolean MakeMove(int MoveX, int MoveY, int SourceTurn, Boolean CommitMove = true)
         {
-            int CurrentTurn = color;
+            int CurrentTurn = SourceTurn;
             int NextTurn;
 
             if (CurrentTurn == ReversiApplication.WHITE)
@@ -135,45 +196,49 @@ namespace Reversi
                 NextTurn = ReversiApplication.WHITE;
 
             // Check for already existing piece
-            if (ColorAt(x, y) != ReversiApplication.EMPTY)
+            if (ColorAt(MoveX, MoveY) != ReversiApplication.EMPTY)
                 return false;
 
             Boolean findStatus = false;
             Boolean takeStatus = false;
 
-            for (int olc = Math.Max(y - 1, 0); olc <= Math.Min(y + 1, BoardSize - 1); olc++)
+            // Search the board for pieces affected by this turn
+            for (int Y = Math.Max(MoveY - 1, 0); Y <= Math.Min(MoveY + 1, BoardSize - 1); Y++)
             {
-                for (int ilc = Math.Max(x - 1, 0); ilc <= Math.Min(x + 1, BoardSize - 1); ilc++)
+                for (int X = Math.Max(MoveX - 1, 0); X <= Math.Min(MoveX + 1, BoardSize - 1); X++)
                 {
-                    if (ColorAt(ilc, olc) == (NextTurn))
+                    // If an enemy piece has been found, capture it and all connecting pieces
+                    if (ColorAt(X, Y) == (NextTurn))
                     {
                         findStatus = true;
 
-                        int newX = ilc;
-                        int newY = olc;
-                        int dirX = ilc - x;
-                        int dirY = olc - y;
+                        int CapturedX = X;
+                        int CapturedY = Y;
+                        int XDirection = X - MoveX;
+                        int YDirection = Y - MoveY;
 
-                        Board TempBoard = new Board(this);
+                        Board SimulationBoard = new Board(this);
 
-                        while (TempBoard.ColorAt(newX, newY) == NextTurn)
+                        // Continue to capture pieces until a friendly piece is found
+                        while (SimulationBoard.ColorAt(CapturedX, CapturedY) == NextTurn)
                         {
-                            TempBoard.PutPiece(newX, newY, CurrentTurn);
-                            newX += dirX;
-                            newY += dirY;
+                            SimulationBoard.PutPiece(CapturedX, CapturedY, CurrentTurn);
+                            CapturedX += XDirection;
+                            CapturedY += YDirection;
 
-                            if (!TempBoard.InBounds(newX, newY))
+                            if (!SimulationBoard.InBounds(CapturedX, CapturedY))
                                 break;
                         }
 
-                        if (TempBoard.InBounds(newX, newY))
+                        // Copy the simulation board to the real board (if the CommitMove flag is set)
+                        if (SimulationBoard.InBounds(CapturedX, CapturedY))
                         {
-                            if (TempBoard.ColorAt(newX, newY) == CurrentTurn)
+                            if (SimulationBoard.ColorAt(CapturedX, CapturedY) == CurrentTurn)
                             {
-                                if (ProcessMove)
+                                if (CommitMove)
                                 {
-                                    TempBoard.PutPiece(x, y, color);
-                                    CopyBoard(TempBoard);
+                                    SimulationBoard.PutPiece(MoveX, MoveY, SourceTurn);
+                                    CopyBoard(SimulationBoard);
                                 }
 
                                 takeStatus = true;
@@ -183,11 +248,11 @@ namespace Reversi
                 }
             }
 
-            if ((!findStatus) && (ProcessMove))
+            if ((!findStatus) && (CommitMove))
             {
                 //gDebugText.Text = "You must place your piece adjacent to an opponents piece.";
             }
-            if ((!takeStatus) && (ProcessMove))
+            if ((!takeStatus) && (CommitMove))
             {
                 //gDebugText.Text = "You must place capture at least one piece on each turn.";
             }
@@ -195,7 +260,11 @@ namespace Reversi
             return takeStatus;
         }
 
-        // Returns a list of all available moves for a given player
+        /// <summary>
+        /// Returns a list of all available moves for a given player
+        /// </summary>
+        /// <param name="CurrentTurn">The turn to consider</param>
+        /// <returns>The list of all available moves for a given player</returns>
         public Point[] AvailableMoves(int CurrentTurn)
         {
             Point[] Moves = new Point[64];
@@ -203,7 +272,7 @@ namespace Reversi
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
                     if (ColorAt(X, Y) == ReversiApplication.EMPTY)
-                        if (MakeMove(X, Y, CurrentTurn, ProcessMove: false))
+                        if (MakeMove(X, Y, CurrentTurn, CommitMove: false))
                         {
                             Moves[foundMoves] = new Point(X, Y);
                             foundMoves++;
@@ -216,7 +285,10 @@ namespace Reversi
             return(FinalMoves);
         }
 
-        // Returns true if a move is possible for EITHER player
+        /// <summary>
+        /// Tests to see if there is a legal move possible for EITHER player
+        /// </summary>
+        /// <returns>True if either player can make a legal move</returns>
         public bool MovePossible()
         {
             if ((MovePossible(ReversiApplication.BLACK)) || (MovePossible(ReversiApplication.WHITE)))
@@ -225,34 +297,60 @@ namespace Reversi
             return (false);
         }
 
-        // Returns true if a move is possible for the given player
-        public bool MovePossible(int color)
+        /// <summary>
+        /// Tests to see if there is a legal move possible for given player
+        /// </summary>
+        /// <param name="Turn">The turn to consider</param>
+        /// <returns>True if the given player can make a legal move</returns>
+        public bool MovePossible(int Turn)
         {
+            // Loop through all spots on the board
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
+                    // Simulate a move, if successful, we know that there is at least this legal move
                     if (ColorAt(X, Y) == ReversiApplication.EMPTY)
-                        if (MakeMove(X, Y, color, ProcessMove: false))
+                        if (MakeMove(X, Y, Turn, CommitMove: false))
                             return true;
 
+            // No legal moves were found
             return false;
         }
 
-        // Places a piece at the given location
-        public void PutPiece(int x, int y, int color)
+        /// <summary>
+        /// Places a piece at the given location
+        /// </summary>
+        /// <param name="Move">The move to place</param>
+        /// <param name="Turn">The move turn</param>
+        public void PutPiece(Point Move, int Turn)
         {
-            if ((color == ReversiApplication.WHITE) || (color == ReversiApplication.BLACK))
-                BoardPieces[x, y] = color;
-            else
-                BoardPieces[x, y] = ReversiApplication.EMPTY;
+            PutPiece(Move.X, Move.Y, Turn);
         }
 
-        // Empty the board
+        /// <summary>
+        /// Places a piece at the given location
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        /// <param name="Turn">The move turn</param>
+        public void PutPiece(int X, int Y, int Turn)
+        {
+            if ((Turn == ReversiApplication.WHITE) || (Turn == ReversiApplication.BLACK))
+                BoardPieces[X, Y] = Turn;
+            else
+                BoardPieces[X, Y] = ReversiApplication.EMPTY;
+        }
+
+        /// <summary>
+        /// Empites the game board, resetting all of the pieces
+        /// </summary>
         public void ClearBoard()
         {
             Array.Clear(BoardPieces, 0, BoardSize * BoardSize);
         }
 
-        // Initialize the game board with the starting pieces
+        /// <summary>
+        /// Initialize the game board with the starting pieces
+        /// </summary>
         public void PlaceStartingPieces()
         {
             if (BoardSize == 8)
@@ -278,19 +376,27 @@ namespace Reversi
             }
         }
 
-        // Return the score of the given player
-        public int FindScore(int colorToCheck)
+        /// <summary>
+        /// Return the score of the given player
+        /// </summary>
+        /// <param name="Turn">The turn to score</param>
+        /// <returns>The score for the given turn</returns>
+        public int FindScore(int Turn)
         {
-            int score = 0;
+            int Score = 0;
+
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == colorToCheck)
-                        score++;
+                    if (ColorAt(X, Y) == Turn)
+                        Score++;
 
-            return score;
+            return Score;
         }
 
-        // Determines if there is a winner in the current game
+        /// <summary>
+        /// Determines if there is a winner in the current game
+        /// </summary>
+        /// <returns>The color of the winning player</returns>
         public int DetermineWinner()
         {
             if (!MovePossible())
@@ -313,41 +419,45 @@ namespace Reversi
             return (ReversiApplication.ERROR);
         }
 
-        public List<Point> MovesAround(Point CurrentPoint)
+        /// <summary>
+        /// Returns all of the moves around a given point
+        /// </summary>
+        /// <param name="SourcePoint">The point on the board to check</param>
+        /// <returns>A list of all moves surrounding the given point</returns>
+        public List<Point> MovesAround(Point SourcePoint)
         {
             List<Point> MovesFound = new List<Point>();
 
-            if( CurrentPoint.X > 0 )
+            if (SourcePoint.X > 0)
             {
-                // Check the left three spots
-                if ( CurrentPoint.X > 0 ) 
+                if (SourcePoint.X > 0) 
                 {
-                    MovesFound.Add( new Point( CurrentPoint.X - 1, CurrentPoint.Y ));           // middle left (4)
+                    MovesFound.Add(new Point(SourcePoint.X - 1, SourcePoint.Y));           // middle left (4)
 
-                    if (CurrentPoint.Y < BoardSize - 1)
-                        MovesFound.Add( new Point( CurrentPoint.X - 1, CurrentPoint.Y + 1 ));   // bottom left (7)
-            
-                    if ( CurrentPoint.Y > 0 )
-                        MovesFound.Add( new Point( CurrentPoint.X - 1, CurrentPoint.Y - 1 ));   // top left (1)
+                    if (SourcePoint.Y < BoardSize - 1)
+                        MovesFound.Add(new Point(SourcePoint.X - 1, SourcePoint.Y + 1));   // bottom left (7)
+
+                    if (SourcePoint.Y > 0)
+                        MovesFound.Add(new Point(SourcePoint.X - 1, SourcePoint.Y - 1));   // top left (1)
                 }
             }
 
-            if (CurrentPoint.X < BoardSize - 1) 
+            if (SourcePoint.X < BoardSize - 1) 
             {
-                MovesFound.Add( new Point( CurrentPoint.X + 1, CurrentPoint.Y ));               // middle right (6)
+                MovesFound.Add(new Point(SourcePoint.X + 1, SourcePoint.Y));               // middle right (6)
 
-                if (CurrentPoint.Y < BoardSize - 1)
-                    MovesFound.Add( new Point( CurrentPoint.X + 1, CurrentPoint.Y + 1 ));       // bottom right (9)
-            
-                if ( CurrentPoint.Y > 0 )
-                    MovesFound.Add( new Point( CurrentPoint.X + 1, CurrentPoint.Y - 1 ));       // top right (3)
+                if (SourcePoint.Y < BoardSize - 1)
+                    MovesFound.Add(new Point(SourcePoint.X + 1, SourcePoint.Y + 1));       // bottom right (9)
+
+                if (SourcePoint.Y > 0)
+                    MovesFound.Add(new Point(SourcePoint.X + 1, SourcePoint.Y - 1));       // top right (3)
             }
 
-            if ( CurrentPoint.Y < BoardSize - 1 )
-                MovesFound.Add( new Point( CurrentPoint.X, CurrentPoint.Y + 1 ));               // bottom middle (8)
+            if (SourcePoint.Y < BoardSize - 1)
+                MovesFound.Add(new Point(SourcePoint.X, SourcePoint.Y + 1));               // bottom middle (8)
 
-            if ( CurrentPoint.Y > 0 )
-                MovesFound.Add( new Point( CurrentPoint.X, CurrentPoint.Y - 1 ));               // top middle (2)
+            if (SourcePoint.Y > 0)
+                MovesFound.Add(new Point(SourcePoint.X, SourcePoint.Y - 1));               // top middle (2)
 
             return (MovesFound);
         }

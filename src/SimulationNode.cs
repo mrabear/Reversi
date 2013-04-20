@@ -29,6 +29,13 @@ namespace Reversi
         private List<String> ChildNodes;    // The list of game nodes that can be created from the current one (i.e. player moves from the current state to one of the children)
         private List<String> ParentNodes;   // The list of game nodes that can create the current one (i.e. player moves from one of the parent states to the current state)
 
+        /// <summary>
+        /// Creates a new SimulationNode instance
+        /// </summary>
+        /// <param name="SourceBoard">The game board to build this node with</param>
+        /// <param name="SourceTurn">The turn that this node represents</param>
+        /// <param name="SetTrunk">(optional) set to true if this is the first element</param>
+        /// <param name="SetLeaf">(optional) set to true if this is a victory state</param>
         public SimulationNode(Board SourceBoard, int SourceTurn, Boolean SetTrunk = false, Boolean SetLeaf = false)
         {
             // Initialize variable defaults
@@ -64,31 +71,55 @@ namespace Reversi
 
         #endregion
 
+        /// <summary>
+        /// Adds the given node to the parent node list
+        /// </summary>
+        /// <param name="NodeID">The node to add</param>
         public void AddParentNode(String NodeID)
         {
             ParentNodes.Add(NodeID);
         }
 
+        /// <summary>
+        /// Adds the given node to the child node list
+        /// </summary>
+        /// <param name="NodeID">The node to add</param>
         public void AddChildNode(String NodeID)
         {
             ChildNodes.Add(NodeID);
         }
 
+        /// <summary>
+        /// Returns true if the given node is a child of this node
+        /// </summary>
+        /// <param name="NodeID">The child node to check</param>
+        /// <returns>True if the given node is a child of this node</returns>
         public Boolean ContainsChild(String NodeID)
         {
             return (ChildNodes.Contains(NodeID));
         }
 
+        /// <summary>
+        /// Returns true if the given node is a parent of this node
+        /// </summary>
+        /// <param name="NodeID">The child node to check</param>
+        /// <returns>True if the given node is a parent of this node</returns>
         public Boolean ContainsParent(String NodeID)
         {
             return (ParentNodes.Contains(NodeID));
         }
 
+        /// <summary>
+        /// Resets the list of available moves
+        /// </summary>
         public void ClearMoves()
         {
             AvailableMoves = new Point[0];
         }
 
+        /// <summary>
+        /// Initializes the basic object variables
+        /// </summary>
         public void Initialize()
         {
             BlackWins = 0;

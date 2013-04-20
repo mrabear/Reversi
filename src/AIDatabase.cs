@@ -29,7 +29,10 @@ namespace Reversi
 
         #endregion
 
-        // Returns a string representing the current database information
+        /// <summary>
+        /// Returns a string dump of the current database information
+        /// </summary>
+        /// <returns>A string dump of the current database information</returns>
         public String DumpSimulationInfo()
         {
             return ("============================\n" +
@@ -41,13 +44,21 @@ namespace Reversi
                     "Total White Winners: " + WhiteWinnerTotal + "\n");
         }
 
-        // Infiniate list iterator for the parallel foreach loop
+        /// <summary>
+        /// Infiniate list iterator for the parallel foreach loop
+        /// </summary>
         private static IEnumerable<bool> IterateUntilFalse(Func<bool> condition)
         {
             while (condition()) yield return true;
         }
 
-        // Builds the database of all potential game states
+        /// <summary>
+        /// Builds the database of all potential game states
+        /// </summary>
+        /// <param name="WorkerThread">The background worker to use</param>
+        /// <param name="BoardSize">The size of the board to simulate</param>
+        /// <param name="VisualizeResults">True if the board analysis should be displayed</param>
+        /// <param name="DisplayDebug">True if debug information should be displayed</param>
         public void BuildAIDatabase(BackgroundWorker WorkerThread, int BoardSize = 8, Boolean VisualizeResults = false, Boolean DisplayDebug = true)
         {
             /////////////////////////////////////////////////////////////
@@ -171,7 +182,7 @@ namespace Reversi
                     foreach (Point CurrentMove in ParentNode.getAvailableMoves())
                     {
                         ChildBoard = new Board(ParentNode.getGameBoard());
-                        ChildBoard.PutPiece(CurrentMove.X, CurrentMove.Y, ChildTurn);
+                        ChildBoard.PutPiece(CurrentMove, ChildTurn);
                         ChildNode = new SimulationNode(ChildBoard, ChildTurn);
 
                         // Add this child to the parent's child node list

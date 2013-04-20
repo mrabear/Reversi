@@ -13,8 +13,9 @@ using System.Threading.Tasks;
 namespace Reversi
 {
 
-    // Class:       AI
-    // Description: Stores the game simulation code used by the AI opponent to play the game
+    /// <summary>
+    /// Stores the game simulation logic used by the AI opponent
+    /// </summary>
     public class AI
     {
         private int color;
@@ -34,6 +35,10 @@ namespace Reversi
 	            {9,5,5,5,5,5,5,9}
             };
 
+        /// <summary>
+        /// Creates a new AI player
+        /// </summary>
+        /// <param name="AIcolor">The color of the AI player</param>
         public AI(int AIcolor)
         {
             color = AIcolor;
@@ -41,6 +46,11 @@ namespace Reversi
             MaxSimDepth = Properties.Settings.Default.MaxDepth;
         }
 
+        /// <summary>
+        /// Creates a new AI player
+        /// </summary>
+        /// <param name="AIcolor">The color of the AI player</param>
+        /// <param name="NewMaxDepth">The number of turns to look ahead (should be an even number)</param>
         public AI(int AIcolor, int NewMaxDepth)
         {
             color = AIcolor;
@@ -56,19 +66,22 @@ namespace Reversi
 
         #endregion
 
-        // Return a point representing the best possible next move for this AI
-        public void MakeNextMove(Game SourceGame)
+        /// <summary>
+        /// Performs a single AI player move
+        /// </summary>
+        /// <param name="SourceBoard">The board to consider</param>
+        public void MakeNextMove(Board SourceBoard)
         {
-            Point[] PossibleMoves = SourceGame.getGameBoard().AvailableMoves(SourceGame.getCurrentTurn());
+            Point[] PossibleMoves = SourceBoard.AvailableMoves(color);
 
             if (PossibleMoves.Length > 0)
             {
                 Point ChosenMove = PossibleMoves[0];
-                Board SimBoard = new Board(SourceGame.getGameBoard());
+                Board SimBoard = new Board(SourceBoard);
                 Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
 
                 if (VisualizeProcess)
-                    ReversiForm.HighlightPiece(Color.Yellow, PossibleMoves);
+                    ReversiForm.HighlightPiece(PossibleMoves, Color.Yellow);
 
                 ReversiForm.reportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
@@ -77,7 +90,7 @@ namespace Reversi
                 {
                     double[] EvalResult = new double[MaxSimDepth];
 
-                    EvaluatePotentialMove(CurrentPoint, SimBoard, SourceGame.getCurrentTurn(), ref EvalResult);
+                    EvaluatePotentialMove(CurrentPoint, SimBoard, color, ref EvalResult);
 
                     // Serializes the theads to make sure the update functions properly
                     lock (this)
@@ -92,7 +105,7 @@ namespace Reversi
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
                         if (VisualizeProcess)
-                            ReversiForm.HighlightPiece(Color.DarkRed, CurrentPoint, MoveWeight.ToString("0.00"));
+                            ReversiForm.HighlightPiece(CurrentPoint, Color.DarkRed, MoveWeight.ToString("0.00"));
 
                         ReversiForm.reportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
@@ -105,18 +118,25 @@ namespace Reversi
                         ChosenMove = ResultMove;
                 }
 
-                SourceGame.getGameBoard().MakeMove(ChosenMove.X, ChosenMove.Y, SourceGame.getCurrentTurn());
+                SourceBoard.MakeMove(ChosenMove.X, ChosenMove.Y, color);
 
                 ReversiForm.RefreshPieces();
 
                 if (VisualizeProcess)
-                    ReversiForm.HighlightPiece(Color.Green, ChosenMove, MoveResults[ChosenMove].ToString("0.00"));
+                    ReversiForm.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));
 
                 ReversiForm.reportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
         }
 
-        // Called for each potential board state in our look ahead search
+        /// <summary>
+        /// Performs a single move of an AI board simulation
+        /// </summary>
+        /// <param name="SourceMove">The current simulation move</param>
+        /// <param name="CurrentBoard">The current simulation board</param>
+        /// <param name="Turn">The current simulation turn</param>
+        /// <param name="BandedWeightTable">The table of values used to analyze the simulation</param>
+        /// <param name="SimulationDepth">The current depth of the simulation (number of moves ahead)</param>
         private void EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, int Turn, ref double[] BandedWeightTable, int SimulationDepth = 0)
         {
             // Look ahead to the impact of this move
@@ -127,7 +147,7 @@ namespace Reversi
                 Board SimulationBoard = new Board(CurrentBoard);
 
                 // Perform the requested move
-                SimulationBoard.PutPiece(SourceMove.X, SourceMove.Y, Turn);
+                SimulationBoard.PutPiece(SourceMove, Turn);
 
                 // Score the result
                 if (ScoreMove(SimulationBoard, SourceMove) > BandedWeightTable[SimulationDepth])
@@ -157,7 +177,11 @@ namespace Reversi
             }
         }
 
-        // Analyzes a list of banded rows and produces a single digit representing the value of the tree
+        /// <summary>
+        /// Analyzes a list of banded rows and produces a single digit representing the value of the tree
+        /// </summary>
+        /// <param name="BandedWeightTable">The table of values to analyze</param>
+        /// <returns>A number representing the net value of the given BandedWeightTable</returns>
         private double AnalyzeWeightTable(double[] BandedWeightTable)
         {
             double CurrentStep, MaxStep = Math.Floor((double)MaxSimDepth / 2);
@@ -188,8 +212,13 @@ namespace Reversi
             return (WeightedTotal);
         }
 
-        // Returns the value of a single spot on the board
-        private double ScoreMove(Board CurrentBoard, Point NewPiece)
+        /// <summary>
+        /// Returns the value of a single spot on the board
+        /// </summary>
+        /// <param name="CurrentBoard">The game board to use</param>
+        /// <param name="Move">The move to consider</param>
+        /// <returns>The net value of a single spot on the board</returns>
+        private double ScoreMove(Board CurrentBoard, Point Move)
         {
             double score = 0;
 
@@ -199,12 +228,17 @@ namespace Reversi
                     score = BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
             */
 
-            return( score * -1 + BoardValueMask[NewPiece.X, NewPiece.Y] );
+            return (score * -1 + BoardValueMask[Move.X, Move.Y]);
         }
 
-        public int GetOtherTurn(int color)
+        /// <summary>
+        /// Returns the turn opposite to the one given
+        /// </summary>
+        /// <param name="turn">The turn to check</param>
+        /// <returns>The turn opposite of the one given</returns>
+        public int GetOtherTurn(int turn)
         {
-            return (color == ReversiApplication.WHITE ? ReversiApplication.BLACK : ReversiApplication.WHITE);
+            return (turn == ReversiApplication.WHITE ? ReversiApplication.BLACK : ReversiApplication.WHITE);
         }
 
     }

@@ -14,6 +14,9 @@ using System.Management;
 
 namespace Reversi
 {
+    /// <summary>
+    /// The main application form, used to display all UI content
+    /// </summary>
     public class ReversiForm : System.Windows.Forms.Form
     {
         #region Windows Form Designer generated code
@@ -43,12 +46,12 @@ namespace Reversi
         private System.Windows.Forms.MainMenu mainDropDownMenu;
         private System.Windows.Forms.MenuItem fileDropDownMenu;
         private System.Windows.Forms.MenuItem gameSetupDropDownMenu;
-        private System.Windows.Forms.MenuItem menuItem8;
+        private System.Windows.Forms.MenuItem AIDifficultyMenu;
         private System.Windows.Forms.MenuItem DiffMenu_Easy;
         private System.Windows.Forms.MenuItem DiffMenu_Normal;
         private System.Windows.Forms.MenuItem DiffMenu_Hard;
         private System.Windows.Forms.MenuItem DiffMenu_VeryHard;
-        private System.Windows.Forms.MenuItem menuItem9;
+        private System.Windows.Forms.MenuItem GameSetupMenuHorzBar1;
         private System.Windows.Forms.MenuItem PvPMenu;
         private System.Windows.Forms.MenuItem PvCMenu;
         private System.Windows.Forms.MenuItem ExitMenu;
@@ -56,8 +59,7 @@ namespace Reversi
         private System.Windows.Forms.MenuItem debugDropDownMenu;
         private System.Windows.Forms.MenuItem DebugSkip;
         private System.Windows.Forms.MenuItem DebugProcess;
-
-        private System.Windows.Forms.MenuItem menuItem4;
+        private System.Windows.Forms.MenuItem newDebugGameScenarios;
         private System.Windows.Forms.MenuItem DebugScenario_NoWhite;
         private System.Windows.Forms.MenuItem DebugScenario_NoBlack;
         private System.Windows.Forms.MenuItem DebugScenario_MidGame;
@@ -104,6 +106,8 @@ namespace Reversi
         private CheckBox debugLogCheckBox;
         private Button newGameButton;
         private Panel currentTurnImageSurface;
+        private MenuItem GameSetupMenuHorzBar2;
+        private MenuItem showAvailableMoves;
         private Panel BoardSurface;
         #endregion
 
@@ -123,16 +127,18 @@ namespace Reversi
             this.gameSetupDropDownMenu = new System.Windows.Forms.MenuItem();
             this.PvPMenu = new System.Windows.Forms.MenuItem();
             this.PvCMenu = new System.Windows.Forms.MenuItem();
-            this.menuItem9 = new System.Windows.Forms.MenuItem();
-            this.menuItem8 = new System.Windows.Forms.MenuItem();
+            this.GameSetupMenuHorzBar1 = new System.Windows.Forms.MenuItem();
+            this.AIDifficultyMenu = new System.Windows.Forms.MenuItem();
             this.DiffMenu_Easy = new System.Windows.Forms.MenuItem();
             this.DiffMenu_Normal = new System.Windows.Forms.MenuItem();
             this.DiffMenu_Hard = new System.Windows.Forms.MenuItem();
             this.DiffMenu_VeryHard = new System.Windows.Forms.MenuItem();
+            this.GameSetupMenuHorzBar2 = new System.Windows.Forms.MenuItem();
+            this.showAvailableMoves = new System.Windows.Forms.MenuItem();
             this.debugDropDownMenu = new System.Windows.Forms.MenuItem();
             this.DebugSkip = new System.Windows.Forms.MenuItem();
             this.DebugProcess = new System.Windows.Forms.MenuItem();
-            this.menuItem4 = new System.Windows.Forms.MenuItem();
+            this.newDebugGameScenarios = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoWhite = new System.Windows.Forms.MenuItem();
             this.DebugScenario_NoBlack = new System.Windows.Forms.MenuItem();
             this.DebugScenario_MidGame = new System.Windows.Forms.MenuItem();
@@ -233,8 +239,10 @@ namespace Reversi
             this.gameSetupDropDownMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.PvPMenu,
             this.PvCMenu,
-            this.menuItem9,
-            this.menuItem8});
+            this.GameSetupMenuHorzBar1,
+            this.AIDifficultyMenu,
+            this.GameSetupMenuHorzBar2,
+            this.showAvailableMoves});
             this.gameSetupDropDownMenu.Text = "Game Setup";
             // 
             // PvPMenu
@@ -251,20 +259,20 @@ namespace Reversi
             this.PvCMenu.Text = "Player vs Computer";
             this.PvCMenu.Click += new System.EventHandler(this.PvCMenu_Click);
             // 
-            // menuItem9
+            // GameSetupMenuHorzBar1
             // 
-            this.menuItem9.Index = 2;
-            this.menuItem9.Text = "-";
+            this.GameSetupMenuHorzBar1.Index = 2;
+            this.GameSetupMenuHorzBar1.Text = "-";
             // 
-            // menuItem8
+            // AIDifficultyMenu
             // 
-            this.menuItem8.Index = 3;
-            this.menuItem8.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.AIDifficultyMenu.Index = 3;
+            this.AIDifficultyMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.DiffMenu_Easy,
             this.DiffMenu_Normal,
             this.DiffMenu_Hard,
             this.DiffMenu_VeryHard});
-            this.menuItem8.Text = "Computer Difficulty";
+            this.AIDifficultyMenu.Text = "Computer Difficulty";
             // 
             // DiffMenu_Easy
             // 
@@ -291,13 +299,25 @@ namespace Reversi
             this.DiffMenu_VeryHard.Text = "&Very Hard";
             this.DiffMenu_VeryHard.Click += new System.EventHandler(this.DiffMenu_VeryHardClick);
             // 
+            // GameSetupMenuHorzBar2
+            // 
+            this.GameSetupMenuHorzBar2.Index = 4;
+            this.GameSetupMenuHorzBar2.Text = "-";
+            // 
+            // showAvailableMoves
+            // 
+            this.showAvailableMoves.Checked = true;
+            this.showAvailableMoves.Index = 5;
+            this.showAvailableMoves.Text = "Show Available Moves";
+            this.showAvailableMoves.Click += new System.EventHandler(this.showAvailableMoves_Click);
+            // 
             // debugDropDownMenu
             // 
             this.debugDropDownMenu.Index = 2;
             this.debugDropDownMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.DebugSkip,
             this.DebugProcess,
-            this.menuItem4});
+            this.newDebugGameScenarios});
             this.debugDropDownMenu.Text = "Debug";
             // 
             // DebugSkip
@@ -313,14 +333,14 @@ namespace Reversi
             this.DebugProcess.Text = "Process Piece Captures";
             this.DebugProcess.Click += new System.EventHandler(this.DebugProcess_Click);
             // 
-            // menuItem4
+            // newDebugGameScenarios
             // 
-            this.menuItem4.Index = 2;
-            this.menuItem4.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.newDebugGameScenarios.Index = 2;
+            this.newDebugGameScenarios.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.DebugScenario_NoWhite,
             this.DebugScenario_NoBlack,
             this.DebugScenario_MidGame});
-            this.menuItem4.Text = "New Game Scenario";
+            this.newDebugGameScenarios.Text = "New Game Scenario";
             // 
             // DebugScenario_NoWhite
             // 
@@ -664,7 +684,7 @@ namespace Reversi
             this.CurrentTurnLabel.BackColor = System.Drawing.Color.Transparent;
             this.CurrentTurnLabel.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CurrentTurnLabel.ForeColor = System.Drawing.Color.Black;
-            this.CurrentTurnLabel.Location = new System.Drawing.Point(0, 547);
+            this.CurrentTurnLabel.Location = new System.Drawing.Point(22, 547);
             this.CurrentTurnLabel.Name = "CurrentTurnLabel";
             this.CurrentTurnLabel.Size = new System.Drawing.Size(107, 49);
             this.CurrentTurnLabel.TabIndex = 3;
@@ -674,7 +694,7 @@ namespace Reversi
             // blackScoreBoardTitle
             // 
             this.blackScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreBoardTitle.Location = new System.Drawing.Point(343, 549);
+            this.blackScoreBoardTitle.Location = new System.Drawing.Point(360, 550);
             this.blackScoreBoardTitle.Name = "blackScoreBoardTitle";
             this.blackScoreBoardTitle.Size = new System.Drawing.Size(112, 42);
             this.blackScoreBoardTitle.TabIndex = 26;
@@ -684,7 +704,7 @@ namespace Reversi
             // whiteScoreBoardTitle
             // 
             this.whiteScoreBoardTitle.Font = new System.Drawing.Font("Calibri", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(169, 551);
+            this.whiteScoreBoardTitle.Location = new System.Drawing.Point(186, 550);
             this.whiteScoreBoardTitle.Name = "whiteScoreBoardTitle";
             this.whiteScoreBoardTitle.Size = new System.Drawing.Size(121, 40);
             this.whiteScoreBoardTitle.TabIndex = 27;
@@ -694,7 +714,7 @@ namespace Reversi
             // whiteScoreBoard
             // 
             this.whiteScoreBoard.Font = new System.Drawing.Font("Calibri", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.whiteScoreBoard.Location = new System.Drawing.Point(275, 554);
+            this.whiteScoreBoard.Location = new System.Drawing.Point(292, 554);
             this.whiteScoreBoard.Name = "whiteScoreBoard";
             this.whiteScoreBoard.Size = new System.Drawing.Size(62, 40);
             this.whiteScoreBoard.TabIndex = 28;
@@ -704,7 +724,7 @@ namespace Reversi
             // blackScoreBoard
             // 
             this.blackScoreBoard.Font = new System.Drawing.Font("Calibri", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.blackScoreBoard.Location = new System.Drawing.Point(438, 552);
+            this.blackScoreBoard.Location = new System.Drawing.Point(455, 552);
             this.blackScoreBoard.Name = "blackScoreBoard";
             this.blackScoreBoard.Size = new System.Drawing.Size(64, 44);
             this.blackScoreBoard.TabIndex = 29;
@@ -813,7 +833,7 @@ namespace Reversi
             // 
             // currentTurnImageSurface
             // 
-            this.currentTurnImageSurface.Location = new System.Drawing.Point(82, 554);
+            this.currentTurnImageSurface.Location = new System.Drawing.Point(104, 554);
             this.currentTurnImageSurface.Name = "currentTurnImageSurface";
             this.currentTurnImageSurface.Size = new System.Drawing.Size(38, 38);
             this.currentTurnImageSurface.TabIndex = 40;
@@ -864,7 +884,9 @@ namespace Reversi
 
         #endregion
 
-        // The main form constructor
+        /// <summary>
+        /// Initializes the form and global variables
+        /// </summary>
         public ReversiForm()
         {
             InitializeComponent();
@@ -885,6 +907,7 @@ namespace Reversi
             gWorkCounter        = workCounter;
             gVictoryCounter     = victoryCounter;
             gCurrentTurnSurface = currentTurnImageSurface;
+            gShowAvailableMoves = showAvailableMoves;
 
             gBoardImage      = Image.FromHbitmap(Properties.Resources.reversi_grid.GetHbitmap());
             gWhitePieceImage = Image.FromHbitmap(Properties.Resources.whitepiece.GetHbitmap());
@@ -902,6 +925,8 @@ namespace Reversi
             updateMaxDepth();
 
             AIInfoTabControl.SelectTab(AISimTab);
+
+            gCurrentGame = ReversiApplication.getCurrentGame();
         }
 
         #region Global Variables
@@ -925,6 +950,7 @@ namespace Reversi
         private static Label gNodeCounter;
         private static Label gWorkCounter;
         private static Label gVictoryCounter;
+        private static MenuItem gShowAvailableMoves;
 
         // Piece dimensions
         private static int boardPieceImageSize;
@@ -937,10 +963,10 @@ namespace Reversi
         private static Board LastDrawnBoard = new Board();
 
         // The Global Game Object
-        private static Game gCurrentGame = ReversiApplication.getCurrentGame();
+        private static Game gCurrentGame;
 
         // Flags that determine who is playing (ai or human)
-        private static Boolean PvC = true;
+        private static Boolean isVSComputer = true;
         private static int AIDifficulty = 1;
 
         #endregion
@@ -951,7 +977,7 @@ namespace Reversi
         public static void setLastDrawnBoard(Board SourceBoard) { LastDrawnBoard.CopyBoard(SourceBoard); }
         public static void setLastDrawnBoard(int BoardSize) { LastDrawnBoard = new Board( BoardSize ); }
 
-        public static Boolean isVsComputer() { return PvC; }
+        public static Boolean isVsComputer() { return isVSComputer; }
 
         public static int getAIDifficulty() { return AIDifficulty; }
         public static void setAIDifficulty(int setAIDifficulty) { AIDifficulty = setAIDifficulty; }
@@ -961,7 +987,9 @@ namespace Reversi
  
         #endregion
 
-        // Resets the form elements to prepare for a new game
+        /// <summary>
+        /// Resets the form elements to prepare for a new game
+        /// </summary>
         private void StartNewGame()
         {
             gBlackScoreBoard.Text = "0";
@@ -984,13 +1012,16 @@ namespace Reversi
             gCurrentGame.getAI().setVisualizeProcess(visualizeCheckbox.Checked);
 
             RefreshPieces(FullRefresh: true);
-
+            MarkAvailableMoves(gCurrentGame.getCurrentTurn());
             UpdateTurnImage(gCurrentGame.getCurrentTurn());
             UpdateScoreBoard();
         }
 
         #region Game Board graphical manipulation methods
 
+        /// <summary>
+        /// Updates the score board for both players
+        /// </summary>
         public static void UpdateScoreBoard()
         {
             gBlackScoreBoard.Text = gCurrentGame.getGameBoard().FindScore(ReversiApplication.BLACK).ToString();
@@ -999,12 +1030,20 @@ namespace Reversi
             gWhiteScoreBoard.Refresh();
         }
 
-        // Redraw the piece images on the board
+        /// <summary>
+        /// Draw all game pieces on the board
+        /// </summary>
+        /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
         public static void RefreshPieces(bool FullRefresh = false)
         {
             RefreshPieces(gCurrentGame.getGameBoard(), FullRefresh);
         }
 
+        /// <summary>
+        /// Draw all game pieces on the board
+        /// </summary>
+        /// <param name="SourceBoard">The board to draw onto the screen</param>
+        /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
         public static void RefreshPieces(Board SourceBoard, bool FullRefresh = false)
         {
             if (FullRefresh)
@@ -1013,39 +1052,94 @@ namespace Reversi
             for (int Y = 0; Y < SourceBoard.getBoardSize(); Y++)
                 for (int X = 0; X < SourceBoard.getBoardSize(); X++)
                     if (( getLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
-                        DrawPiece(SourceBoard.ColorAt(X, Y), X, Y);
+                        DrawPiece(X, Y, SourceBoard.ColorAt(X, Y));
 
             getLastDrawnBoard().CopyBoard(SourceBoard.getBoardPieces());
         }
 
-        public static void DrawPiece(int color, Point SourcePoint)
+        /// <summary>
+        /// Draw a single game pieces on the board
+        /// </summary>
+        /// <param name="Piece">The piece to place</param>
+        /// <param name="color">The piece color</param>
+        public static void DrawPiece(Point Piece, int Color)
         {
-            DrawPiece(color, SourcePoint.X, SourcePoint.Y);
+            DrawPiece(Piece.X, Piece.Y, Color);
         }
 
-        public static void DrawPiece(int color, int X, int Y)
+        /// <summary>
+        /// Draw a single game pieces on the board
+        /// </summary>
+        /// <param name="X">The X value of the piece</param>
+        /// <param name="Y">The Y value of the piece</param>
+        /// <param name="color">The piece color</param>
+        public static void DrawPiece(int X, int Y, int Color)
         {
-            if(( color == ReversiApplication.WHITE ) || ( color == ReversiApplication.BLACK ))
-                gBoardGFX.DrawImage(getTurnImage(color), X * boardGridSize + 1, Y * boardGridSize + 1, boardPieceImageSize, boardPieceImageSize);
+            if ((Color == ReversiApplication.WHITE) || (Color == ReversiApplication.BLACK))
+                gBoardGFX.DrawImage(getTurnImage(Color), X * boardGridSize + 1, Y * boardGridSize + 1, boardPieceImageSize, boardPieceImageSize);
         }
 
+        /// <summary>
+        /// Redraws the board image, erasing all pieces
+        /// </summary>
         public static void RedrawBoardImage()
         {
             gBoardGFX.DrawImage(gBoardImage, 0, 0, 480, 480);
         }
 
-        public static void HighlightPiece(Color PieceColor, Point[] PieceList)
+        /// <summary>
+        /// Marks all of the available moves for the given turn on the current game board
+        /// </summary>
+        /// <param name="Turn">The turn to use</param>
+        public static void MarkAvailableMoves(int Turn)
+        {
+            MarkAvailableMoves(gCurrentGame.getGameBoard(), Turn);
+        }
+
+        /// <summary>
+        /// Marks all of the available moves for the given turn on the given game board
+        /// </summary>
+        /// <param name="SourceBoard">The game board</param>
+        /// <param name="Turn">The turn to use</param>
+        public static void MarkAvailableMoves(Board SourceBoard, int Turn)
+        {
+            // Only display if the 'Show Available Moves' box is checked
+            if( gShowAvailableMoves.Checked )
+                // Loop through all available moves and place a dot at the location
+                foreach (Point CurrentPiece in SourceBoard.AvailableMoves( Turn ))
+                    gBoardGFX.FillEllipse(new SolidBrush(Color.DarkSeaGreen), CurrentPiece.X * boardGridSize + boardGridSize / 2 - 4, CurrentPiece.Y * boardGridSize + boardGridSize / 2 - 4, 8, 8);
+        }
+
+        /// <summary>
+        /// Places a highlight circle at the given locations
+        /// </summary>
+        /// <param name="PieceList">The list of pieces</param>
+        /// <param name="PieceColor">The highlight color</param>
+        public static void HighlightPiece(Point[] PieceList, Color PieceColor)
         {
             foreach (Point CurrentPiece in PieceList)
-                HighlightPiece(PieceColor, CurrentPiece.X, CurrentPiece.Y );
+                HighlightPiece(CurrentPiece.X, CurrentPiece.Y, PieceColor);
         }
 
-        public static void HighlightPiece(Color PieceColor, Point Piece, String PieceLabel = "")
+        /// <summary>
+        /// Places a highlight circle at the given location
+        /// </summary>
+        /// <param name="Piece">The piece to highlight</param>
+        /// <param name="PieceColor">The highlight color</param>
+        /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
+        public static void HighlightPiece(Point Piece, Color PieceColor, String PieceLabel = "")
         {
-            HighlightPiece(PieceColor, Piece.X, Piece.Y, PieceLabel);
+            HighlightPiece(Piece.X, Piece.Y, PieceColor, PieceLabel);
         }
 
-        public static void HighlightPiece(Color PieceColor, int X, int Y, String PieceLabel = "")
+        /// <summary>
+        /// Places a highlight circle at the given location
+        /// </summary>
+        /// <param name="X">The X value of the piece to highlight</param>
+        /// <param name="Y">The Y value of the piece to highlight</param>
+        /// <param name="PieceColor">The highlight color</param>
+        /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
+        public static void HighlightPiece(int X, int Y, Color PieceColor, String PieceLabel = "")
         {
             gBoardGFX.DrawEllipse(new Pen(PieceColor, 4), X * boardGridSize + 5, Y * boardGridSize + 5, boardPieceImageSize - 8, boardPieceImageSize - 8);
 
@@ -1057,39 +1151,63 @@ namespace Reversi
                 gBoardGFX.DrawString(PieceLabel, new Font("Tahoma", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * boardGridSize + 5, Y * boardGridSize + 14, boardGridSize - 10, boardGridSize - 28), sf);
         }
 
-        public static Image getTurnImage(int color)
+        /// <summary>
+        /// Returns the correct image for a given turn
+        /// </summary>
+        /// <param name="Turn">The turn</param>
+        /// <returns>Image for the given turn</returns>
+        public static Image getTurnImage(int Turn)
         {
-            if (color == ReversiApplication.WHITE)
+            if (Turn == ReversiApplication.WHITE)
                 return (gWhitePieceImage);
             
             return (gBlackPieceImage);
         }
 
-        public static void UpdateTurnImage(int color)
+        /// <summary>
+        /// Updates the "current turn" image on the form
+        /// </summary>
+        /// <param name="Turn">The turn to update the form with</param>
+        public static void UpdateTurnImage(int Turn)
         {
-            if (color == ReversiApplication.WHITE)
-                gCurrentTurnImageGFX.DrawImage(getTurnImage(color), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
+            if (Turn == ReversiApplication.WHITE)
+                gCurrentTurnImageGFX.DrawImage(getTurnImage(Turn), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
             else
-                gCurrentTurnImageGFX.DrawImage(getTurnImage(color), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
+                gCurrentTurnImageGFX.DrawImage(getTurnImage(Turn), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
         }
 
-        public static void ShowWinner(int WinningColor)
+        /// <summary>
+        /// Updates the "Current Turn" image to indicate a winner (or tie)
+        /// </summary>
+        /// <param name="WinningTurn">The winning turn</param>
+        public static void ShowWinner(int WinningTurn)
         {
-            if (WinningColor == ReversiApplication.EMPTY)
+            if (WinningTurn == ReversiApplication.EMPTY)
             {
                 gCurrentTurnLabel.Text = "Tie";
                 gCurrentTurnSurface.Visible = false;
             }
-            else if((WinningColor == ReversiApplication.BLACK) || (WinningColor == ReversiApplication.WHITE))
+            else if ((WinningTurn == ReversiApplication.BLACK) || (WinningTurn == ReversiApplication.WHITE))
             {
                 gCurrentTurnLabel.Text = "Win!";
-                UpdateTurnImage(WinningColor);
+                UpdateTurnImage(WinningTurn);
             }
         }
 
+        /// <summary>
+        /// Called when the "Game Board" is repainted, refreshes the pieces
+        /// </summary>
         private void BoardSurface_Paint(object sender, PaintEventArgs e)
         {
             RefreshPieces(FullRefresh: true);
+        }
+
+        /// <summary>
+        /// Called when the "Current Turn Image" is repainted, refreshes the current turn image
+        /// </summary>
+        private void currentTurnImageSurface_Paint(object sender, PaintEventArgs e)
+        {
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
         }
 
         #endregion
@@ -1141,7 +1259,7 @@ namespace Reversi
         {
             PvPMenu.Checked = true;
             PvCMenu.Checked = false;
-            PvC = false;
+            isVSComputer = false;
         }
 
         // Player vs AI selected
@@ -1149,13 +1267,18 @@ namespace Reversi
         {
             PvPMenu.Checked = false;
             PvCMenu.Checked = true;
-            PvC = true;
+            isVSComputer = true;
         }
 
         // Game exit selected
         private void ExitMenu_Click(object sender, System.EventArgs e)
         {
             ActiveForm.Close();
+        }
+
+        private void showAvailableMoves_Click(object sender, EventArgs e)
+        {
+            showAvailableMoves.Checked = !showAvailableMoves.Checked;
         }
 
         // New game selected
@@ -1396,6 +1519,11 @@ namespace Reversi
             return (Convert.ToInt32(gridSizeDropDown.Items[gridSizeDropDown.SelectedIndex].ToString()));
         }
 
+        private void newGameButton_Click(object sender, EventArgs e)
+        {
+            StartNewGame();
+        }
+
         // Responds to the MouseUp event on the board image, processes the click as a placed piece
         private void PlaceUserPiece(object sender, System.Windows.Forms.MouseEventArgs e)
         {
@@ -1504,6 +1632,7 @@ namespace Reversi
             UpdateScoreBoard();
             ShowWinner( gCurrentGame.getGameBoard().DetermineWinner() );
             gCurrentGame.setTurnInProgress(false);
+            MarkAvailableMoves(gCurrentGame.getCurrentTurn());
         }
 
         #endregion
@@ -1530,20 +1659,5 @@ namespace Reversi
         }
 
         #endregion
-
-        private void newGameButton_Click(object sender, EventArgs e)
-        {
-            StartNewGame();
-        }
-
-        private void CurrentTurnImage_Paint(object sender, PaintEventArgs e)
-        {
-            UpdateTurnImage(gCurrentGame.getCurrentTurn());
-        }
-
-        private void currentTurnImageSurface_Paint(object sender, PaintEventArgs e)
-        {
-            UpdateTurnImage(gCurrentGame.getCurrentTurn());
-        }
     }
 }
