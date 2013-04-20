@@ -1,6 +1,6 @@
-// Reversi
-// Brian Hebert
-//
+/// <summary>
+/// Reversi.Board.cs
+/// </summary>
 
 using System;
 using System.Drawing;
@@ -55,7 +55,14 @@ namespace Reversi
 
         #region Getters and Setters
 
+        /// <summary>
+        /// Returns the 2d list of game pieces
+        /// </summary>
         public int[,] getBoardPieces() { return BoardPieces; }
+
+        /// <summary>
+        /// Returns the board size
+        /// </summary>
         public int getBoardSize() { return BoardSize; }
 
         #endregion

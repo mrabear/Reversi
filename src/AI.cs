@@ -1,6 +1,6 @@
-// Reversi
-// Brian Hebert
-//
+/// <summary>
+/// Reversi.AI.cs
+/// </summary>
 
 using System;
 using System.Drawing;
@@ -60,8 +60,21 @@ namespace Reversi
 
         #region Getters and Setters
 
+        /// <summary>
+        /// Returns the color of the AI opponent
+        /// </summary>
         public int  getColor() { return color; }
+
+        /// <summary>
+        /// Sets the maximum simulation depth
+        /// </summary>
+        /// <param name="NewMaxDepth">The maximum number of turns to look ahead</param>
         public void setMaxDepth(int NewMaxDepth) { MaxSimDepth = NewMaxDepth; }
+
+        /// <summary>
+        /// Sets the VisualizeProcess flag
+        /// </summary>
+        /// <param name="newVisualizeProcess">True if the AI should display the move analysis results</param>
         public void setVisualizeProcess(bool newVisualizeProcess) { VisualizeProcess = newVisualizeProcess; }
 
         #endregion

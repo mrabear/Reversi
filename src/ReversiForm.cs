@@ -1,5 +1,6 @@
-// Reversi
-// Brian Hebert
+/// <summary>
+/// Reversi.ReversiForm.cs
+/// </summary>
 
 using System;
 using System.Drawing;
@@ -889,14 +890,15 @@ namespace Reversi
         /// </summary>
         public ReversiForm()
         {
+            // Initialize the form (generated code)
             InitializeComponent();
+
+            // Esablish graphics handles
             gBoardGFX = BoardSurface.CreateGraphics();
             gCurrentTurnImageGFX = currentTurnImageSurface.CreateGraphics();
 
-            gDebugText = DebugAITrace;
-            simTimerLabel.Text = "";
-
             // Static global binds for important form elements
+            gDebugText          = DebugAITrace;
             gWhiteScoreBoard    = whiteScoreBoard;
             gBlackScoreBoard    = blackScoreBoard;
             gCurrentTurnLabel   = CurrentTurnLabel;
@@ -909,23 +911,26 @@ namespace Reversi
             gCurrentTurnSurface = currentTurnImageSurface;
             gShowAvailableMoves = showAvailableMoves;
 
+            // Game board and piece image handles
             gBoardImage      = Image.FromHbitmap(Properties.Resources.reversi_grid.GetHbitmap());
             gWhitePieceImage = Image.FromHbitmap(Properties.Resources.whitepiece.GetHbitmap());
             gBlackPieceImage = Image.FromHbitmap(Properties.Resources.blackpiece.GetHbitmap());
 
+            // Graphic dimensions
             boardPieceImageSize = gBlackPieceImage.Width;
-
             boardGridSize = Properties.Settings.Default.GridSize;
 
+            // AI Opponent worker thread settings
             AITurnWorker.WorkerSupportsCancellation = true;
             AITurnWorker.WorkerReportsProgress = true;
 
+            // Setup form elements
             gridSizeDropDown.SelectedIndex = 4;
-
+            simTimerLabel.Text = "";
             updateMaxDepth();
-
             AIInfoTabControl.SelectTab(AISimTab);
 
+            // Establish a static binding to the global game instance
             gCurrentGame = ReversiApplication.getCurrentGame();
         }
 
@@ -973,16 +978,44 @@ namespace Reversi
 
         #region Getters and Setters
 
+        /// <summary>
+        /// Gets the board that was last drawn onto the screen
+        /// </summary>
+        /// <returns>The last drawn Board object</returns>
         public static Board getLastDrawnBoard() { return LastDrawnBoard; }
-        public static void setLastDrawnBoard(Board SourceBoard) { LastDrawnBoard.CopyBoard(SourceBoard); }
+
+        /// <summary>
+        /// Resets the board that was last drawn onto the screen
+        /// </summary>
+        /// <param name="BoardSize">The new board size</param>
         public static void setLastDrawnBoard(int BoardSize) { LastDrawnBoard = new Board( BoardSize ); }
 
+        /// <summary>
+        /// True if the current game is versus the computer opponent
+        /// </summary>
         public static Boolean isVsComputer() { return isVSComputer; }
 
+        /// <summary>
+        /// Returns the current computer difficulty setting
+        /// </summary>
         public static int getAIDifficulty() { return AIDifficulty; }
+
+        /// <summary>
+        /// Sets the difficulty of the computer opponent
+        /// </summary>
+        /// <param name="setAIDifficulty">The difficulty level (0-4)</param>
         public static void setAIDifficulty(int setAIDifficulty) { AIDifficulty = setAIDifficulty; }
 
+        /// <summary>
+        /// Thread unsafe way to append text to the debug window
+        /// </summary>
+        /// <param name="newDebugText">The debug message to append</param>
         public static void appendDebugText(String newDebugText) { gDebugText.Text += newDebugText; }
+
+        /// <summary>
+        /// Thread unsafe way to set the text of the debug window
+        /// </summary>
+        /// <param name="newDebugText">The debug message set</param>
         public static void setDebugText( String newDebugText ) { gDebugText.Text = newDebugText; }
  
         #endregion
@@ -1004,7 +1037,7 @@ namespace Reversi
             whiteScoreBoardTitle.Visible = true;
             blackScoreBoardTitle.Visible = true;
 
-            ReversiApplication.resetCurrentGame(getBoardSize());
+            ReversiApplication.resetCurrentGame(getCurrentBoardSize());
             gCurrentGame = ReversiApplication.getCurrentGame();
 
             gCurrentGame.getAI().setMaxDepth(simulationDepthSlider.Value);
@@ -1210,276 +1243,45 @@ namespace Reversi
             UpdateTurnImage(gCurrentGame.getCurrentTurn());
         }
 
-        #endregion
+        /// <summary>
+        /// Thread safe delegate for updateDatabaseProgress()
+        /// </summary>
+        /// <param name="TimeElapsed">The time that has elapsed so far in the build</param>
+        /// <param name="WorkNodeCount">The number of nodes sitting in the work queue</param>
+        /// <param name="NodeTotal">The total number of nodes processed</param>
+        /// <param name="VictoryTotal">The total number of victory states discovered so far</param>
+        public delegate void updateDatabaseProgressDelegate(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int VictoryTotal);
 
-        #region Drop Down Menu Event Handelers
-
-        // Easy AI difficulty selected
-        private void DiffMenu_EasyClick(object sender, System.EventArgs e)
+        /// <summary>
+        /// Thread safe way to update the database build progress form elements
+        /// </summary>
+        /// <param name="TimeElapsed">The time that has elapsed so far in the build</param>
+        /// <param name="WorkNodeCount">The number of nodes sitting in the work queue</param>
+        /// <param name="NodeTotal">The total number of nodes processed</param>
+        /// <param name="VictoryTotal">The total number of victory states discovered so far</param>
+        public static void updateDatabaseProgress(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int VictoryTotal)
         {
-            DiffMenu_Easy.Checked = true;
-            DiffMenu_Normal.Checked = false;
-            DiffMenu_Hard.Checked = false;
-            DiffMenu_VeryHard.Checked = false;
-            AIDifficulty = 0;
+            gNodeCounter.Invoke(new updateDatabaseProgressDelegate(updateDatabaseProgressForm), TimeElapsed, WorkNodeCount, NodeTotal, VictoryTotal);
         }
 
-        // Normal AI difficulty selected
-        private void DiffMenu_NormalClick(object sender, System.EventArgs e)
-        {
-            DiffMenu_Easy.Checked = false;
-            DiffMenu_Normal.Checked = true;
-            DiffMenu_Hard.Checked = false;
-            DiffMenu_VeryHard.Checked = false;
-            AIDifficulty = 1;
-        }
-
-        // Hard AI difficulty selected
-        private void DiffMenu_HardClick(object sender, System.EventArgs e)
-        {
-            DiffMenu_Easy.Checked = false;
-            DiffMenu_Normal.Checked = false;
-            DiffMenu_Hard.Checked = true;
-            DiffMenu_VeryHard.Checked = false;
-            AIDifficulty = 2;
-        }
-
-        // Very Hard AI difficulty selected
-        private void DiffMenu_VeryHardClick(object sender, System.EventArgs e)
-        {
-            DiffMenu_Easy.Checked = false;
-            DiffMenu_Normal.Checked = false;
-            DiffMenu_Hard.Checked = false;
-            DiffMenu_VeryHard.Checked = true;
-            AIDifficulty = 3;
-        }
-
-        // Player vs Player selected
-        private void PvPMenu_Click(object sender, System.EventArgs e)
-        {
-            PvPMenu.Checked = true;
-            PvCMenu.Checked = false;
-            isVSComputer = false;
-        }
-
-        // Player vs AI selected
-        private void PvCMenu_Click(object sender, System.EventArgs e)
-        {
-            PvPMenu.Checked = false;
-            PvCMenu.Checked = true;
-            isVSComputer = true;
-        }
-
-        // Game exit selected
-        private void ExitMenu_Click(object sender, System.EventArgs e)
-        {
-            ActiveForm.Close();
-        }
-
-        private void showAvailableMoves_Click(object sender, EventArgs e)
-        {
-            showAvailableMoves.Checked = !showAvailableMoves.Checked;
-        }
-
-        // New game selected
-        private void NewGameMenu_Click(object sender, System.EventArgs e)
-        {
-            //CurrentGame = new Game( getBoardSize() );
-            StartNewGame();
-        }
-
-        // Skip turn (debug option) selected
-        private void DebugSkip_Click(object sender, System.EventArgs e)
-        {
-            gCurrentGame.SwitchTurn();
-        }
-
-        // unused
-        private void DebugProcess_Click(object sender, System.EventArgs e)
-        {
-            gCurrentGame.setProcessMoves(!gCurrentGame.getProcessMoves());
-            DebugProcess.Checked = !DebugProcess.Checked;
-        }
-
-        // Start a new game scenario where white cannot move
-        private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
-        {
-            StartNewGame();
-            gCurrentGame.getGameBoard().ClearBoard();
-            gCurrentGame.getGameBoard().PutPiece(0, 0, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 1, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 2, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 3, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 4, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 5, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 6, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(0, 7, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(1, 0, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 1, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 2, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 3, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 4, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 5, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 6, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(1, 7, ReversiApplication.WHITE);
-            RefreshPieces(FullRefresh: true);
-            UpdateScoreBoard();
-            UpdateTurnImage(gCurrentGame.getCurrentTurn());
-            gCurrentGame.setCurrentTurn(ReversiApplication.BLACK);
-            StartAITurnWorker();
-        }
-
-        // Sets up the a new game with the middle of the board already filled in
-        private void DebugScenario_MidGame_Click(object sender, EventArgs e)
-        {
-            StartNewGame();
-            gCurrentGame.getGameBoard().PutPiece(2, 2, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(2, 3, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(2, 4, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(2, 5, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(3, 2, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(3, 3, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(3, 4, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(3, 5, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(4, 2, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(4, 3, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(4, 4, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(4, 5, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(5, 2, ReversiApplication.BLACK);
-            gCurrentGame.getGameBoard().PutPiece(5, 3, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(5, 4, ReversiApplication.WHITE);
-            gCurrentGame.getGameBoard().PutPiece(5, 5, ReversiApplication.WHITE);
-            RefreshPieces(FullRefresh: true);
-            UpdateScoreBoard();
-            UpdateTurnImage(gCurrentGame.getCurrentTurn());
-        }
-
-        #endregion
-
-        #region AI Database Form & Event Handelers
-
-        // Responds to the analyze database button press, starts the job
-        private void BuildAIDBButton_Click(object sender, EventArgs e)
-        {
-            SetupSimulationForm();
-            DBBuildWorker.RunWorkerAsync(getBoardSize());
-        }
-
-        // Starts the database background worker (button press)
-        private void DBBuildWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            StartBuildDB(Convert.ToInt32(e.Argument.ToString()));
-        }
-
-        // Starts the database build background worker
-        private void StartBuildDB(int BoardSize = 4)
-        {
-            ReversiApplication.resetCurrentGame(BoardSize);
-            gCurrentGame = ReversiApplication.getCurrentGame();
-
-            DatabaseFactory.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
-        }
-
-        // Called from within the database build background woker to report the progress of the build
-        private void DBBuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-
-        }
-
-        public delegate void updateDatabaseProgressDelegate(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int LeafCount);
-
-        public static void updateDatabaseProgress(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int LeafCount)
-        {
-            gNodeCounter.Invoke(new updateDatabaseProgressDelegate(updateDatabaseProgressForm), TimeElapsed, WorkNodeCount, NodeTotal, LeafCount);
-        }
-
-        private static void updateDatabaseProgressForm(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int LeafCount)
+        /// <summary>
+        /// Thread UNSAFE way to update the database build progress form elements
+        /// </summary>
+        /// <param name="TimeElapsed">The time that has elapsed so far in the build</param>
+        /// <param name="WorkNodeCount">The number of nodes sitting in the work queue</param>
+        /// <param name="NodeTotal">The total number of nodes processed</param>
+        /// <param name="VictoryTotal">The total number of victory states discovered so far</param>
+        private static void updateDatabaseProgressForm(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int VictoryTotal)
         {
             gSimTimerLabel.Text = TimeElapsed.ToString(@"hh\:mm\:ss");
             gNodeCounter.Text = NodeTotal.ToString();
             gWorkCounter.Text = WorkNodeCount.ToString();
-            gVictoryCounter.Text = LeafCount.ToString();
+            gVictoryCounter.Text = VictoryTotal.ToString();
         }
 
-        // Runs when the database background worker thread is finished
-        private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            ClearSimulationForm();
-        }
-
-        // Dumps the database information to the debug window
-        private void dumpDBInfoButton_Click(object sender, EventArgs e)
-        {
-            gDebugText.Text += DatabaseFactory.DumpSimulationInfo();
-        }
-
-        // Responds to the analyze database button press
-        private void anaylzeDBButton_Click(object sender, EventArgs e)
-        {
-            SetupSimulationForm();
-            DBAnalysisWorker.RunWorkerAsync();
-        }
-
-        // Cancels any of the background jobs that are currently running
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            cancelAIWorkers();
-        }
-
-        private void cancelAIWorkers()
-        {
-            if (DBBuildWorker.IsBusy)
-                DBBuildWorker.CancelAsync();
-
-            if (DBAnalysisWorker.IsBusy)
-                DBAnalysisWorker.CancelAsync();
-
-            ClearSimulationForm();
-        }
-
-        // Starts of the database analysis background worker
-        private void DBAnalysisWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            Boolean DisplayDebug = true;
-            DatabaseFactory.AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, gDebugText, DisplayDebug);
-        }
-
-        private void ClearSimulationForm()
-        {
-            simTimerLabel.Text = "";
-            cancelButton.Visible = false;
-            RAMCheckTimer.Enabled = false;
-            RAMUsageBar.Visible = false;
-            RAMLabel.Visible = false;
-            RAMUsageBar.Maximum = 100;
-        }
-
-        private void SetupSimulationForm()
-        {
-            cancelButton.Visible = true;
-            DBAnalysisWorker.WorkerSupportsCancellation = true;
-            DBAnalysisWorker.WorkerReportsProgress = true;
-            DBBuildWorker.WorkerSupportsCancellation = true;
-            DBBuildWorker.WorkerReportsProgress = true;
-            RAMCheckTimer.Enabled = true;
-            RAMUsageBar.Visible = true;
-            RAMLabel.Visible = true;
-            UpdateRAMprogress();
-
-            // Reset the score board
-            gBlackScoreBoard.Visible = false;
-            gWhiteScoreBoard.Visible = false;
-            CurrentTurnLabel.Visible = false;
-            whiteScoreBoardTitle.Visible = false;
-            blackScoreBoardTitle.Visible = false;
-            gCurrentTurnSurface.Visible = false;
-        }
-
-        private void RAMCheckTimer_Tick(object sender, EventArgs e)
-        {
-            UpdateRAMprogress();
-        }
-
+        /// <summary>
+        /// Update the RAM usage meter
+        /// </summary>
         private void UpdateRAMprogress()
         {
             ObjectQuery wql = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
@@ -1511,20 +1313,338 @@ namespace Reversi
 
         #endregion
 
+        #region Drop Down Menu Event Handelers
+
+        /// <summary>
+        /// Easy AI difficulty menu option selected
+        /// </summary>
+        private void DiffMenu_EasyClick(object sender, System.EventArgs e)
+        {
+            DiffMenu_Easy.Checked = true;
+            DiffMenu_Normal.Checked = false;
+            DiffMenu_Hard.Checked = false;
+            DiffMenu_VeryHard.Checked = false;
+            AIDifficulty = 0;
+        }
+
+        /// <summary>
+        /// Normal AI difficulty menu option selected
+        /// </summary>
+        private void DiffMenu_NormalClick(object sender, System.EventArgs e)
+        {
+            DiffMenu_Easy.Checked = false;
+            DiffMenu_Normal.Checked = true;
+            DiffMenu_Hard.Checked = false;
+            DiffMenu_VeryHard.Checked = false;
+            AIDifficulty = 1;
+        }
+
+        /// <summary>
+        /// Hard AI difficulty menu option selected
+        /// </summary>
+        private void DiffMenu_HardClick(object sender, System.EventArgs e)
+        {
+            DiffMenu_Easy.Checked = false;
+            DiffMenu_Normal.Checked = false;
+            DiffMenu_Hard.Checked = true;
+            DiffMenu_VeryHard.Checked = false;
+            AIDifficulty = 2;
+        }
+
+        /// <summary>
+        /// Very Hard AI difficulty menu option selected
+        /// </summary>
+        private void DiffMenu_VeryHardClick(object sender, System.EventArgs e)
+        {
+            DiffMenu_Easy.Checked = false;
+            DiffMenu_Normal.Checked = false;
+            DiffMenu_Hard.Checked = false;
+            DiffMenu_VeryHard.Checked = true;
+            AIDifficulty = 3;
+        }
+
+        /// <summary>
+        /// Player vs Player menu option selected
+        /// </summary>
+        private void PvPMenu_Click(object sender, System.EventArgs e)
+        {
+            PvPMenu.Checked = true;
+            PvCMenu.Checked = false;
+            isVSComputer = false;
+        }
+
+        /// <summary>
+        /// Player vs Computer menu option selected
+        /// </summary>
+        private void PvCMenu_Click(object sender, System.EventArgs e)
+        {
+            PvPMenu.Checked = false;
+            PvCMenu.Checked = true;
+            isVSComputer = true;
+        }
+
+        /// <summary>
+        /// Game Exit menu option selected
+        /// </summary>
+        private void ExitMenu_Click(object sender, System.EventArgs e)
+        {
+            ActiveForm.Close();
+        }
+
+        /// <summary>
+        /// Show Available Moves menu option selected
+        /// </summary>
+        private void showAvailableMoves_Click(object sender, EventArgs e)
+        {
+            showAvailableMoves.Checked = !showAvailableMoves.Checked;
+        }
+
+        /// <summary>
+        /// New Game menu option selected
+        /// </summary>
+        private void NewGameMenu_Click(object sender, System.EventArgs e)
+        {
+            StartNewGame();
+        }
+
+        /// <summary>
+        /// Skip turn (debug option) menu option selected
+        /// </summary>
+        private void DebugSkip_Click(object sender, System.EventArgs e)
+        {
+            gCurrentGame.SwitchTurn();
+        }
+
+        // unused
+        private void DebugProcess_Click(object sender, System.EventArgs e)
+        {
+            gCurrentGame.setProcessMoves(!gCurrentGame.getProcessMoves());
+            DebugProcess.Checked = !DebugProcess.Checked;
+        }
+
+        /// <summary>
+        /// Start a new game scenario where white cannot move
+        /// </summary>
+        private void DebugScenario_NoWhite_Click(object sender, System.EventArgs e)
+        {
+            StartNewGame();
+            gCurrentGame.getGameBoard().ClearBoard();
+            gCurrentGame.getGameBoard().PutPiece(0, 0, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 1, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 2, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 6, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(0, 7, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(1, 0, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 1, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 2, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 3, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 4, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 5, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 6, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(1, 7, ReversiApplication.WHITE);
+            RefreshPieces(FullRefresh: true);
+            UpdateScoreBoard();
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
+            gCurrentGame.setCurrentTurn(ReversiApplication.BLACK);
+            StartAITurnWorker();
+        }
+
+        /// <summary>
+        /// Sets up the a new game with the middle of the board already filled in
+        /// </summary>
+        private void DebugScenario_MidGame_Click(object sender, EventArgs e)
+        {
+            StartNewGame();
+            gCurrentGame.getGameBoard().PutPiece(2, 2, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(2, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(2, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(2, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(3, 2, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(3, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(3, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(3, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 2, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 3, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 4, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(4, 5, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(5, 2, ReversiApplication.BLACK);
+            gCurrentGame.getGameBoard().PutPiece(5, 3, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(5, 4, ReversiApplication.WHITE);
+            gCurrentGame.getGameBoard().PutPiece(5, 5, ReversiApplication.WHITE);
+            RefreshPieces(FullRefresh: true);
+            UpdateScoreBoard();
+            UpdateTurnImage(gCurrentGame.getCurrentTurn());
+        }
+
+        #endregion
+
+        #region AI Database Form & Event Handelers
+
+        /// <summary>
+        /// Responds to the analyze database button press, starts the job
+        /// </summary>
+        private void BuildAIDBButton_Click(object sender, EventArgs e)
+        {
+            SetupSimulationForm();
+            DBBuildWorker.RunWorkerAsync(getCurrentBoardSize());
+        }
+
+        /// <summary>
+        /// Starts the database background worker (button press)
+        /// </summary>
+        private void DBBuildWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            StartBuildDB(Convert.ToInt32(e.Argument.ToString()));
+        }
+
+        /// <summary>
+        /// Starts the database build background worker
+        /// </summary>
+        private void StartBuildDB(int BoardSize = 4)
+        {
+            ReversiApplication.resetCurrentGame(BoardSize);
+            gCurrentGame = ReversiApplication.getCurrentGame();
+
+            DatabaseFactory.BuildAIDatabase(DBBuildWorker, BoardSize, visualizeCheckbox.Checked, true);
+        }
+
+        /// <summary>
+        /// Called from within the database build background woker to report the progress of the build
+        /// </summary>
+        private void DBBuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Called when the RAM timer ticks, used to update the RAM usage meter during database builds
+        /// </summary>
+        private void RAMCheckTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateRAMprogress();
+        }
+
+        /// <summary>
+        /// Runs when the database background worker thread is finished
+        /// </summary>
+        private void DBBuildWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            ClearSimulationForm();
+        }
+
+        /// <summary>
+        /// Dumps the database information to the debug window
+        /// </summary>
+        private void dumpDBInfoButton_Click(object sender, EventArgs e)
+        {
+            gDebugText.Text += DatabaseFactory.DumpSimulationInfo();
+        }
+
+        /// <summary>
+        /// Responds to the analyze database button press
+        /// </summary>
+        private void anaylzeDBButton_Click(object sender, EventArgs e)
+        {
+            SetupSimulationForm();
+            DBAnalysisWorker.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Responds to the "Cancel Job" button
+        /// </summary>
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            cancelAIWorkers();
+        }
+
+
+        /// <summary>
+        /// Cancels any of the background jobs that are currently running
+        /// </summary>
+        private void cancelAIWorkers()
+        {
+            if (DBBuildWorker.IsBusy)
+                DBBuildWorker.CancelAsync();
+
+            if (DBAnalysisWorker.IsBusy)
+                DBAnalysisWorker.CancelAsync();
+
+            ClearSimulationForm();
+        }
+
+        /// <summary>
+        /// Starts of the database analysis background worker
+        /// </summary>
+        private void DBAnalysisWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Boolean DisplayDebug = true;
+            DatabaseFactory.AnalyzeAIDatabase(DBAnalysisWorker, visualizeCheckbox.Checked, gDebugText, DisplayDebug);
+        }
+
+        /// <summary>
+        /// Hides / Resets the form elements associated with the database builder
+        /// </summary>
+        private void ClearSimulationForm()
+        {
+            simTimerLabel.Text = "";
+            cancelButton.Visible = false;
+            RAMCheckTimer.Enabled = false;
+            RAMUsageBar.Visible = false;
+            RAMLabel.Visible = false;
+            RAMUsageBar.Maximum = 100;
+        }
+
+        /// <summary>
+        /// Displays the form elements associated with the database builder
+        /// </summary>
+        private void SetupSimulationForm()
+        {
+            cancelButton.Visible = true;
+            DBAnalysisWorker.WorkerSupportsCancellation = true;
+            DBAnalysisWorker.WorkerReportsProgress = true;
+            DBBuildWorker.WorkerSupportsCancellation = true;
+            DBBuildWorker.WorkerReportsProgress = true;
+            RAMCheckTimer.Enabled = true;
+            RAMUsageBar.Visible = true;
+            RAMLabel.Visible = true;
+            UpdateRAMprogress();
+
+            // Reset the score board
+            gBlackScoreBoard.Visible = false;
+            gWhiteScoreBoard.Visible = false;
+            CurrentTurnLabel.Visible = false;
+            whiteScoreBoardTitle.Visible = false;
+            blackScoreBoardTitle.Visible = false;
+            gCurrentTurnSurface.Visible = false;
+        }
+
+        #endregion
+
         #region Miscellaneous Form Level Methods
 
-        // Returns an integer board size as selected on the form
-        private int getBoardSize()
+        /// <summary>
+        /// Returns an integer board size as selected on the form
+        /// </summary>
+        /// <returns>An integer board size as selected on the form</returns>
+        private int getCurrentBoardSize()
         {
             return (Convert.ToInt32(gridSizeDropDown.Items[gridSizeDropDown.SelectedIndex].ToString()));
         }
 
+        /// <summary>
+        /// Responds to the "New Game" button being clicked
+        /// </summary>
         private void newGameButton_Click(object sender, EventArgs e)
         {
             StartNewGame();
         }
 
-        // Responds to the MouseUp event on the board image, processes the click as a placed piece
+        /// <summary>
+        /// Responds to the MouseUp event on the board image, processes the click as a placed piece
+        /// </summary>
         private void PlaceUserPiece(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             int x = (e.X + 1) / boardGridSize;
@@ -1534,36 +1654,50 @@ namespace Reversi
             if (!gCurrentGame.getTurnInProgress())
                 gCurrentGame.ProcessTurn(x, y);
         }
-
-        // If the grid size drop down changes, updates the board with the new dimensions
+        
+        /// <summary>
+        /// If the grid size drop down changes, updates the board with the new dimensions
+        /// </summary>
         private void gridSizeDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            gridDimensionLabel.Text = getBoardSize() + "x" + getBoardSize();
+            int newBoardSize = getCurrentBoardSize();
 
-            BoardSurface.Width = boardGridSize * getBoardSize();
-            BoardSurface.Height = boardGridSize * getBoardSize();
+            gridDimensionLabel.Text = newBoardSize + "x" + newBoardSize;
+
+            BoardSurface.Width = boardGridSize * newBoardSize;
+            BoardSurface.Height = boardGridSize * newBoardSize;
 
             StartNewGame();
         }
 
-        // Starts a new game 100ms after the form has loaded
+        /// <summary>
+        /// Starts a new game 100ms after the form has loaded
+        /// </summary>
         private void NewGameTimer_Tick(object sender, EventArgs e)
         {
             StartNewGame();
             NewGameTimer.Enabled = false;
         }
 
-        // Thread safe delegates for debug reporting
-        public delegate void setDebugTextDelagate(string newText);
-        public delegate void appendDebugTextDelagate(string newText);
+        /// <summary>
+        /// Thread safe delegates for setting the debug window with the new text
+        /// </summary>
+        /// <param name="newText">The information to report</param>
+        private delegate void setDebugTextDelagate(string newText);
 
-        // Thread safe way to clear the debug message box
-        public static void clearDebugMessage()
-        {
-            gDebugText.Invoke(new setDebugTextDelagate(setDebugText), "");
-        }
+        /// <summary>
+        /// Thread safe delegates for appending to the debug window with the new text
+        /// </summary>
+        /// <param name="newText">The information to report</param>
+        private delegate void appendDebugTextDelagate(string newText);
 
-        // Thread safe way to update the debug message box
+        /// <summary>
+        /// Thread safe way to update the debug message box
+        /// </summary>
+        /// <param name="newDebugMsg">The information to report</param>
+        /// <param name="updateConsole">(optional: false) True to update the console</param>
+        /// <param name="updateWindow">(optional: true) True to update the debug window</param>
+        /// <param name="overwrite">(optional: false) To reset the debug window</param>
         public static void reportDebugMessage(String newDebugMsg, bool updateConsole = false, bool updateWindow = true, bool overwrite = false)
         {
             if( gDebugLogCheckBox.Checked && updateWindow )
@@ -1576,13 +1710,25 @@ namespace Reversi
                 Console.WriteLine(newDebugMsg);
         }
 
-        // Clears the debug text box
+        /// <summary>
+        /// Thread safe way to clear the debug message box
+        /// </summary>
+        public static void clearDebugMessage()
+        {
+            gDebugText.Invoke(new setDebugTextDelagate(setDebugText), "");
+        }
+
+        /// <summary>
+        /// Responds to the 'Clear' button on top of the debug window
+        /// </summary>
         private void clearDebugLogButton_Click(object sender, EventArgs e)
         {
             clearDebugMessage();
         }
 
-        // Hides/Shows the debug panel
+        /// <summary>
+        /// Hides/Shows the debug panel
+        /// </summary>
         private void hideDebugButton_Click(object sender, EventArgs e)
         {
             if (Width > 565)
@@ -1603,29 +1749,41 @@ namespace Reversi
 
         #region AI Turn BG Worker Event Handelers
 
+        /// <summary>
+        /// Starts the AI turn worker job, which will analyze the board and make a move
+        /// </summary>
         public static void StartAITurnWorker()
         {
             gAITurnWorker.RunWorkerAsync();
         }
 
+        /// <summary>
+        /// Called mid-way through an AI turn analysis, used to report back progress
+        /// </summary>
         public static void ReportAITurnWorkerProgress(int progress = 0)
         {
             gAITurnWorker.ReportProgress(progress);
         }
 
-        // Called asynchronously when it is time for the AI to wake up and do some work
+        /// <summary>
+        /// Called asynchronously when it is time for the AI to wake up and do some work
+        /// </summary>
         private void AITurnMonitor_DoWork(object sender, DoWorkEventArgs e)
         {
             gCurrentGame.ProcessAITurn();
         }
 
-        // Called every time the AI monitor has a move to render
+        /// <summary>
+        /// Called every time the AI monitor has a move to render
+        /// </summary>
         private void AITurnMonitor_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             
         }
 
-        // Called when the AI monitor has no more moves to place
+        /// <summary>
+        /// Called when the AI monitor has no more moves to place
+        /// </summary>
         private void AITurnMonitor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             gCurrentGame.SwitchTurn();
@@ -1639,6 +1797,9 @@ namespace Reversi
 
         #region AI Simulation Tab event handlers
 
+        /// <summary>
+        /// Responds to the simulation depth slider being moved
+        /// </summary>
         private void simulationDepthSlider_Scroll(object sender, EventArgs e)
         {
             if (simulationDepthSlider.Value % 2 != 0)
@@ -1647,12 +1808,18 @@ namespace Reversi
             updateMaxDepth();
         }
 
+        /// <summary>
+        /// Updates the current game and form elements with the current simulation max depth
+        /// </summary>
         private void updateMaxDepth()
         {
             simDepthCount.Text = simulationDepthSlider.Value.ToString();
             gCurrentGame.getAI().setMaxDepth(simulationDepthSlider.Value - 1);
         }
 
+        /// <summary>
+        /// Responds to the visulize checkbox being changed
+        /// </summary>
         private void visualizeCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             gCurrentGame.getAI().setVisualizeProcess(visualizeCheckbox.Checked);

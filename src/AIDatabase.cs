@@ -1,6 +1,6 @@
-// Reversi
-// Brian Hebert
-//
+/// <summary>
+/// Reversi.AIDatabase.cs
+/// </summary>
 
 using System;
 using System.Drawing;
@@ -10,6 +10,9 @@ using System.Windows.Forms;
 
 namespace Reversi
 {
+    /// <summary>
+    /// Used to calculate the AI turn database
+    /// </summary>
     public class AIDatabase
     {
         private static Dictionary<string, int> BlackMoves = new Dictionary<string, int>();
@@ -24,10 +27,6 @@ namespace Reversi
         private static int BlackWinnerTotal = 0;
         private static int TieTotal = 0;
         private static int LeafTotal = 0;
-
-        #region Getters and Setters
-
-        #endregion
 
         /// <summary>
         /// Returns a string dump of the current database information

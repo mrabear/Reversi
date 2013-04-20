@@ -1,6 +1,6 @@
-// Reversi
-// Brian Hebert
-//
+/// <summary>
+/// Reversi.SimulationNode.cs
+/// </summary>
 
 using System;
 using System.Drawing;

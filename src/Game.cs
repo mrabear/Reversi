@@ -1,6 +1,6 @@
-// Reversi
-// Brian Hebert
-//
+/// <summary>
+/// Reversi.Game.cs
+/// </summary>
 
 using System;
 using System.Drawing;
@@ -43,16 +43,59 @@ namespace Reversi
 
         #region Getters and Setters
 
+        /// <summary>
+        /// Returns the current game turn
+        /// </summary>
         public int getCurrentTurn() { return CurrentTurn; }
-        public void setCurrentTurn(int turn) { CurrentTurn = turn; }
-        public Board getGameBoard() { return GameBoard; }
-        public Boolean getProcessMoves() { return ProcessMoves; }
-        public void setProcessMoves(Boolean flag) { ProcessMoves = flag; }
-        public AI getAI() { return AI; }
+
+        /// <summary>
+        /// Sets the current game turn
+        /// </summary>
+        /// <param name="Turn">The current turn</param>
+        public void setCurrentTurn(int Turn) { CurrentTurn = Turn; }
+
+        /// <summary>
+        /// Returns the next turn
+        /// </summary>
         public int getNextTurn() { return NextTurn; }
-        public void setNextTurn(int turn) { NextTurn = turn; }
+
+        /// <summary>
+        /// Sets the next turn
+        /// </summary>
+        /// <param name="Turn">The next move</param>
+        public void setNextTurn(int Turn) { NextTurn = Turn; }
+
+        /// <summary>
+        /// Returns the current game board
+        /// </summary>
+        public Board getGameBoard() { return GameBoard; }
+
+        /// <summary>
+        /// Returns True if the game is currently processing moves
+        /// </summary>
+        public Boolean getProcessMoves() { return ProcessMoves; }
+
+        /// <summary>
+        /// Sets to True if the game is currently processing moves
+        /// </summary>
+        /// <param name="isMoveProcessing">Set to True if the game is processing a move</param>
+        public void setProcessMoves(Boolean isMoveProcessing) { ProcessMoves = isMoveProcessing; }
+
+        /// <summary>
+        /// Returns the AI opponent object
+        /// </summary>
+        public AI getAI() { return AI; }
+
+        /// <summary>
+        /// Returns the color of the AI opponent
+        /// </summary>
         public Boolean getTurnInProgress() { return TurnInProgress; }
-        public void setTurnInProgress(Boolean flag) { TurnInProgress = flag; }
+
+        /// <summary>
+        /// Sets to True if the game is currently processing a turn
+        /// </summary>
+        /// <param name="isMoveProcessing">Set to True if the game is processing a turn</param>
+        public void setTurnInProgress(Boolean isTurninProgress) { TurnInProgress = isTurninProgress; }
 
         #endregion
 
