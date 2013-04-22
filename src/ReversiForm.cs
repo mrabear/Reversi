@@ -71,6 +71,7 @@ namespace Reversi
         protected Panel ScoreBoardPanel;
         private Panel panel1;
         private PictureBox ShowDebugInfo;
+        protected Label label1;
         protected Panel BoardSurface;
 
         /// <summary>
@@ -118,6 +119,7 @@ namespace Reversi
             this.ScoreBoardPanel = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.ShowDebugInfo = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.DBBuilderButtonsBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SimulationDepthSlider)).BeginInit();
             this.panel1.SuspendLayout();
@@ -127,10 +129,10 @@ namespace Reversi
             // Title
             // 
             this.Title.BackColor = System.Drawing.Color.Transparent;
-            this.Title.Font = new System.Drawing.Font("Segoe UI", 30F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Title.Font = new System.Drawing.Font("Segoe UI", 32.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Title.ForeColor = System.Drawing.Color.White;
             this.Title.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.Title.Location = new System.Drawing.Point(21, 8);
+            this.Title.Location = new System.Drawing.Point(21, 19);
             this.Title.Margin = new System.Windows.Forms.Padding(0);
             this.Title.Name = "Title";
             this.Title.Size = new System.Drawing.Size(159, 75);
@@ -432,7 +434,7 @@ namespace Reversi
             this.DebugAITrace.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DebugAITrace.ForeColor = System.Drawing.Color.White;
             this.DebugAITrace.HideSelection = false;
-            this.DebugAITrace.Location = new System.Drawing.Point(758, 433);
+            this.DebugAITrace.Location = new System.Drawing.Point(758, 457);
             this.DebugAITrace.Name = "DebugAITrace";
             this.DebugAITrace.Size = new System.Drawing.Size(413, 290);
             this.DebugAITrace.TabIndex = 5;
@@ -444,7 +446,7 @@ namespace Reversi
             this.ClearDebugLogButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ClearDebugLogButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ClearDebugLogButton.ForeColor = System.Drawing.Color.White;
-            this.ClearDebugLogButton.Location = new System.Drawing.Point(759, 401);
+            this.ClearDebugLogButton.Location = new System.Drawing.Point(759, 425);
             this.ClearDebugLogButton.Name = "ClearDebugLogButton";
             this.ClearDebugLogButton.Size = new System.Drawing.Size(64, 23);
             this.ClearDebugLogButton.TabIndex = 36;
@@ -455,9 +457,9 @@ namespace Reversi
             // AITraceLabel
             // 
             this.AITraceLabel.BackColor = System.Drawing.Color.Transparent;
-            this.AITraceLabel.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.AITraceLabel.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.AITraceLabel.ForeColor = System.Drawing.Color.White;
-            this.AITraceLabel.Location = new System.Drawing.Point(758, 403);
+            this.AITraceLabel.Location = new System.Drawing.Point(758, 423);
             this.AITraceLabel.Name = "AITraceLabel";
             this.AITraceLabel.Size = new System.Drawing.Size(413, 27);
             this.AITraceLabel.TabIndex = 6;
@@ -473,7 +475,7 @@ namespace Reversi
             this.DebugLogCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.DebugLogCheckBox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DebugLogCheckBox.ForeColor = System.Drawing.Color.White;
-            this.DebugLogCheckBox.Location = new System.Drawing.Point(1085, 406);
+            this.DebugLogCheckBox.Location = new System.Drawing.Point(1085, 427);
             this.DebugLogCheckBox.Name = "DebugLogCheckBox";
             this.DebugLogCheckBox.Size = new System.Drawing.Size(75, 21);
             this.DebugLogCheckBox.TabIndex = 38;
@@ -497,9 +499,9 @@ namespace Reversi
             this.NewGameButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.NewGameButton.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NewGameButton.ForeColor = System.Drawing.Color.White;
-            this.NewGameButton.Location = new System.Drawing.Point(548, 36);
+            this.NewGameButton.Location = new System.Drawing.Point(571, 37);
             this.NewGameButton.Name = "NewGameButton";
-            this.NewGameButton.Size = new System.Drawing.Size(122, 38);
+            this.NewGameButton.Size = new System.Drawing.Size(99, 37);
             this.NewGameButton.TabIndex = 40;
             this.NewGameButton.Text = "New Game";
             this.NewGameButton.UseVisualStyleBackColor = false;
@@ -534,7 +536,7 @@ namespace Reversi
             this.panel1.Controls.Add(this.VictoryCounter);
             this.panel1.Controls.Add(this.SimTimerLabel);
             this.panel1.Controls.Add(this.DBBuilderButtonsBox);
-            this.panel1.Location = new System.Drawing.Point(758, 27);
+            this.panel1.Location = new System.Drawing.Point(758, 37);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(413, 368);
             this.panel1.TabIndex = 41;
@@ -550,13 +552,25 @@ namespace Reversi
             this.ShowDebugInfo.TabStop = false;
             this.ShowDebugInfo.Click += new System.EventHandler(this.HideDebugButton_Click);
             // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(758, 6);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(413, 27);
+            this.label1.TabIndex = 43;
+            this.label1.Text = "Debug Options";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.BackgroundImage = global::Reversi.Properties.Resources.GreenBackground;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(1191, 756);
-            this.Controls.Add(this.Title);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.ShowDebugInfo);
             this.Controls.Add(this.ScoreBoardPanel);
             this.Controls.Add(this.BoardSurface);
@@ -566,6 +580,7 @@ namespace Reversi
             this.Controls.Add(this.DebugAITrace);
             this.Controls.Add(this.AITraceLabel);
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.Title);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
