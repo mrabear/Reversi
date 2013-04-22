@@ -1,6 +1,6 @@
 bin/
 obj/
-Image Scraps/
+Scraps/
 *.suo
 *.sln
 *.user
