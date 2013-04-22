@@ -73,9 +73,9 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap boardXaxis {
+        internal static System.Drawing.Bitmap DebugButton {
             get {
-                object obj = ResourceManager.GetObject("boardXaxis", resourceCulture);
+                object obj = ResourceManager.GetObject("DebugButton", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap boardYaxis {
+        internal static System.Drawing.Bitmap GameBoard {
             get {
-                object obj = ResourceManager.GetObject("boardYaxis", resourceCulture);
+                object obj = ResourceManager.GetObject("GameBoard", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,49 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap reversi_grid {
+        internal static System.Drawing.Bitmap GreenBackground {
             get {
-                object obj = ResourceManager.GetObject("reversi_grid", resourceCulture);
+                object obj = ResourceManager.GetObject("GreenBackground", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap NewGameButton {
+            get {
+                object obj = ResourceManager.GetObject("NewGameButton", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ScoreBoard_BlackTurn {
+            get {
+                object obj = ResourceManager.GetObject("ScoreBoard_BlackTurn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ScoreBoard_WhiteTurn {
+            get {
+                object obj = ResourceManager.GetObject("ScoreBoard_WhiteTurn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SuggestedPiece {
+            get {
+                object obj = ResourceManager.GetObject("SuggestedPiece", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

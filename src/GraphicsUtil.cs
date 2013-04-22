@@ -14,15 +14,31 @@ namespace Reversi
     /// </summary>
     public class GraphicsUtil : ReversiForm
     {
+
         /// <summary>
         /// Updates the score board for both players
         /// </summary>
         public static void UpdateScoreBoard()
         {
-            gBlackScoreBoard.Text = gCurrentGame.GetGameBoard().FindScore(ReversiApplication.BLACK).ToString();
-            gWhiteScoreBoard.Text = gCurrentGame.GetGameBoard().FindScore(ReversiApplication.WHITE).ToString();
-            gBlackScoreBoard.Refresh();
-            gWhiteScoreBoard.Refresh();
+            UpdateScoreBoard(gCurrentGame.GetCurrentTurn());
+        }
+
+        /// <summary>
+        /// Updates the score board for both players
+        /// </summary>
+        public static void UpdateScoreBoard( int Turn )
+        {
+            if (Turn == ReversiApplication.WHITE)
+                gScoreBoardGFX.DrawImage(global::Reversi.Properties.Resources.ScoreBoard_WhiteTurn, 0, 0);
+            else
+                gScoreBoardGFX.DrawImage(global::Reversi.Properties.Resources.ScoreBoard_BlackTurn, 0, 0);
+
+            StringFormat sf = new StringFormat();
+            sf.LineAlignment = StringAlignment.Center;
+            sf.Alignment = StringAlignment.Center;
+
+            gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.BLACK).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.White, new RectangleF(83, 47, 39, 28), sf);
+            gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.WHITE).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.Black, new RectangleF(220, 47, 39, 28), sf);
         }
 
         /// <summary>
@@ -71,7 +87,7 @@ namespace Reversi
         public static void DrawPiece(int X, int Y, int Color)
         {
             if ((Color == ReversiApplication.WHITE) || (Color == ReversiApplication.BLACK))
-                gBoardGFX.DrawImage(GetTurnImage(Color), X * BoardGridSize + 1, Y * BoardGridSize + 1, BoardPieceImageSize, BoardPieceImageSize);
+                gGameBoardGFX.DrawImage(GetPieceImage(Color), X * BoardGridSize, Y * BoardGridSize, BoardGridSize, BoardGridSize);
         }
 
         /// <summary>
@@ -79,7 +95,15 @@ namespace Reversi
         /// </summary>
         public static void RedrawBoardImage()
         {
-            gBoardGFX.DrawImage(gBoardImage, 0, 0, 480, 480);
+            gGameBoardGFX.DrawImage(global::Reversi.Properties.Resources.GameBoard, 0, 0, gGameBoardSurface.Width, gGameBoardSurface.Height);
+
+            int TotalBoardSize = FormUtil.GetCurrentBoardSize() * Properties.Settings.Default.GridSize;
+
+            for (int gridCoord = 0; gridCoord <= TotalBoardSize; gridCoord += Properties.Settings.Default.GridSize)
+            {
+                gGameBoardGFX.DrawLine(new Pen(Color.White, 2), 0, gridCoord, TotalBoardSize, gridCoord);
+                gGameBoardGFX.DrawLine(new Pen(Color.White, 2), gridCoord, 0, gridCoord, TotalBoardSize);
+            }
         }
 
         /// <summary>
@@ -102,7 +126,7 @@ namespace Reversi
             if (gShowAvailableMoves.Checked)
                 // Loop through all available moves and place a dot at the location
                 foreach (Point CurrentPiece in SourceBoard.AvailableMoves(Turn))
-                    gBoardGFX.FillEllipse(new SolidBrush(Color.DarkSeaGreen), CurrentPiece.X * BoardGridSize + BoardGridSize / 2 - 4, CurrentPiece.Y * BoardGridSize + BoardGridSize / 2 - 4, 8, 8);
+                    gGameBoardGFX.DrawImage(global::Reversi.Properties.Resources.SuggestedPiece, CurrentPiece.X * BoardGridSize, CurrentPiece.Y * BoardGridSize, BoardGridSize, BoardGridSize);
         }
 
         /// <summary>
@@ -136,14 +160,14 @@ namespace Reversi
         /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
         public static void HighlightPiece(int X, int Y, Color PieceColor, String PieceLabel = "")
         {
-            gBoardGFX.DrawEllipse(new Pen(PieceColor, 4), X * BoardGridSize + 5, Y * BoardGridSize + 5, BoardPieceImageSize - 8, BoardPieceImageSize - 8);
+            gGameBoardGFX.DrawEllipse(new Pen(PieceColor, 4), X * BoardGridSize + 11, Y * BoardGridSize + 11, BoardGridSize - 23, BoardGridSize - 23);
 
             StringFormat sf = new StringFormat();
             sf.LineAlignment = StringAlignment.Center;
             sf.Alignment = StringAlignment.Center;
 
             if (PieceLabel != "")
-                gBoardGFX.DrawString(PieceLabel, new Font("Tahoma", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * BoardGridSize + 5, Y * BoardGridSize + 14, BoardGridSize - 10, BoardGridSize - 28), sf);
+                gGameBoardGFX.DrawString(PieceLabel, new Font("Segoe UI", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * BoardGridSize + 5, Y * BoardGridSize + 14, BoardGridSize - 10, BoardGridSize - 28), sf);
         }
 
         /// <summary>
@@ -151,24 +175,12 @@ namespace Reversi
         /// </summary>
         /// <param name="Turn">The turn</param>
         /// <returns>Image for the given turn</returns>
-        public static Image GetTurnImage(int Turn)
+        public static Image GetPieceImage(int Turn)
         {
             if (Turn == ReversiApplication.WHITE)
-                return (gWhitePieceImage);
+                return (global::Reversi.Properties.Resources.whitepiece);
 
-            return (gBlackPieceImage);
-        }
-
-        /// <summary>
-        /// Updates the "current turn" image on the form
-        /// </summary>
-        /// <param name="Turn">The turn to update the form with</param>
-        public static void UpdateTurnImage(int Turn)
-        {
-            if (Turn == ReversiApplication.WHITE)
-                gCurrentTurnImageGFX.DrawImage(GetTurnImage(Turn), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
-            else
-                gCurrentTurnImageGFX.DrawImage(GetTurnImage(Turn), 0, 0, gCurrentTurnSurface.Width, gCurrentTurnSurface.Height);
+            return (global::Reversi.Properties.Resources.blackpiece);
         }
 
         /// <summary>
@@ -177,16 +189,8 @@ namespace Reversi
         /// <param name="WinningTurn">The winning turn</param>
         public static void ShowWinner(int WinningTurn)
         {
-            if (WinningTurn == ReversiApplication.EMPTY)
-            {
-                gCurrentTurnLabel.Text = "Tie";
-                gCurrentTurnSurface.Visible = false;
-            }
-            else if ((WinningTurn == ReversiApplication.BLACK) || (WinningTurn == ReversiApplication.WHITE))
-            {
-                gCurrentTurnLabel.Text = "Win!";
-                UpdateTurnImage(WinningTurn);
-            }
+            if ((WinningTurn == ReversiApplication.BLACK) || (WinningTurn == ReversiApplication.WHITE))
+                UpdateScoreBoard(WinningTurn);
         }
 
         /// <summary>

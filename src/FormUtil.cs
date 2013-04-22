@@ -19,18 +19,6 @@ namespace Reversi
         /// </summary>
         public static void StartNewGame()
         {
-            gBlackScoreBoard.Text = "0";
-            gWhiteScoreBoard.Text = "0";
-            gCurrentTurnLabel.Text = "Turn:";
-            gCurrentTurnSurface.Visible = true;
-
-            // Reset the score board
-            gBlackScoreBoard.Visible = true;
-            gWhiteScoreBoard.Visible = true;
-            gCurrentTurnLabel.Visible = true;
-            gWhiteScoreBoardTitle.Visible = true;
-            gBlackScoreBoardTitle.Visible = true;
-
             ReversiApplication.ResetCurrentGame(GetCurrentBoardSize());
             gCurrentGame = ReversiApplication.GetCurrentGame();
 
@@ -39,7 +27,6 @@ namespace Reversi
 
             GraphicsUtil.RefreshPieces(FullRefresh: true);
             GraphicsUtil.MarkAvailableMoves(gCurrentGame.GetCurrentTurn());
-            GraphicsUtil.UpdateTurnImage(gCurrentGame.GetCurrentTurn());
             GraphicsUtil.UpdateScoreBoard();
         }
 
@@ -92,14 +79,6 @@ namespace Reversi
             gRAMUsageBar.Visible = true;
             gRAMLabel.Visible = true;
             GraphicsUtil.UpdateRAMprogress();
-
-            // Reset the score board
-            gBlackScoreBoard.Visible = false;
-            gWhiteScoreBoard.Visible = false;
-            gCurrentTurnLabel.Visible = false;
-            gWhiteScoreBoardTitle.Visible = false;
-            gBlackScoreBoardTitle.Visible = false;
-            gCurrentTurnSurface.Visible = false;
         }
 
         /// <summary>
@@ -144,8 +123,8 @@ namespace Reversi
 
             gGridDimensionLabel.Text = newBoardSize + "x" + newBoardSize;
 
-            gBoardSurface.Width = BoardGridSize * newBoardSize;
-            gBoardSurface.Height = BoardGridSize * newBoardSize;
+            gGameBoardSurface.Width = BoardGridSize * newBoardSize;
+            gGameBoardSurface.Height = BoardGridSize * newBoardSize;
 
             StartNewGame();
         }

@@ -178,7 +178,7 @@ namespace Reversi
                 CurrentTurn = ReversiApplication.WHITE;
                 NextTurn = ReversiApplication.BLACK;
             }
-            GraphicsUtil.UpdateTurnImage(CurrentTurn);
+            GraphicsUtil.UpdateScoreBoard(CurrentTurn);
         }
 
         /// <summary>

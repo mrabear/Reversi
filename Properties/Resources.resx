@@ -121,16 +121,28 @@
   <data name="blackpiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\blackpiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="boardXaxis" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\boardXaxis.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="DebugButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\DebugButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="boardYaxis" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\boardYaxis.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="GreenBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\GreenBackground.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="reversi_grid" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\reversi_grid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="NewGameButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\NewGameButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="whitepiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\whitepiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GameBoard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\GameBoard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ScoreBoard_BlackTurn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\ScoreBoard_BlackTurn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ScoreBoard_WhiteTurn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\ScoreBoard_WhiteTurn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SuggestedPiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\SuggestedPiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

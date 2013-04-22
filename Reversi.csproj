@@ -7,7 +7,7 @@
     <ProjectGuid>{A4E4AE17-FD83-4EB0-B770-A3A839706C54}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>img\reversi_large.ico</ApplicationIcon>
+    <ApplicationIcon>img\ReversiIcon.ico</ApplicationIcon>
     <AssemblyKeyContainerName />
     <AssemblyName>Reversi</AssemblyName>
     <AssemblyOriginatorKeyFile />
@@ -127,15 +127,20 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="src\SimulationNode.cs" />
-    <Content Include="img\blackpiece.png" />
-    <Content Include="img\boardXaxis.png" />
-    <Content Include="img\boardYaxis.png" />
-    <Content Include="img\reversi_grid.png" />
-    <Content Include="img\whitepiece.png" />
-    <Content Include="img\reversi_large.ico" />
+    <Content Include="img\BlackPiece.png" />
+    <None Include="img\ScoreBoard_WhiteTurn.png" />
+    <None Include="img\ScoreBoard_BlackTurn.png" />
+    <None Include="img\GreenBackground.png" />
+    <None Include="img\DebugButton.png" />
+    <None Include="img\NewGameButton.png" />
+    <None Include="img\GameBoard.png" />
+    <None Include="img\SuggestedPiece.png" />
+    <Content Include="img\WhitePiece.png" />
+    <Content Include="img\ReversiIcon.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="src\ReversiForm.resx">
       <DependentUpon>ReversiForm.cs</DependentUpon>
