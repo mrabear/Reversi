@@ -67,11 +67,12 @@ namespace Reversi
         protected Button ClearDebugLogButton;
         protected Label AITraceLabel;
         protected CheckBox DebugLogCheckBox;
-        protected Button NewGameButton;
         protected Panel ScoreBoardPanel;
         private Panel panel1;
         private PictureBox ShowDebugInfo;
         protected Label label1;
+        protected CheckBox ShowAvailableMovesCheckbox;
+        private PictureBox NewGameButton;
         protected Panel BoardSurface;
 
         /// <summary>
@@ -115,27 +116,29 @@ namespace Reversi
             this.AITraceLabel = new System.Windows.Forms.Label();
             this.DebugLogCheckBox = new System.Windows.Forms.CheckBox();
             this.BoardSurface = new System.Windows.Forms.Panel();
-            this.NewGameButton = new System.Windows.Forms.Button();
             this.ScoreBoardPanel = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.ShowAvailableMovesCheckbox = new System.Windows.Forms.CheckBox();
             this.ShowDebugInfo = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.NewGameButton = new System.Windows.Forms.PictureBox();
             this.DBBuilderButtonsBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SimulationDepthSlider)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ShowDebugInfo)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NewGameButton)).BeginInit();
             this.SuspendLayout();
             // 
             // Title
             // 
             this.Title.BackColor = System.Drawing.Color.Transparent;
-            this.Title.Font = new System.Drawing.Font("Segoe UI", 32.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Title.Font = new System.Drawing.Font("Segoe UI", 39.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Title.ForeColor = System.Drawing.Color.White;
             this.Title.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.Title.Location = new System.Drawing.Point(21, 19);
+            this.Title.Location = new System.Drawing.Point(17, 5);
             this.Title.Margin = new System.Windows.Forms.Padding(0);
             this.Title.Name = "Title";
-            this.Title.Size = new System.Drawing.Size(159, 75);
+            this.Title.Size = new System.Drawing.Size(340, 93);
             this.Title.TabIndex = 1;
             this.Title.Text = "Reversi";
             this.Title.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -157,14 +160,12 @@ namespace Reversi
             this.VisualizeCheckbox.AutoSize = true;
             this.VisualizeCheckbox.BackColor = System.Drawing.Color.Transparent;
             this.VisualizeCheckbox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.VisualizeCheckbox.Checked = true;
-            this.VisualizeCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.VisualizeCheckbox.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.VisualizeCheckbox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.VisualizeCheckbox.ForeColor = System.Drawing.Color.White;
-            this.VisualizeCheckbox.Location = new System.Drawing.Point(111, 182);
+            this.VisualizeCheckbox.Location = new System.Drawing.Point(19, 189);
             this.VisualizeCheckbox.Margin = new System.Windows.Forms.Padding(0);
             this.VisualizeCheckbox.Name = "VisualizeCheckbox";
-            this.VisualizeCheckbox.Size = new System.Drawing.Size(213, 29);
+            this.VisualizeCheckbox.Size = new System.Drawing.Size(151, 21);
             this.VisualizeCheckbox.TabIndex = 8;
             this.VisualizeCheckbox.Text = "Display Visualizations";
             this.VisualizeCheckbox.UseVisualStyleBackColor = false;
@@ -485,6 +486,7 @@ namespace Reversi
             // BoardSurface
             // 
             this.BoardSurface.BackColor = System.Drawing.Color.Transparent;
+            this.BoardSurface.Cursor = System.Windows.Forms.Cursors.Hand;
             this.BoardSurface.ForeColor = System.Drawing.Color.Transparent;
             this.BoardSurface.Location = new System.Drawing.Point(30, 83);
             this.BoardSurface.Name = "BoardSurface";
@@ -493,24 +495,10 @@ namespace Reversi
             this.BoardSurface.Paint += new System.Windows.Forms.PaintEventHandler(this.BoardSurface_Paint);
             this.BoardSurface.MouseDown += new System.Windows.Forms.MouseEventHandler(this.BoardSurface_MouseDown);
             // 
-            // NewGameButton
-            // 
-            this.NewGameButton.BackColor = System.Drawing.Color.Transparent;
-            this.NewGameButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.NewGameButton.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NewGameButton.ForeColor = System.Drawing.Color.White;
-            this.NewGameButton.Location = new System.Drawing.Point(571, 37);
-            this.NewGameButton.Name = "NewGameButton";
-            this.NewGameButton.Size = new System.Drawing.Size(99, 37);
-            this.NewGameButton.TabIndex = 40;
-            this.NewGameButton.Text = "New Game";
-            this.NewGameButton.UseVisualStyleBackColor = false;
-            this.NewGameButton.Click += new System.EventHandler(this.NewGameButton_Click);
-            // 
             // ScoreBoardPanel
             // 
             this.ScoreBoardPanel.BackColor = System.Drawing.Color.Transparent;
-            this.ScoreBoardPanel.Location = new System.Drawing.Point(180, 0);
+            this.ScoreBoardPanel.Location = new System.Drawing.Point(355, 0);
             this.ScoreBoardPanel.Name = "ScoreBoardPanel";
             this.ScoreBoardPanel.Size = new System.Drawing.Size(343, 83);
             this.ScoreBoardPanel.TabIndex = 40;
@@ -520,6 +508,7 @@ namespace Reversi
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(64)))), ((int)(((byte)(0)))));
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.ShowAvailableMovesCheckbox);
             this.panel1.Controls.Add(this.VisualizeCheckbox);
             this.panel1.Controls.Add(this.SimDepthCountLabel);
             this.panel1.Controls.Add(this.SimDepthCount);
@@ -541,9 +530,27 @@ namespace Reversi
             this.panel1.Size = new System.Drawing.Size(413, 368);
             this.panel1.TabIndex = 41;
             // 
+            // ShowAvailableMovesCheckbox
+            // 
+            this.ShowAvailableMovesCheckbox.AutoSize = true;
+            this.ShowAvailableMovesCheckbox.BackColor = System.Drawing.Color.Transparent;
+            this.ShowAvailableMovesCheckbox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.ShowAvailableMovesCheckbox.Checked = true;
+            this.ShowAvailableMovesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowAvailableMovesCheckbox.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ShowAvailableMovesCheckbox.ForeColor = System.Drawing.Color.White;
+            this.ShowAvailableMovesCheckbox.Location = new System.Drawing.Point(247, 189);
+            this.ShowAvailableMovesCheckbox.Margin = new System.Windows.Forms.Padding(0);
+            this.ShowAvailableMovesCheckbox.Name = "ShowAvailableMovesCheckbox";
+            this.ShowAvailableMovesCheckbox.Size = new System.Drawing.Size(157, 21);
+            this.ShowAvailableMovesCheckbox.TabIndex = 42;
+            this.ShowAvailableMovesCheckbox.Text = "Show Available Moves";
+            this.ShowAvailableMovesCheckbox.UseVisualStyleBackColor = false;
+            // 
             // ShowDebugInfo
             // 
             this.ShowDebugInfo.BackColor = System.Drawing.Color.Transparent;
+            this.ShowDebugInfo.Cursor = System.Windows.Forms.Cursors.Hand;
             this.ShowDebugInfo.Image = global::Reversi.Properties.Resources.DebugButton;
             this.ShowDebugInfo.Location = new System.Drawing.Point(686, 347);
             this.ShowDebugInfo.Name = "ShowDebugInfo";
@@ -564,17 +571,31 @@ namespace Reversi
             this.label1.Text = "Debug Options";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // NewGameButton
+            // 
+            this.NewGameButton.BackColor = System.Drawing.Color.Transparent;
+            this.NewGameButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.NewGameButton.Image = global::Reversi.Properties.Resources.NewGameButton;
+            this.NewGameButton.Location = new System.Drawing.Point(277, 34);
+            this.NewGameButton.Name = "NewGameButton";
+            this.NewGameButton.Size = new System.Drawing.Size(69, 48);
+            this.NewGameButton.TabIndex = 44;
+            this.NewGameButton.TabStop = false;
+            this.NewGameButton.Click += new System.EventHandler(this.NewGameButton_Click);
+            this.NewGameButton.MouseEnter += new System.EventHandler(this.NewGameButton_MouseEnter);
+            this.NewGameButton.MouseLeave += new System.EventHandler(this.NewGameButton_MouseLeave);
+            // 
             // ReversiForm
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.BackgroundImage = global::Reversi.Properties.Resources.GreenBackground;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(1191, 756);
+            this.Controls.Add(this.BoardSurface);
+            this.Controls.Add(this.NewGameButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ShowDebugInfo);
             this.Controls.Add(this.ScoreBoardPanel);
-            this.Controls.Add(this.BoardSurface);
-            this.Controls.Add(this.NewGameButton);
             this.Controls.Add(this.DebugLogCheckBox);
             this.Controls.Add(this.ClearDebugLogButton);
             this.Controls.Add(this.DebugAITrace);
@@ -593,6 +614,7 @@ namespace Reversi
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ShowDebugInfo)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NewGameButton)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -612,7 +634,10 @@ namespace Reversi
             LastDrawnBoard = new Board();
 
             // Esablish graphics handles
-            gGameBoardGFX           = BoardSurface.CreateGraphics();
+            //gGameBoardFrontBuffer   = GameBoard.CreateGraphics();
+            gGameBoardBackBuffer    = new Bitmap(BoardSurface.Width, BoardSurface.Height);
+            gGameBoardBackBufferGFX = Graphics.FromImage(gGameBoardBackBuffer);
+
             gScoreBoardGFX          = ScoreBoardPanel.CreateGraphics();
 
             // Static global binds for form elements
@@ -624,12 +649,8 @@ namespace Reversi
             gWorkCounter            = WorkCounter;
             gVictoryCounter         = VictoryCounter;
             gScoreBoardSurface      = ScoreBoardPanel;
-
-            //gShowAvailableMoves     = ShowAvailableMoves;
-            gShowAvailableMoves = new MenuItem();
-            gShowAvailableMoves.Checked = true;
-            
-            gRAMUsageBar = RAMUsageBar;
+            gShowAvailableMoves     = ShowAvailableMovesCheckbox;            
+            gRAMUsageBar            = RAMUsageBar;
             gDBBuildWorker          = DBBuildWorker;
             gDBAnalysisWorker       = DBAnalysisWorker;
             gSimulationDepthSlider  = SimulationDepthSlider;
@@ -668,9 +689,11 @@ namespace Reversi
         #region Global Variables
 
         // Static handles to graphical assets
-        protected static Graphics           gGameBoardGFX;
+        protected static Graphics           gGameBoardFrontBuffer;
         protected static Graphics           gCurrentTurnImageGFX;
         protected static Graphics           gScoreBoardGFX;
+        protected static Graphics           gGameBoardBackBufferGFX;
+        protected static Bitmap             gGameBoardBackBuffer;
 
         // Static handles to form objects
         protected static Panel              gGameBoardSurface;
@@ -678,7 +701,7 @@ namespace Reversi
         protected static BackgroundWorker   gAITurnWorker;
         protected static BackgroundWorker   gDBBuildWorker;
         protected static BackgroundWorker   gDBAnalysisWorker;
-        protected static MenuItem           gShowAvailableMoves;
+        protected static CheckBox           gShowAvailableMoves;
         protected static CheckBox           gDebugLogCheckBox;
         protected static CheckBox           gVisualizeCheckbox;
         protected static Button             gCancelBuildButton;
@@ -767,6 +790,10 @@ namespace Reversi
         public void BoardSurface_Paint(object sender, PaintEventArgs e)
         {
             GraphicsUtil.RefreshPieces(FullRefresh: true);
+            GraphicsUtil.MarkAvailableMoves(gCurrentGame.GetCurrentTurn());
+            GraphicsUtil.PromoteBackBuffer();
+            //gGameBoardSurface.CreateGraphics().DrawImage(gGameBoardBackBuffer, 0, 0);
+
         }
 
         /// <summary>
@@ -775,7 +802,6 @@ namespace Reversi
         private void ScoreBoardPanel_Paint(object sender, PaintEventArgs e)
         {
             GraphicsUtil.UpdateScoreBoard(gCurrentGame.GetCurrentTurn());
-            GraphicsUtil.UpdateScoreBoard();
         }
 
         #endregion
@@ -969,7 +995,7 @@ namespace Reversi
 
         #endregion
 
-        #region Game FLow Event Handelers
+        #region Game Flow Event Handelers
 
         /// <summary>
         /// Responds to the "New Game" button being clicked
@@ -995,6 +1021,16 @@ namespace Reversi
             FormUtil.StartNewGame();
             NewGameTimer.Enabled = false;
             ToggleDebugVisibility();
+        }
+
+        private void NewGameButton_MouseEnter(object sender, EventArgs e)
+        {
+            NewGameButton.Image = Reversi.Properties.Resources.NewGameButton_Hover;
+        }
+
+        private void NewGameButton_MouseLeave(object sender, EventArgs e)
+        {
+            NewGameButton.Image = Reversi.Properties.Resources.NewGameButton;
         }
 
         #endregion

@@ -135,6 +135,7 @@
     <None Include="img\NewGameButton.png" />
     <None Include="img\GameBoard.png" />
     <None Include="img\SuggestedPiece.png" />
+    <None Include="img\NewGameButton_Hover.png" />
     <Content Include="img\WhitePiece.png" />
     <Content Include="img\ReversiIcon.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">

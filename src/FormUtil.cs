@@ -19,15 +19,17 @@ namespace Reversi
         /// </summary>
         public static void StartNewGame()
         {
+            // Start a new game
             ReversiApplication.ResetCurrentGame(GetCurrentBoardSize());
             gCurrentGame = ReversiApplication.GetCurrentGame();
 
+            // Setup the AI player
             gCurrentGame.GetAI().SetMaxDepth(gSimulationDepthSlider.Value);
             gCurrentGame.GetAI().SetVisualizeProcess(gVisualizeCheckbox.Checked);
 
-            GraphicsUtil.RefreshPieces(FullRefresh: true);
-            GraphicsUtil.MarkAvailableMoves(gCurrentGame.GetCurrentTurn());
-            GraphicsUtil.UpdateScoreBoard();
+            // Force a repaint of the game board and score board
+            gGameBoardSurface.Invalidate();
+            gScoreBoardSurface.Invalidate();
         }
 
         /// <summary>
@@ -183,9 +185,8 @@ namespace Reversi
         {
             gCurrentGame.SetTurnInProgress(false);
             gCurrentGame.SwitchTurn();
-            GraphicsUtil.UpdateScoreBoard();
-            GraphicsUtil.ShowWinner(gCurrentGame.GetGameBoard().DetermineWinner());
-            GraphicsUtil.MarkAvailableMoves(gCurrentGame.GetCurrentTurn());
+            GraphicsUtil.RefreshAll();
+            //GraphicsUtil.ShowWinner(gCurrentGame.GetGameBoard().DetermineWinner());
         }
     }
 }

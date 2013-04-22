@@ -16,11 +16,20 @@ namespace Reversi
     {
 
         /// <summary>
+        /// Repaints all game graphics surfaces
+        /// </summary>
+        public static void RefreshAll()
+        {
+            gScoreBoardSurface.Invalidate();
+            gGameBoardSurface.Invalidate();
+        }
+
+        /// <summary>
         /// Updates the score board for both players
         /// </summary>
         public static void UpdateScoreBoard()
         {
-            UpdateScoreBoard(gCurrentGame.GetCurrentTurn());
+            gScoreBoardSurface.Invalidate();
         }
 
         /// <summary>
@@ -29,16 +38,16 @@ namespace Reversi
         public static void UpdateScoreBoard( int Turn )
         {
             if (Turn == ReversiApplication.WHITE)
-                gScoreBoardGFX.DrawImage(global::Reversi.Properties.Resources.ScoreBoard_WhiteTurn, 0, 0);
+                gScoreBoardGFX.DrawImage(Reversi.Properties.Resources.ScoreBoard_WhiteTurn, 0, 0);
             else
-                gScoreBoardGFX.DrawImage(global::Reversi.Properties.Resources.ScoreBoard_BlackTurn, 0, 0);
+                gScoreBoardGFX.DrawImage(Reversi.Properties.Resources.ScoreBoard_BlackTurn, 0, 0);
 
             StringFormat sf = new StringFormat();
             sf.LineAlignment = StringAlignment.Center;
             sf.Alignment = StringAlignment.Center;
 
-            gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.BLACK).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.White, new RectangleF(83, 47, 39, 28), sf);
-            gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.WHITE).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.Black, new RectangleF(220, 47, 39, 28), sf);
+            gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.BLACK).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.White, new RectangleF(51, 47, 100, 28), sf);
+            gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.WHITE).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.Black, new RectangleF(189, 47, 100, 28), sf);
         }
 
         /// <summary>
@@ -87,7 +96,7 @@ namespace Reversi
         public static void DrawPiece(int X, int Y, int Color)
         {
             if ((Color == ReversiApplication.WHITE) || (Color == ReversiApplication.BLACK))
-                gGameBoardGFX.DrawImage(GetPieceImage(Color), X * BoardGridSize, Y * BoardGridSize, BoardGridSize, BoardGridSize);
+                gGameBoardBackBufferGFX.DrawImage(GetPieceImage(Color), X * BoardGridSize, Y * BoardGridSize, BoardGridSize, BoardGridSize);
         }
 
         /// <summary>
@@ -95,15 +104,12 @@ namespace Reversi
         /// </summary>
         public static void RedrawBoardImage()
         {
-            gGameBoardGFX.DrawImage(global::Reversi.Properties.Resources.GameBoard, 0, 0, gGameBoardSurface.Width, gGameBoardSurface.Height);
+            gGameBoardBackBufferGFX.DrawImage(Reversi.Properties.Resources.GameBoard, 0, 0, gGameBoardSurface.Width, gGameBoardSurface.Height);
+        }
 
-            int TotalBoardSize = FormUtil.GetCurrentBoardSize() * Properties.Settings.Default.GridSize;
-
-            for (int gridCoord = 0; gridCoord <= TotalBoardSize; gridCoord += Properties.Settings.Default.GridSize)
-            {
-                gGameBoardGFX.DrawLine(new Pen(Color.White, 2), 0, gridCoord, TotalBoardSize, gridCoord);
-                gGameBoardGFX.DrawLine(new Pen(Color.White, 2), gridCoord, 0, gridCoord, TotalBoardSize);
-            }
+        public static void PromoteBackBuffer()
+        {
+            gGameBoardSurface.CreateGraphics().DrawImage(gGameBoardBackBuffer, 0, 0);
         }
 
         /// <summary>
@@ -123,10 +129,10 @@ namespace Reversi
         public static void MarkAvailableMoves(Board SourceBoard, int Turn)
         {
             // Only display if the 'Show Available Moves' box is checked
-            if (gShowAvailableMoves.Checked)
+            if ((gShowAvailableMoves.Checked) && (gCurrentGame.GetCurrentTurn() != gCurrentGame.GetAI().GetColor()))
                 // Loop through all available moves and place a dot at the location
                 foreach (Point CurrentPiece in SourceBoard.AvailableMoves(Turn))
-                    gGameBoardGFX.DrawImage(global::Reversi.Properties.Resources.SuggestedPiece, CurrentPiece.X * BoardGridSize, CurrentPiece.Y * BoardGridSize, BoardGridSize, BoardGridSize);
+                    gGameBoardBackBufferGFX.DrawImage(Reversi.Properties.Resources.SuggestedPiece, CurrentPiece.X * BoardGridSize, CurrentPiece.Y * BoardGridSize, BoardGridSize, BoardGridSize);
         }
 
         /// <summary>
@@ -160,14 +166,14 @@ namespace Reversi
         /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
         public static void HighlightPiece(int X, int Y, Color PieceColor, String PieceLabel = "")
         {
-            gGameBoardGFX.DrawEllipse(new Pen(PieceColor, 4), X * BoardGridSize + 11, Y * BoardGridSize + 11, BoardGridSize - 23, BoardGridSize - 23);
+            gGameBoardBackBufferGFX.DrawEllipse(new Pen(PieceColor, 4), X * BoardGridSize + 24, Y * BoardGridSize + 24, 30, 30);
 
             StringFormat sf = new StringFormat();
             sf.LineAlignment = StringAlignment.Center;
             sf.Alignment = StringAlignment.Center;
 
             if (PieceLabel != "")
-                gGameBoardGFX.DrawString(PieceLabel, new Font("Segoe UI", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * BoardGridSize + 5, Y * BoardGridSize + 14, BoardGridSize - 10, BoardGridSize - 28), sf);
+                gGameBoardBackBufferGFX.DrawString(PieceLabel, new Font("Segoe UI", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * BoardGridSize + 5, (Y + 1) * BoardGridSize - 35, BoardGridSize - 10, BoardGridSize - 28), sf);
         }
 
         /// <summary>
@@ -178,9 +184,9 @@ namespace Reversi
         public static Image GetPieceImage(int Turn)
         {
             if (Turn == ReversiApplication.WHITE)
-                return (global::Reversi.Properties.Resources.whitepiece);
+                return (Reversi.Properties.Resources.WhitePiece);
 
-            return (global::Reversi.Properties.Resources.blackpiece);
+            return (Reversi.Properties.Resources.BlackPiece);
         }
 
         /// <summary>
@@ -190,7 +196,8 @@ namespace Reversi
         public static void ShowWinner(int WinningTurn)
         {
             if ((WinningTurn == ReversiApplication.BLACK) || (WinningTurn == ReversiApplication.WHITE))
-                UpdateScoreBoard(WinningTurn);
+                //UpdateScoreBoard(WinningTurn);
+                gScoreBoardSurface.Invalidate();
         }
 
         /// <summary>

@@ -136,7 +136,7 @@ namespace Reversi
 
                 SourceBoard.MakeMove(ChosenMove.X, ChosenMove.Y, AITurn);
 
-                GraphicsUtil.RefreshPieces();
+                //GraphicsUtil.RefreshPieces();
 
                 if (VisualizeProcess)
                     GraphicsUtil.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));

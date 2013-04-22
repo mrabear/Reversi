@@ -126,9 +126,10 @@ namespace Reversi
                     {
                         if (GameBoard.MakeMove(X, Y, CurrentTurn))
                         {
-                            GraphicsUtil.RefreshPieces(FullRefresh: true);
-                            GraphicsUtil.UpdateScoreBoard();
-                            GraphicsUtil.ShowWinner(GameBoard.DetermineWinner());
+                            GraphicsUtil.RefreshAll();
+                            //GraphicsUtil.ShowWinner(GameBoard.DetermineWinner());
+                            //GraphicsUtil.RefreshPieces();
+                            //GraphicsUtil.UpdateScoreBoard();
 
                             SwitchTurn();
                         }
@@ -137,7 +138,6 @@ namespace Reversi
                     {
                         SwitchTurn();
                     }
-                    //GraphicsUtil.MarkAvailableMoves(CurrentTurn);
                 }
 
                 if ((VsComputer) && (CurrentTurn == AI.GetColor()))
@@ -159,7 +159,7 @@ namespace Reversi
                 if (GameBoard.MovePossible(AI.GetColor() == ReversiApplication.BLACK ? ReversiApplication.WHITE : ReversiApplication.BLACK))
                     break;
                 else
-                    GraphicsUtil.RefreshPieces(FullRefresh: true);
+                    GraphicsUtil.RefreshAll();
             }
         }
 
@@ -178,7 +178,6 @@ namespace Reversi
                 CurrentTurn = ReversiApplication.WHITE;
                 NextTurn = ReversiApplication.BLACK;
             }
-            GraphicsUtil.UpdateScoreBoard(CurrentTurn);
         }
 
         /// <summary>
