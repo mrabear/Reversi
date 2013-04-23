@@ -3,16 +3,23 @@
 /// </summary>
 
 using System;
-using System.Drawing;
-using System.Windows.Forms;
 using System.Management;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace Reversi
 {
     /// <summary>
     /// A subclass of ReversiForm, used to manipulate the game board and other graphics assets
     /// </summary>
-    public class GraphicsUtil : ReversiForm
+    public class GraphicsUtil
     {
 
         /// <summary>
@@ -20,8 +27,9 @@ namespace Reversi
         /// </summary>
         public static void RefreshAll()
         {
-            gScoreBoardSurface.Invalidate();
-            gGameBoardSurface.Invalidate();
+            RefreshPieces(FullRefresh: true);
+            //gScoreBoardSurface.Invalidate();
+            //gGameBoardSurface.Invalidate();
         }
 
         /// <summary>
@@ -29,7 +37,7 @@ namespace Reversi
         /// </summary>
         public static void UpdateScoreBoard()
         {
-            gScoreBoardSurface.Invalidate();
+            //gScoreBoardSurface.Invalidate();
         }
 
         /// <summary>
@@ -37,6 +45,7 @@ namespace Reversi
         /// </summary>
         public static void UpdateScoreBoard( int Turn )
         {
+            /*
             if (Turn == ReversiApplication.WHITE)
                 gScoreBoardGFX.DrawImage(Reversi.Properties.Resources.ScoreBoard_WhiteTurn, 0, 0);
             else
@@ -48,6 +57,7 @@ namespace Reversi
 
             gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.BLACK).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.White, new RectangleF(51, 47, 100, 28), sf);
             gScoreBoardGFX.DrawString(gCurrentGame.GetGameBoard().FindScore(ReversiApplication.WHITE).ToString(), new Font("Segoe UI", (float)30, FontStyle.Regular), Brushes.Black, new RectangleF(189, 47, 100, 28), sf);
+            */
         }
 
         /// <summary>
@@ -56,7 +66,7 @@ namespace Reversi
         /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
         public static void RefreshPieces(bool FullRefresh = false)
         {
-            RefreshPieces(gCurrentGame.GetGameBoard(), FullRefresh);
+            RefreshPieces(ReversiWindow.GetCurrentGame().GetGameBoard(), FullRefresh);
         }
 
         /// <summary>
@@ -66,15 +76,15 @@ namespace Reversi
         /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
         public static void RefreshPieces(Board SourceBoard, bool FullRefresh = false)
         {
-            if (FullRefresh)
-                RedrawBoardImage();
+            //if (FullRefresh)
+            //    RedrawBoardImage();
 
             for (int Y = 0; Y < SourceBoard.GetBoardSize(); Y++)
                 for (int X = 0; X < SourceBoard.GetBoardSize(); X++)
-                    if ((GetLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
+                    if ((ReversiWindow.GetLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
                         DrawPiece(X, Y, SourceBoard.ColorAt(X, Y));
 
-            GetLastDrawnBoard().CopyBoard(SourceBoard.GetBoardPieces());
+            ReversiWindow.GetLastDrawnBoard().CopyBoard(SourceBoard.GetBoardPieces());
         }
 
         /// <summary>
@@ -93,10 +103,10 @@ namespace Reversi
         /// <param name="X">The X value of the piece</param>
         /// <param name="Y">The Y value of the piece</param>
         /// <param name="color">The piece color</param>
-        public static void DrawPiece(int X, int Y, int Color)
+        public static void DrawPiece(double X, double Y, int Color)
         {
-            if ((Color == ReversiApplication.WHITE) || (Color == ReversiApplication.BLACK))
-                gGameBoardBackBufferGFX.DrawImage(GetPieceImage(Color), X * BoardGridSize, Y * BoardGridSize, BoardGridSize, BoardGridSize);
+            if ((Color == ReversiWindow.WHITE) || (Color == ReversiWindow.BLACK)) ;
+                //gGameBoardBackBufferGFX.DrawImage(GetPieceImage(Color), X * BoardGridSize, Y * BoardGridSize, BoardGridSize, BoardGridSize);
         }
 
         /// <summary>
@@ -109,7 +119,7 @@ namespace Reversi
 
         public static void PromoteBackBuffer()
         {
-            gGameBoardSurface.CreateGraphics().DrawImage(gGameBoardBackBuffer, 0, 0);
+            //gGameBoardSurface.CreateGraphics().DrawImage(gGameBoardBackBuffer, 0, 0);
         }
 
         /// <summary>
@@ -118,7 +128,7 @@ namespace Reversi
         /// <param name="Turn">The turn to use</param>
         public static void MarkAvailableMoves(int Turn)
         {
-            MarkAvailableMoves(gCurrentGame.GetGameBoard(), Turn);
+            //MarkAvailableMoves(gCurrentGame.GetGameBoard(), Turn);
         }
 
         /// <summary>
@@ -128,11 +138,13 @@ namespace Reversi
         /// <param name="Turn">The turn to use</param>
         public static void MarkAvailableMoves(Board SourceBoard, int Turn)
         {
+            /*
             // Only display if the 'Show Available Moves' box is checked
             if ((gShowAvailableMoves.Checked) && (gCurrentGame.GetCurrentTurn() != gCurrentGame.GetAI().GetColor()))
                 // Loop through all available moves and place a dot at the location
                 foreach (Point CurrentPiece in SourceBoard.AvailableMoves(Turn))
                     gGameBoardBackBufferGFX.DrawImage(Reversi.Properties.Resources.SuggestedPiece, CurrentPiece.X * BoardGridSize, CurrentPiece.Y * BoardGridSize, BoardGridSize, BoardGridSize);
+             */
         }
 
         /// <summary>
@@ -142,8 +154,10 @@ namespace Reversi
         /// <param name="PieceColor">The highlight color</param>
         public static void HighlightPiece(Point[] PieceList, Color PieceColor)
         {
+            /*
             foreach (Point CurrentPiece in PieceList)
                 HighlightPiece(CurrentPiece.X, CurrentPiece.Y, PieceColor);
+             */
         }
 
         /// <summary>
@@ -164,16 +178,12 @@ namespace Reversi
         /// <param name="Y">The Y value of the piece to highlight</param>
         /// <param name="PieceColor">The highlight color</param>
         /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
-        public static void HighlightPiece(int X, int Y, Color PieceColor, String PieceLabel = "")
+        public static void HighlightPiece(double X, double Y, Color PieceColor, String PieceLabel = "")
         {
-            gGameBoardBackBufferGFX.DrawEllipse(new Pen(PieceColor, 4), X * BoardGridSize + 24, Y * BoardGridSize + 24, 30, 30);
+            //gGameBoardBackBufferGFX.DrawEllipse(new Pen(PieceColor, 4), X * BoardGridSize + 24, Y * BoardGridSize + 24, 30, 30);
 
-            StringFormat sf = new StringFormat();
-            sf.LineAlignment = StringAlignment.Center;
-            sf.Alignment = StringAlignment.Center;
-
-            if (PieceLabel != "")
-                gGameBoardBackBufferGFX.DrawString(PieceLabel, new Font("Segoe UI", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * BoardGridSize + 5, (Y + 1) * BoardGridSize - 35, BoardGridSize - 10, BoardGridSize - 28), sf);
+            //if (PieceLabel != "")
+            //    gGameBoardBackBufferGFX.DrawString(PieceLabel, new Font("Segoe UI", (float)9, FontStyle.Regular), Brushes.White, new RectangleF(X * BoardGridSize + 5, (Y + 1) * BoardGridSize - 35, BoardGridSize - 10, BoardGridSize - 28), sf);
         }
 
         /// <summary>
@@ -181,13 +191,13 @@ namespace Reversi
         /// </summary>
         /// <param name="Turn">The turn</param>
         /// <returns>Image for the given turn</returns>
-        public static Image GetPieceImage(int Turn)
+       /* public static Image GetPieceImage(int Turn)
         {
-            if (Turn == ReversiApplication.WHITE)
-                return (Reversi.Properties.Resources.WhitePiece);
+            //if (Turn == ReversiApplication.WHITE)
+            //    return (Reversi.Properties.Resources.WhitePiece);
 
             return (Reversi.Properties.Resources.BlackPiece);
-        }
+        }*/
 
         /// <summary>
         /// Updates the "Current Turn" image to indicate a winner (or tie)
@@ -195,77 +205,9 @@ namespace Reversi
         /// <param name="WinningTurn">The winning turn</param>
         public static void ShowWinner(int WinningTurn)
         {
-            if ((WinningTurn == ReversiApplication.BLACK) || (WinningTurn == ReversiApplication.WHITE))
+           // if ((WinningTurn == ReversiApplication.BLACK) || (WinningTurn == ReversiApplication.WHITE))
                 //UpdateScoreBoard(WinningTurn);
-                gScoreBoardSurface.Invalidate();
-        }
-
-        /// <summary>
-        /// Thread safe delegate for updateDatabaseProgress()
-        /// </summary>
-        /// <param name="TimeElapsed">The time that has elapsed so far in the build</param>
-        /// <param name="WorkNodeCount">The number of nodes sitting in the work queue</param>
-        /// <param name="NodeTotal">The total number of nodes processed</param>
-        /// <param name="VictoryTotal">The total number of victory states discovered so far</param>
-        public delegate void updateDatabaseProgressDelegate(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int VictoryTotal);
-
-        /// <summary>
-        /// Thread safe way to update the database build progress form elements
-        /// </summary>
-        /// <param name="TimeElapsed">The time that has elapsed so far in the build</param>
-        /// <param name="WorkNodeCount">The number of nodes sitting in the work queue</param>
-        /// <param name="NodeTotal">The total number of nodes processed</param>
-        /// <param name="VictoryTotal">The total number of victory states discovered so far</param>
-        public static void UpdateDatabaseProgress(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int VictoryTotal)
-        {
-            gNodeCounter.Invoke(new updateDatabaseProgressDelegate(UpdateDatabaseProgressForm), TimeElapsed, WorkNodeCount, NodeTotal, VictoryTotal);
-        }
-
-        /// <summary>
-        /// Thread UNSAFE way to update the database build progress form elements
-        /// </summary>
-        /// <param name="TimeElapsed">The time that has elapsed so far in the build</param>
-        /// <param name="WorkNodeCount">The number of nodes sitting in the work queue</param>
-        /// <param name="NodeTotal">The total number of nodes processed</param>
-        /// <param name="VictoryTotal">The total number of victory states discovered so far</param>
-        public static void UpdateDatabaseProgressForm(TimeSpan TimeElapsed, int WorkNodeCount, int NodeTotal, int VictoryTotal)
-        {
-            gSimTimerLabel.Text = TimeElapsed.ToString(@"hh\:mm\:ss");
-            gNodeCounter.Text = NodeTotal.ToString();
-            gWorkCounter.Text = WorkNodeCount.ToString();
-            gVictoryCounter.Text = VictoryTotal.ToString();
-        }
-
-        /// <summary>
-        /// Update the RAM usage meter
-        /// </summary>
-        public static void UpdateRAMprogress()
-        {
-            ObjectQuery wql = new ObjectQuery("SELECT * FROM Win32_OperatingSystem");
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher(wql);
-            ManagementObjectCollection results = searcher.Get();
-
-            foreach (ManagementObject result in results)
-            {
-                if (gRAMUsageBar.Maximum < 1024)
-                    gRAMUsageBar.Maximum = Convert.ToInt32(result["FreePhysicalMemory"]);
-
-                gRAMUsageBar.Value = Math.Min(Convert.ToInt32(result["FreePhysicalMemory"]), gRAMUsageBar.Maximum);
-            }
-
-            // If RAM is running low, emergency stop any running jobs
-            if ((float)gRAMUsageBar.Value / (float)gRAMUsageBar.Maximum < Properties.Settings.Default.MemoryFloor)
-            {
-                FormUtil.CancelAIWorkers();
-                gDebugText.Text += "#####   DB Build Aborted: Memory floor reached (" + gRAMUsageBar.Value.ToString("0,0.") + " KB free)  #####";
-            }
-
-            Graphics RAMGfx = gRAMUsageBar.CreateGraphics();
-            int MemoryAbortLine = Convert.ToInt32(gRAMUsageBar.Width * Properties.Settings.Default.MemoryFloor);
-
-            RAMGfx.DrawString(gRAMUsageBar.Value.ToString("0,0.") + " KB free", new Font("Arial", (float)11, FontStyle.Regular), Brushes.White, new PointF(120, 2));
-            RAMGfx.DrawLine(new Pen(Color.Red, 2), MemoryAbortLine, 0, MemoryAbortLine, gRAMUsageBar.Height);
-            RAMGfx.DrawString("Abort   Line", new Font("Arial", (float)8, FontStyle.Regular), Brushes.White, new PointF(MemoryAbortLine - 34, 4));
+            //    gScoreBoardSurface.Invalidate();
         }
     }
 }

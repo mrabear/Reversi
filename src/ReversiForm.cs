@@ -486,6 +486,7 @@ namespace Reversi
             // BoardSurface
             // 
             this.BoardSurface.BackColor = System.Drawing.Color.Transparent;
+            this.BoardSurface.BackgroundImage = global::Reversi.Properties.Resources.GameBoard;
             this.BoardSurface.Cursor = System.Windows.Forms.Cursors.Hand;
             this.BoardSurface.ForeColor = System.Drawing.Color.Transparent;
             this.BoardSurface.Location = new System.Drawing.Point(30, 83);
@@ -602,6 +603,7 @@ namespace Reversi
             this.Controls.Add(this.AITraceLabel);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.Title);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
