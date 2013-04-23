@@ -3,7 +3,7 @@
 /// </summary>
 
 using System;
-using System.Drawing;
+using System.Windows;
 
 namespace Reversi
 {
@@ -103,9 +103,9 @@ namespace Reversi
         /// Processes a single turn of gameplay, two if it is vs. AI
         /// </summary>
         /// <param name="Move">The move to process</param>
-        public void ProcessTurn(Point Move)
+        public bool ProcessTurn(Point Move)
         {
-            ProcessTurn(Move.X, Move.Y);
+            return(ProcessTurn(Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y)));
         }
 
         /// <summary>
@@ -113,8 +113,10 @@ namespace Reversi
         /// </summary>
         /// <param name="X">The X value of the move</param>
         /// <param name="Y">The Y value of the move</param>
-        public void ProcessTurn(int X, int Y)
+        public bool ProcessTurn(int X, int Y)
         {
+            bool MoveOutcome = false;
+
             TurnInProgress = true;
 
             if (!IsComplete)
@@ -122,22 +124,10 @@ namespace Reversi
                 // As long as this isn't an AI turn, process the requested move
                 if (!((VsComputer) && (CurrentTurn == AI.GetColor())) )
                 {
-                    if (GameBoard.MovePossible(CurrentTurn))
-                    {
-                        if (GameBoard.MakeMove(X, Y, CurrentTurn))
-                        {
-                            GraphicsUtil.RefreshAll();
-                            //GraphicsUtil.ShowWinner(GameBoard.DetermineWinner());
-                            //GraphicsUtil.RefreshPieces();
-                            //GraphicsUtil.UpdateScoreBoard();
+                    if ( GameBoard.MovePossible(CurrentTurn) )
+                        MoveOutcome = GameBoard.MakeMove(X, Y, CurrentTurn);
 
-                            SwitchTurn();
-                        }
-                    }
-                    else
-                    {
-                        SwitchTurn();
-                    }
+                    SwitchTurn();
                 }
 
                 //***if ((VsComputer) && (CurrentTurn == AI.GetColor()))
@@ -145,6 +135,8 @@ namespace Reversi
                 //***else
                     TurnInProgress = false;
             }
+
+            return (MoveOutcome);
         }
 
         /// <summary>

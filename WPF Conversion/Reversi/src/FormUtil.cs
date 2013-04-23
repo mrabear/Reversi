@@ -51,11 +51,13 @@ namespace Reversi
         /// <summary>
         /// Responds to the MouseUp event on the board image, processes the click as a placed piece
         /// </summary>
-        public static void PlaceUserPiece( Point MouseClick )
+        public static bool PlaceUserPiece( Point MouseClick )
         {
             // Don't process the mouse click if there is a turn already being processed
             if (!GetCurrentGame().GetTurnInProgress())
-                GetCurrentGame().ProcessTurn(Convert.ToInt32( (MouseClick.X + 1) / Properties.Settings.Default.GRID_SIZE ), Convert.ToInt32( (MouseClick.Y + 1) / Properties.Settings.Default.GRID_SIZE ));
+                return( GetCurrentGame().ProcessTurn(Convert.ToInt32( (MouseClick.X + 1) / Properties.Settings.Default.GRID_SIZE ), Convert.ToInt32( (MouseClick.Y + 1) / Properties.Settings.Default.GRID_SIZE )));
+
+            return (false);
         }
 
         /// <summary>

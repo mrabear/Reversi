@@ -25,7 +25,12 @@ namespace Reversi
         public static int EMPTY = Properties.Settings.Default.EMPTY;
         public static int ERROR = Properties.Settings.Default.ERROR;
 
-        private static Game CurrentGame;
+        protected static Game CurrentGame;
+        protected static Grid gGameBoardGrid;
+
+        protected static Image gBlackPieceImage;
+        protected static Image gWhitePieceImage;
+        protected static Image gSuggestedPieceImage;
 
         // The board used to track what has been drawn on the screen
         protected static Board LastDrawnBoard;
@@ -48,13 +53,6 @@ namespace Reversi
         /// Returns the global application game instance
         /// </summary>
         /// <returns>The current application game instance</returns>
-        public static Canvas GetGameBoard() { return new Canvas(); }
-        //public static Grid GetGameBoard() { return new Grid(); }
-
-        /// <summary>
-        /// Returns the global application game instance
-        /// </summary>
-        /// <returns>The current application game instance</returns>
         public static Game GetCurrentGame() { return CurrentGame; }
 
         #endregion
@@ -68,12 +66,18 @@ namespace Reversi
         public ReversiWindow()
         {
             InitializeComponent();
+
+            // Static binds
+            gGameBoardGrid = GameBoardGrid;
+            //gWhitePieceImage.Source = .UriSource = new Uri("/Reversi;/img/WhitePiece.png");
             FormUtil.StartNewGame();
         }
 
         private void GameBoard_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            FormUtil.PlaceUserPiece(e.GetPosition(this));
+            if( FormUtil.PlaceUserPiece(e.GetPosition(this)) )
+                GraphicsUtil.RefreshPieces(GameBoardGrid);
+
             Console.WriteLine("mouseLeft is clicked");
         }
     }

@@ -19,15 +19,15 @@ namespace Reversi
     /// <summary>
     /// A subclass of ReversiForm, used to manipulate the game board and other graphics assets
     /// </summary>
-    public class GraphicsUtil
+    public class GraphicsUtil : ReversiWindow
     {
 
         /// <summary>
         /// Repaints all game graphics surfaces
         /// </summary>
-        public static void RefreshAll()
+        public static void RefreshAll(Grid BoardGrid)
         {
-            RefreshPieces(FullRefresh: true);
+            RefreshPieces(BoardGrid, FullRefresh: true);
             //gScoreBoardSurface.Invalidate();
             //gGameBoardSurface.Invalidate();
         }
@@ -64,9 +64,9 @@ namespace Reversi
         /// Draw all game pieces on the board
         /// </summary>
         /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
-        public static void RefreshPieces(bool FullRefresh = false)
+        public static void RefreshPieces(Grid BoardGrid, bool FullRefresh = false)
         {
-            RefreshPieces(ReversiWindow.GetCurrentGame().GetGameBoard(), FullRefresh);
+            RefreshPieces(BoardGrid,ReversiWindow.GetCurrentGame().GetGameBoard(), FullRefresh);
         }
 
         /// <summary>
@@ -74,15 +74,19 @@ namespace Reversi
         /// </summary>
         /// <param name="SourceBoard">The board to draw onto the screen</param>
         /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
-        public static void RefreshPieces(Board SourceBoard, bool FullRefresh = false)
+        public static void RefreshPieces(Grid BoardGrid, Board SourceBoard, bool FullRefresh = false)
         {
             //if (FullRefresh)
             //    RedrawBoardImage();
-
+            
             for (int Y = 0; Y < SourceBoard.GetBoardSize(); Y++)
                 for (int X = 0; X < SourceBoard.GetBoardSize(); X++)
                     if ((ReversiWindow.GetLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
-                        DrawPiece(X, Y, SourceBoard.ColorAt(X, Y));
+                    {
+
+                        //BoardGrid.Children.
+                    }
+                        //DrawPiece(X, Y, SourceBoard.ColorAt(X, Y));
 
             ReversiWindow.GetLastDrawnBoard().CopyBoard(SourceBoard.GetBoardPieces());
         }
@@ -105,7 +109,9 @@ namespace Reversi
         /// <param name="color">The piece color</param>
         public static void DrawPiece(double X, double Y, int Color)
         {
+            
             if ((Color == ReversiWindow.WHITE) || (Color == ReversiWindow.BLACK)) ;
+
                 //gGameBoardBackBufferGFX.DrawImage(GetPieceImage(Color), X * BoardGridSize, Y * BoardGridSize, BoardGridSize, BoardGridSize);
         }
 
