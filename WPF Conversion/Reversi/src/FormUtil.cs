@@ -34,6 +34,8 @@ namespace Reversi
             GetCurrentGame().GetAI().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
             GetCurrentGame().GetAI().SetVisualizeProcess(true);
 
+
+
             // Force a repaint of the game board and score board
             //gGameBoardSurface.Invalidate();
             //gScoreBoardSurface.Invalidate();

@@ -58,6 +58,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="src\FormUtil.cs" />
+    <Compile Include="src\ui\GameBoard.cs" />
+    <Compile Include="src\ui\GamePiece.cs" />
     <Compile Include="src\GraphicsUtil.cs" />
     <Compile Include="src\SimulationNode.cs" />
     <Page Include="src\ReversiWindow.xaml">
@@ -92,7 +94,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
@@ -105,67 +107,67 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\BlackPiece.png">
+    <Resource Include="img\BlackPiece.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\DebugButton.png">
+    <Resource Include="img\DebugButton.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\GameBoard.png">
+    <Resource Include="img\GameBoard.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\GreenBackground.png">
+    <Resource Include="img\GreenBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\NewGameButton.png">
+    <Resource Include="img\NewGameButton.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\NewGameButton_Hover.png">
+    <Resource Include="img\NewGameButton_Hover.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\ScoreBoard_BlackTurn.png">
+    <Resource Include="img\ScoreBoard_BlackTurn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\ScoreBoard_WhiteTurn.png">
+    <Resource Include="img\ScoreBoard_WhiteTurn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\SuggestedPiece.png">
+    <Resource Include="img\SuggestedPiece.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\Title.png">
+    <Resource Include="img\Title.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\WhitePiece.png">
+    <Resource Include="img\WhitePiece.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ReversiIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\FormBackground.png">
+    <Resource Include="img\FormBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

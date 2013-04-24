@@ -78,17 +78,14 @@ namespace Reversi
         {
             //if (FullRefresh)
             //    RedrawBoardImage();
-            
+            /*AdornerLayer myAdornerLayer = AdornerLayer.GetAdornerLayer(BoardGrid);
+
             for (int Y = 0; Y < SourceBoard.GetBoardSize(); Y++)
                 for (int X = 0; X < SourceBoard.GetBoardSize(); X++)
                     if ((ReversiWindow.GetLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
-                    {
+                        myAdornerLayer.Add(new GamePiece(BoardGrid, X, Y, SourceBoard.ColorAt(X, Y)));
 
-                        //BoardGrid.Children.
-                    }
-                        //DrawPiece(X, Y, SourceBoard.ColorAt(X, Y));
-
-            ReversiWindow.GetLastDrawnBoard().CopyBoard(SourceBoard.GetBoardPieces());
+            ReversiWindow.GetLastDrawnBoard().CopyBoard(SourceBoard.GetBoardPieces());*/
         }
 
         /// <summary>

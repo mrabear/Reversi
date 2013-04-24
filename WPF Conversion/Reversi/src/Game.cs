@@ -15,7 +15,7 @@ namespace Reversi
         private int CurrentTurn;
         private int NextTurn;
         private int Difficulty;
-        private Boolean VsComputer = true;
+        private Boolean VsComputer = false;
         private Board GameBoard;
         private Boolean IsComplete = false;
         private Boolean ProcessMoves = true;
@@ -124,10 +124,16 @@ namespace Reversi
                 // As long as this isn't an AI turn, process the requested move
                 if (!((VsComputer) && (CurrentTurn == AI.GetColor())) )
                 {
-                    if ( GameBoard.MovePossible(CurrentTurn) )
+                    if (GameBoard.MovePossible(CurrentTurn))
+                    {
                         MoveOutcome = GameBoard.MakeMove(X, Y, CurrentTurn);
-
-                    SwitchTurn();
+                        if( MoveOutcome )
+                            SwitchTurn();
+                    }
+                    else
+                    {
+                        SwitchTurn();
+                    }
                 }
 
                 //***if ((VsComputer) && (CurrentTurn == AI.GetColor()))
