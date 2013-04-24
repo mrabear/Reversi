@@ -3,6 +3,7 @@
 /// </summary>
 
 using System;
+using System.IO;
 using System.Management;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,9 +20,38 @@ namespace Reversi
     /// <summary>
     /// A subclass of ReversiForm, used to manipulate the game board and other graphics assets
     /// </summary>
-    public class GraphicsUtil : ReversiWindow
+    public class GraphicsUtil
     {
 
+
+        public static ImageSource GenerateImageSource(System.Drawing.Bitmap bm)
+        {
+
+            BitmapSource bms = null;
+            if (bm != null)
+            {
+                IntPtr h_bm = bm.GetHbitmap();
+                bms = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(h_bm, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            }
+            return bms;
+        }  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////
         /// <summary>
         /// Repaints all game graphics surfaces
         /// </summary>
@@ -76,16 +106,7 @@ namespace Reversi
         /// <param name="FullRefresh">(optional) True forces a full refresh of all pieces</param>
         public static void RefreshPieces(Grid BoardGrid, Board SourceBoard, bool FullRefresh = false)
         {
-            //if (FullRefresh)
-            //    RedrawBoardImage();
-            /*AdornerLayer myAdornerLayer = AdornerLayer.GetAdornerLayer(BoardGrid);
 
-            for (int Y = 0; Y < SourceBoard.GetBoardSize(); Y++)
-                for (int X = 0; X < SourceBoard.GetBoardSize(); X++)
-                    if ((ReversiWindow.GetLastDrawnBoard().ColorAt(X, Y) != SourceBoard.ColorAt(X, Y)) || (FullRefresh))
-                        myAdornerLayer.Add(new GamePiece(BoardGrid, X, Y, SourceBoard.ColorAt(X, Y)));
-
-            ReversiWindow.GetLastDrawnBoard().CopyBoard(SourceBoard.GetBoardPieces());*/
         }
 
         /// <summary>

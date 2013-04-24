@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -77,19 +78,6 @@ namespace Reversi
         /// <param name="BoardSize">The size of the board to use in the new game</param>
         public static void ResetCurrentGame(int BoardSize = 8) { CurrentGame = new Game(BoardSize); }
 
-        /// <summary>
-        /// Returns the global application game instance
-        /// </summary>
-        /// <returns>The current application game instance</returns>
-        public static ImageSource GetGamePiece( int PieceColor) {
-            if (PieceColor == WHITE)
-                return gWhitePieceImage;
-            else if (PieceColor == BLACK)
-                return gBlackPieceImage;
-            else
-                return gSuggestedPieceImage;
-        }
-
         public ReversiWindow()
         {
             InitializeComponent();
@@ -103,25 +91,16 @@ namespace Reversi
 
         private void GameBoardSurface_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //gBlackPieceImage = new ImageSourceConverter().ConvertFromString("/Reversi;component/img/BlackPiece.png") as ImageSource;
-            //gWhitePieceImage = new ImageSourceConverter().ConvertFromString("/Reversi;component/img/WhitePiece.png") as ImageSource;
-            //gSuggestedPieceImage = new ImageSourceConverter().ConvertFromString("/Reversi;component/img/SuggestedPiece.png") as ImageSource;
-
-
-        }
-
-        private void Reversi_Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-
+           
             Point PlayerMove = e.GetPosition(this);
 
             if (FormUtil.PlaceUserPiece(PlayerMove))
             {
-                GameBoardSurface.UpdateBoard(CurrentGame.GetGameBoard());
-                GameBoardSurface.Refresh();
+                //GameBoardSurface.UpdateBoard(CurrentGame.GetGameBoard());
+                GameBoardSurface.InvalidateVisual();
             }
 
-            Console.WriteLine("mouseLeft is clicked");
+            Console.WriteLine("Click at " + PlayerMove.X + "," + PlayerMove.Y );
         }
     }
 }

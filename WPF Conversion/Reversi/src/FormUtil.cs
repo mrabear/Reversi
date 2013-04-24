@@ -34,8 +34,6 @@ namespace Reversi
             GetCurrentGame().GetAI().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
             GetCurrentGame().GetAI().SetVisualizeProcess(true);
 
-
-
             // Force a repaint of the game board and score board
             //gGameBoardSurface.Invalidate();
             //gScoreBoardSurface.Invalidate();
@@ -55,9 +53,14 @@ namespace Reversi
         /// </summary>
         public static bool PlaceUserPiece( Point MouseClick )
         {
+            int GridX = Convert.ToInt32((MouseClick.X + 1) / Properties.Settings.Default.GRID_SIZE);
+            int GridY = Convert.ToInt32((MouseClick.Y + 1) / Properties.Settings.Default.GRID_SIZE);
+
+            Console.WriteLine("\tGrid Coords: " + GridX + "," + GridY);
+
             // Don't process the mouse click if there is a turn already being processed
             if (!GetCurrentGame().GetTurnInProgress())
-                return( GetCurrentGame().ProcessTurn(Convert.ToInt32( (MouseClick.X + 1) / Properties.Settings.Default.GRID_SIZE ), Convert.ToInt32( (MouseClick.Y + 1) / Properties.Settings.Default.GRID_SIZE )));
+                return (GetCurrentGame().ProcessTurn(GridX,GridY));
 
             return (false);
         }
