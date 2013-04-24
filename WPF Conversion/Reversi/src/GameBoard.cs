@@ -23,7 +23,7 @@ namespace Reversi
 
        //private static Board MainBoard;
         private static Board LastDrawnBoard;
-        private static Board WorkBoard;
+        private static Board DisplayBoard;
 
         //private static List<Visual> BoardPieces;
 
@@ -40,7 +40,7 @@ namespace Reversi
             LastDrawnBoard = new Board();
             LastDrawnBoard.ClearBoard();
 
-            WorkBoard = new Board();
+            DisplayBoard = new Board();
 
             gBlackPieceImage = GraphicsUtil.GenerateImageSource(Properties.Resources.BlackPiece);
             gWhitePieceImage = GraphicsUtil.GenerateImageSource(Properties.Resources.WhitePiece);
@@ -53,9 +53,9 @@ namespace Reversi
         /// <returns>The current application game instance</returns>
         public ImageSource GetGamePiece(int PieceColor)
         {
-            if (PieceColor == ReversiWindow.WHITE)
+            if (PieceColor == App.BLACK)
                 return gBlackPieceImage;
-            else if (PieceColor == ReversiWindow.BLACK)
+            else if (PieceColor == App.WHITE)
                 return gWhitePieceImage;
             else
                 return null;
@@ -63,15 +63,15 @@ namespace Reversi
 
         public void DrawPieces(DrawingContext dc)
         {
-            WorkBoard = new Board(ReversiWindow.GetCurrentGame().GetGameBoard());
+            DisplayBoard = new Board(App.GetActiveGameBoard());
 
-            for (int Y = 0; Y < WorkBoard.GetBoardSize(); Y++)
-                for (int X = 0; X < WorkBoard.GetBoardSize(); X++)
+            for (int Y = 0; Y < DisplayBoard.GetBoardSize(); Y++)
+                for (int X = 0; X < DisplayBoard.GetBoardSize(); X++)
                 //if ((LastDrawnBoard.ColorAt(X, Y) != MainBoard.ColorAt(X, Y)))
                     //dc.DrawRectangle(null, new Pen(System.Windows.Media.Brushes.White, 1), GetBoardRect(X,Y));
-                    dc.DrawImage(GetGamePiece(WorkBoard.ColorAt(X, Y)), GetBoardRect(X, Y));
+                    dc.DrawImage(GetGamePiece(DisplayBoard.ColorAt(X, Y)), GetBoardRect(X, Y));
 
-            LastDrawnBoard = new Board(WorkBoard);
+            LastDrawnBoard = new Board(DisplayBoard);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Reversi
         /// <param name="Turn">The turn to use</param>
         public void DrawAvailableMoves(DrawingContext dc)
         {
-            DrawAvailableMoves(dc, ReversiWindow.GetCurrentGame().GetGameBoard(), ReversiWindow.GetCurrentGame().GetCurrentTurn());
+            DrawAvailableMoves(dc, App.GetActiveGameBoard(), App.GetCurrentGame().GetCurrentTurn());
         }
 
         /// <summary>
@@ -90,9 +90,9 @@ namespace Reversi
         /// <param name="Turn">The turn to use</param>
         public void DrawAvailableMoves(DrawingContext dc, Board SourceBoard, int Turn)
         {
-            if ((ReversiWindow.GetCurrentGame().GetCurrentTurn() != ReversiWindow.GetCurrentGame().GetAI().GetColor()) || (!ReversiWindow.GetCurrentGame().IsVsComputer()))
+            if ((App.GetCurrentGame().GetCurrentTurn() != App.GetComputerPlayer().GetColor()) || (!App.GetCurrentGame().IsVsComputer()))
                 // Loop through all available moves and place a dot at the location
-                foreach (Point CurrentPiece in WorkBoard.AvailableMoves(ReversiWindow.GetCurrentGame().GetCurrentTurn()))
+                foreach (Point CurrentPiece in DisplayBoard.AvailableMoves(App.GetCurrentGame().GetCurrentTurn()))
                     dc.DrawImage(gSuggestedPieceImage, GetBoardRect(CurrentPiece));
         }
 
@@ -111,7 +111,7 @@ namespace Reversi
             base.OnRender(dc);
 
             // Filter for the design time tool
-            if (ReversiWindow.GetCurrentGame() != null)
+            if (App.GetCurrentGame() != null)
             {
                 DrawPieces(dc);
                 DrawAvailableMoves(dc);

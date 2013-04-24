@@ -14,13 +14,10 @@ namespace Reversi
     {
         private int CurrentTurn;
         private int NextTurn;
-        private int Difficulty;
-        private Boolean VsComputer = false;
-        private Board GameBoard;
+        private Boolean VsComputer = true;
         private Boolean IsComplete = false;
         private Boolean ProcessMoves = true;
         private Boolean TurnInProgress = false;
-        private AI AI;
 
         /// <summary>
         /// Creates a new Game instance
@@ -28,17 +25,12 @@ namespace Reversi
         /// <param name="BoardSize">The size of the game board</param>
         public Game(int BoardSize = 8)
         {
-            CurrentTurn = ReversiWindow.WHITE;
-            NextTurn = ReversiWindow.BLACK;
-            //Difficulty = ReversiForm.GetAIDifficulty();
+            CurrentTurn = App.WHITE;
+            NextTurn = App.BLACK;
             //VsComputer = ReversiForm.VsComputer();
-            GameBoard = new Board(BoardSize);
+            App.ResetActiveGameBoard(BoardSize);
             IsComplete = false;
-            AI = new AI(ReversiWindow.BLACK);
-
-            // Reset the board that tracks which pieces have been drawn on the screen
-            //***ReversiForm.SetLastDrawnBoard( BoardSize );
-            //***ReversiForm.GetLastDrawnBoard().ClearBoard();
+            App.ResetComputerPlayer(App.BLACK);
         }
 
         #region Getters and Setters
@@ -68,11 +60,6 @@ namespace Reversi
         public void SetNextTurn(int Turn) { NextTurn = Turn; }
 
         /// <summary>
-        /// Returns the current game board
-        /// </summary>
-        public Board GetGameBoard() { return GameBoard; }
-
-        /// <summary>
         /// Returns True if the game is currently processing moves
         /// </summary>
         public Boolean GetProcessMoves() { return ProcessMoves; }
@@ -82,11 +69,6 @@ namespace Reversi
         /// </summary>
         /// <param name="isMoveProcessing">Set to True if the game is processing a move</param>
         public void SetProcessMoves(Boolean isMoveProcessing) { ProcessMoves = isMoveProcessing; }
-
-        /// <summary>
-        /// Returns the AI opponent object
-        /// </summary>
-        public AI GetAI() { return AI; }
 
         /// <summary>
         /// Returns the color of the AI opponent
@@ -105,9 +87,9 @@ namespace Reversi
         /// Processes a single turn of gameplay, two if it is vs. AI
         /// </summary>
         /// <param name="Move">The move to process</param>
-        public bool ProcessTurn(Point Move)
+        public bool ProcessUserTurn(Point Move)
         {
-            return(ProcessTurn(Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y)));
+            return (ProcessUserTurn(Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y)));
         }
 
         /// <summary>
@@ -115,7 +97,7 @@ namespace Reversi
         /// </summary>
         /// <param name="X">The X value of the move</param>
         /// <param name="Y">The Y value of the move</param>
-        public bool ProcessTurn(int X, int Y)
+        public bool ProcessUserTurn(int X, int Y)
         {
             bool MoveOutcome = false;
 
@@ -124,11 +106,11 @@ namespace Reversi
             if (!IsComplete)
             {
                 // As long as this isn't an AI turn, process the requested move
-                if (!((VsComputer) && (CurrentTurn == AI.GetColor())) )
+                if (!((VsComputer) && (CurrentTurn == App.GetComputerPlayer().GetColor())))
                 {
-                    if (GameBoard.MovePossible(CurrentTurn))
+                    if (App.GetActiveGameBoard().MovePossible(CurrentTurn))
                     {
-                        MoveOutcome = GameBoard.MakeMove(X, Y, CurrentTurn);
+                        MoveOutcome = App.GetActiveGameBoard().MakeMove(X, Y, CurrentTurn);
                         if( MoveOutcome )
                             SwitchTurn();
                     }
@@ -138,9 +120,9 @@ namespace Reversi
                     }
                 }
 
-                //***if ((VsComputer) && (CurrentTurn == AI.GetColor()))
-                    //***FormUtil.StartAITurnWorker();
-                //***else
+                if ((VsComputer) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
+                    App.GetComputerPlayer().ProcessAITurn();
+                else
                     TurnInProgress = false;
             }
 
@@ -148,53 +130,20 @@ namespace Reversi
         }
 
         /// <summary>
-        /// Processes a single AI turn
-        /// </summary>
-        public void ProcessAITurn()
-        {
-            while (GameBoard.MovePossible(AI.GetColor()))
-            {
-                AI.MakeNextMove(GameBoard);
-
-                if (GameBoard.MovePossible(AI.GetColor() == ReversiWindow.BLACK ? ReversiWindow.WHITE : ReversiWindow.BLACK))
-                    break;
-                //***else
-                    //***GraphicsUtil.RefreshAll();
-            }
-        }
-
-        /// <summary>
         /// Switches the current turn and updates the turn image
         /// </summary>
         public void SwitchTurn()
         {
-            if (CurrentTurn == ReversiWindow.WHITE)
+            if (CurrentTurn == App.WHITE)
             {
-                CurrentTurn = ReversiWindow.BLACK;
-                NextTurn = ReversiWindow.WHITE;
+                CurrentTurn = App.BLACK;
+                NextTurn = App.WHITE;
             }
             else
             {
-                CurrentTurn = ReversiWindow.WHITE;
-                NextTurn = ReversiWindow.BLACK;
+                CurrentTurn = App.WHITE;
+                NextTurn = App.BLACK;
             }
-        }
-
-        /// <summary>
-        /// Returns a string representation of the current turn, used for display purposes
-        /// </summary>
-        /// <param name="color">The color to convert to a string</param>
-        /// <returns>A string representation of the current turn</returns>
-        public string GetTurnString(int color)
-        {
-            if (color == ReversiWindow.WHITE)
-                return ("White");
-            else if (color == ReversiWindow.BLACK)
-                return ("Black");
-            else if (color == ReversiWindow.EMPTY)
-                return ("Empty");
-            else
-                return ("Illegal Color!");
         }
     }
 

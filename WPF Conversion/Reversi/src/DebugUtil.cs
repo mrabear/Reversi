@@ -4,7 +4,6 @@
 
 using System;
 using System.Management;
-
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,20 +19,12 @@ namespace Reversi
     /// <summary>
     /// A subclass of ReversiForm, used to manipulate the various form elements
     /// </summary>
-    public class FormUtil : ReversiWindow
+    public class DebugUtil
     {
-
-
         /// <summary>
         /// Updates the current game and form elements with the current simulation max depth
         /// </summary>
-        public static void UpdateMaxDepth()
-        {
-            //gSimDepthCount.Text = gSimulationDepthSlider.Value.ToString();
-            //gCurrentGame.GetAI().SetMaxDepth(gSimulationDepthSlider.Value - 1);
-        }
-
-
+        public static void UpdateMaxDepth(){}
 
         /// <summary>
         /// Thread safe delegates for setting the debug window with the new text

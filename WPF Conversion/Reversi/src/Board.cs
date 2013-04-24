@@ -179,7 +179,7 @@ namespace Reversi
         public int ColorAt(int X, int Y)
         {
             if( !InBounds( X, Y ))
-                return ReversiWindow.ERROR;
+                return App.ERROR;
 
             return(BoardPieces[X, Y]);
         }
@@ -210,13 +210,13 @@ namespace Reversi
             int CurrentTurn = SourceTurn;
             int NextTurn;
 
-            if (CurrentTurn == ReversiWindow.WHITE)
-                NextTurn = ReversiWindow.BLACK;
+            if (CurrentTurn == App.WHITE)
+                NextTurn = App.BLACK;
             else
-                NextTurn = ReversiWindow.WHITE;
+                NextTurn = App.WHITE;
 
             // Check for already existing piece
-            if (ColorAt(MoveX, MoveY) != ReversiWindow.EMPTY)
+            if (ColorAt(MoveX, MoveY) != App.EMPTY)
                 return false;
 
             Boolean findStatus = false;
@@ -291,7 +291,7 @@ namespace Reversi
             int foundMoves = 0;
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == ReversiWindow.EMPTY)
+                    if (ColorAt(X, Y) == App.EMPTY)
                         if (MakeMove(X, Y, CurrentTurn, CommitMove: false))
                         {
                             Moves[foundMoves] = new Point(X, Y);
@@ -311,7 +311,7 @@ namespace Reversi
         /// <returns>True if either player can make a legal move</returns>
         public bool MovePossible()
         {
-            if ((MovePossible(ReversiWindow.BLACK)) || (MovePossible(ReversiWindow.WHITE)))
+            if ((MovePossible(App.BLACK)) || (MovePossible(App.WHITE)))
                 return (true);
 
             return (false);
@@ -328,7 +328,7 @@ namespace Reversi
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
                     // Simulate a move, if successful, we know that there is at least this legal move
-                    if (ColorAt(X, Y) == ReversiWindow.EMPTY)
+                    if (ColorAt(X, Y) == App.EMPTY)
                         if (MakeMove(X, Y, Turn, CommitMove: false))
                             return true;
 
@@ -354,10 +354,10 @@ namespace Reversi
         /// <param name="Turn">The move turn</param>
         public void PutPiece(int X, int Y, int Turn)
         {
-            if ((Turn == ReversiWindow.WHITE) || (Turn == ReversiWindow.BLACK))
+            if ((Turn == App.WHITE) || (Turn == App.BLACK))
                 BoardPieces[X, Y] = Turn;
             else
-                BoardPieces[X, Y] = ReversiWindow.EMPTY;
+                BoardPieces[X, Y] = App.EMPTY;
         }
 
         /// <summary>
@@ -375,24 +375,24 @@ namespace Reversi
         {
             if (BoardSize == 8)
             {
-                PutPiece(3, 3, ReversiWindow.WHITE);
-                PutPiece(4, 4, ReversiWindow.WHITE);
-                PutPiece(3, 4, ReversiWindow.BLACK);
-                PutPiece(4, 3, ReversiWindow.BLACK);
+                PutPiece(3, 3, App.WHITE);
+                PutPiece(4, 4, App.WHITE);
+                PutPiece(3, 4, App.BLACK);
+                PutPiece(4, 3, App.BLACK);
             }
             else if (BoardSize == 6)
             {
-                PutPiece(2, 2, ReversiWindow.WHITE);
-                PutPiece(3, 3, ReversiWindow.WHITE);
-                PutPiece(2, 3, ReversiWindow.BLACK);
-                PutPiece(3, 2, ReversiWindow.BLACK);
+                PutPiece(2, 2, App.WHITE);
+                PutPiece(3, 3, App.WHITE);
+                PutPiece(2, 3, App.BLACK);
+                PutPiece(3, 2, App.BLACK);
             }
             else
             {
-                PutPiece(1, 1, ReversiWindow.WHITE);
-                PutPiece(2, 2, ReversiWindow.WHITE);
-                PutPiece(1, 2, ReversiWindow.BLACK);
-                PutPiece(2, 1, ReversiWindow.BLACK);
+                PutPiece(1, 1, App.WHITE);
+                PutPiece(2, 2, App.WHITE);
+                PutPiece(1, 2, App.BLACK);
+                PutPiece(2, 1, App.BLACK);
             }
         }
 
@@ -421,22 +421,22 @@ namespace Reversi
         {
             if (!MovePossible())
             {
-                int WhiteScore = FindScore(ReversiWindow.WHITE);
-                int BlackScore = FindScore(ReversiWindow.BLACK);
+                int WhiteScore = FindScore(App.WHITE);
+                int BlackScore = FindScore(App.BLACK);
 
                 // Black Wins
                 if (BlackScore > WhiteScore)
-                    return (ReversiWindow.BLACK);
+                    return (App.BLACK);
                 // White Wins
                 else if (BlackScore < WhiteScore)
-                    return (ReversiWindow.WHITE);
+                    return (App.WHITE);
                 // Tie Game
                 else
-                    return (ReversiWindow.EMPTY);
+                    return (App.EMPTY);
             }
 
             // No victory
-            return (ReversiWindow.ERROR);
+            return (App.ERROR);
         }
 
         /// <summary>

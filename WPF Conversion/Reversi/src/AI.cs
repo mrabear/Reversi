@@ -22,6 +22,8 @@ namespace Reversi
         private bool VisualizeProcess;
         private object SpinLock;
 
+        private readonly BackgroundWorker AIBGWorker = new BackgroundWorker();
+
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
@@ -45,19 +47,10 @@ namespace Reversi
             VisualizeProcess = false;
             MaxSimDepth = Properties.Settings.Default.MAX_SIM_DEPTH;
             SpinLock = new object();
-        }
 
-        /// <summary>
-        /// Creates a new AI player
-        /// </summary>
-        /// <param name="AIcolor">The color of the AI player</param>
-        /// <param name="NewMaxDepth">The number of turns to look ahead (should be an even number)</param>
-        public AI(int AIcolor, int NewMaxDepth)
-        {
-            AITurn = AIcolor;
-            VisualizeProcess = false;
-            MaxSimDepth = NewMaxDepth;
-            SpinLock = new object();
+            AIBGWorker.DoWork += AIBGWorker_DoWork;
+            AIBGWorker.RunWorkerCompleted += AIBGWorker_Completed;
+
         }
 
         #region Getters and Setters
@@ -264,7 +257,46 @@ namespace Reversi
         /// <returns>The turn opposite of the one given</returns>
         public int GetOtherTurn(int turn)
         {
-            return (turn == ReversiWindow.WHITE ? ReversiWindow.BLACK : ReversiWindow.WHITE);
+            return (turn == App.WHITE ? App.BLACK : App.WHITE);
         }
+
+        #region AI Background Workers
+
+        /// <summary>
+        /// Called when the AI monitor has no more moves to place
+        /// </summary>
+        public void ProcessAITurn()
+        {
+            AIBGWorker.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Called when the AI monitor has no more moves to place
+        /// </summary>
+        public void AIBGWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            App.GetCurrentGame().SetTurnInProgress(false);
+            App.GetCurrentGame().SwitchTurn();
+            ReversiWindow.RefreshGameBoard();
+        }
+
+        /// <summary>
+        /// Called asynchronously when it is time for the AI to wake up and do some work
+        /// </summary>
+        private void AIBGWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (App.GetActiveGameBoard().MovePossible(GetColor()))
+            {
+                MakeNextMove(App.GetActiveGameBoard());
+
+                if (App.GetActiveGameBoard().MovePossible(GetColor() == App.BLACK ? App.WHITE : App.BLACK))
+                    break;
+                else
+                    ReversiWindow.RefreshGameBoard();
+            }
+        }
+
+        #endregion
+
     }
 }

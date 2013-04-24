@@ -57,8 +57,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="src\FormUtil.cs" />
-    <Compile Include="src\ui\GameBoard.cs" />
+    <Compile Include="src\DebugUtil.cs" />
+    <Compile Include="src\GameBoard.cs" />
     <Compile Include="src\GraphicsUtil.cs" />
     <Page Include="src\ReversiWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

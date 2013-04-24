@@ -20,83 +20,39 @@ namespace Reversi
     /// </summary>
     public partial class ReversiWindow : Window
     {
-        public static int WHITE = Properties.Settings.Default.WHITE;
-        public static int BLACK = Properties.Settings.Default.BLACK;
-        public static int EMPTY = Properties.Settings.Default.EMPTY;
-        public static int ERROR = Properties.Settings.Default.ERROR;
-
-        protected static Game CurrentGame;
-        protected static Grid gGameBoardGrid;
-
-        protected static ImageSource gBlackPieceImage;
-        protected static ImageSource gWhitePieceImage;
-        protected static ImageSource gSuggestedPieceImage;
-
-        // The board used to track what has been drawn on the screen
-        protected static Board LastDrawnBoard;
-
-        #region Getters and Setters
-
-        /// <summary>
-        /// Gets the board that was last drawn onto the screen
-        /// </summary>
-        /// <returns>The last drawn Board object</returns>
-        public static Board GetLastDrawnBoard() { return LastDrawnBoard; }
-
-        /// <summary>
-        /// Resets the board that was last drawn onto the screen
-        /// </summary>
-        /// <param name="BoardSize">The new board size</param>
-        public static void ResetLastDrawnBoard(int BoardSize) { LastDrawnBoard = new Board(BoardSize); }
-
-        /// <summary>
-        /// Returns the global application game instance
-        /// </summary>
-        /// <returns>The current application game instance</returns>
-        public static Game GetCurrentGame() { return CurrentGame; }
-
-        #endregion
-
-        /// <summary>
-        /// Resets the global application game instance
-        /// </summary>
-        /// <param name="BoardSize">The size of the board to use in the new game</param>
-        public static void ResetCurrentGame(int BoardSize = 8) { CurrentGame = new Game(BoardSize); }
+        protected static GameBoard gGameBoardSurface;
 
         public ReversiWindow()
         {
             InitializeComponent();
-
-
-            // Static binds
-            //gGameBoardGrid = GameBoardGrid;
-            //gWhitePieceImage.Source = .UriSource = new Uri("/Reversi;/img/WhitePiece.png");
             StartNewGame();
+
+            gGameBoardSurface = GameBoardSurface;
         }
 
-        private void GameBoardSurface_MouseDown(object sender, MouseButtonEventArgs e)
+        private void PlaceUserPiece(object sender, MouseButtonEventArgs e)
         {
             Point PlayerMove = e.GetPosition(GameBoardSurface);
 
-            if (PlaceUserPiece(PlayerMove))
-                GameBoardSurface.InvalidateVisual();
+            int GridX = Convert.ToInt32(Math.Floor((PlayerMove.X) / Properties.Settings.Default.GRID_SIZE));
+            int GridY = Convert.ToInt32(Math.Floor((PlayerMove.Y) / Properties.Settings.Default.GRID_SIZE));
+
+            if (!App.GetCurrentGame().GetTurnInProgress())
+                if (App.GetCurrentGame().ProcessUserTurn(GridX, GridY))
+                    RefreshGameBoard();
 
             Console.WriteLine("Click at " + PlayerMove.X + "," + PlayerMove.Y );
         }
 
-        /// <summary>
-        /// Responds to the MouseUp event on the board image, processes the click as a placed piece
-        /// </summary>
-        public static bool PlaceUserPiece(Point MouseClick)
+        public static void RefreshGameBoard()
         {
-            int GridX = Convert.ToInt32(Math.Floor(( MouseClick.X ) / Properties.Settings.Default.GRID_SIZE));
-            int GridY = Convert.ToInt32(Math.Floor(( MouseClick.Y ) / Properties.Settings.Default.GRID_SIZE));
+            if (gGameBoardSurface != null)
+                gGameBoardSurface.Dispatcher.Invoke(InvalidateGameBoard);
+        }
 
-            // Don't process the mouse click if there is a turn already being processed
-            if (!GetCurrentGame().GetTurnInProgress())
-                return (GetCurrentGame().ProcessTurn(GridX, GridY));
-
-            return (false);
+        public static void InvalidateGameBoard()
+        {        
+                gGameBoardSurface.InvalidateVisual();
         }
 
         /// <summary>
@@ -105,15 +61,14 @@ namespace Reversi
         public static void StartNewGame()
         {
             // Start a new game
-            ResetCurrentGame();
+            App.ResetCurrentGame();
 
             // Setup the AI player
-            GetCurrentGame().GetAI().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
-            GetCurrentGame().GetAI().SetVisualizeProcess(true);
+            App.GetComputerPlayer().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
+            App.GetComputerPlayer().SetVisualizeProcess(true);
 
             // Force a repaint of the game board and score board
-            //gGameBoardSurface.Invalidate();
-            //gScoreBoardSurface.Invalidate();
+            RefreshGameBoard();
         }
     }
 }
