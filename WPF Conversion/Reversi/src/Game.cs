@@ -48,6 +48,8 @@ namespace Reversi
         /// </summary>
         public int GetCurrentTurn() { return CurrentTurn; }
 
+        public bool IsVsComputer() { return VsComputer; }
+
         /// <summary>
         /// Sets the current game turn
         /// </summary>

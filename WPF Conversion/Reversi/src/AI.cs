@@ -3,7 +3,7 @@
 /// </summary>
 
 using System;
-using System.Drawing;
+using System.Windows;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
@@ -133,7 +133,7 @@ namespace Reversi
                         ChosenMove = ResultMove;
                 }
 
-                SourceBoard.MakeMove(ChosenMove.X, ChosenMove.Y, AITurn);
+                SourceBoard.MakeMove(ChosenMove, AITurn);
 
                 //****GraphicsUtil.RefreshPieces();
 
@@ -235,6 +235,17 @@ namespace Reversi
         /// <returns>The net value of a single spot on the board</returns>
         private double ScoreMove(Board CurrentBoard, Point Move)
         {
+            return (ScoreMove(CurrentBoard, Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y)));
+        }
+
+        /// <summary>
+        /// Returns the value of a single spot on the board
+        /// </summary>
+        /// <param name="CurrentBoard">The game board to use</param>
+        /// <param name="Move">The move to consider</param>
+        /// <returns>The net value of a single spot on the board</returns>
+        private double ScoreMove(Board CurrentBoard, int SourceX, int SourceY)
+        {
             double score = 0;
 
             /*
@@ -243,7 +254,7 @@ namespace Reversi
                     score = BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
             */
 
-            return (score * -1 + BoardValueMask[Move.X, Move.Y]);
+            return (score * -1 + BoardValueMask[SourceX, SourceY]);
         }
 
         /// <summary>

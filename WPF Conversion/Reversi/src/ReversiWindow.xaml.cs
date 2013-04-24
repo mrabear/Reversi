@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,20 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Threading;
-using System.Windows.Threading;
-
-public static class ExtensionMethods
-{
-
-    private static Action EmptyDelegate = delegate() { };
-
-
-    public static void Refresh(this UIElement uiElement)
-    {
-        uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
-    }
-}
 
 namespace Reversi
 {
@@ -86,21 +71,49 @@ namespace Reversi
             // Static binds
             //gGameBoardGrid = GameBoardGrid;
             //gWhitePieceImage.Source = .UriSource = new Uri("/Reversi;/img/WhitePiece.png");
-            FormUtil.StartNewGame();
+            StartNewGame();
         }
 
         private void GameBoardSurface_MouseDown(object sender, MouseButtonEventArgs e)
         {
-           
-            Point PlayerMove = e.GetPosition(this);
+            Point PlayerMove = e.GetPosition(GameBoardSurface);
 
-            if (FormUtil.PlaceUserPiece(PlayerMove))
-            {
-                //GameBoardSurface.UpdateBoard(CurrentGame.GetGameBoard());
+            if (PlaceUserPiece(PlayerMove))
                 GameBoardSurface.InvalidateVisual();
-            }
 
             Console.WriteLine("Click at " + PlayerMove.X + "," + PlayerMove.Y );
+        }
+
+        /// <summary>
+        /// Responds to the MouseUp event on the board image, processes the click as a placed piece
+        /// </summary>
+        public static bool PlaceUserPiece(Point MouseClick)
+        {
+            int GridX = Convert.ToInt32(Math.Floor(( MouseClick.X ) / Properties.Settings.Default.GRID_SIZE));
+            int GridY = Convert.ToInt32(Math.Floor(( MouseClick.Y ) / Properties.Settings.Default.GRID_SIZE));
+
+            // Don't process the mouse click if there is a turn already being processed
+            if (!GetCurrentGame().GetTurnInProgress())
+                return (GetCurrentGame().ProcessTurn(GridX, GridY));
+
+            return (false);
+        }
+
+        /// <summary>
+        /// Resets the form elements to prepare for a new game
+        /// </summary>
+        public static void StartNewGame()
+        {
+            // Start a new game
+            ResetCurrentGame();
+
+            // Setup the AI player
+            GetCurrentGame().GetAI().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
+            GetCurrentGame().GetAI().SetVisualizeProcess(true);
+
+            // Force a repaint of the game board and score board
+            //gGameBoardSurface.Invalidate();
+            //gScoreBoardSurface.Invalidate();
         }
     }
 }

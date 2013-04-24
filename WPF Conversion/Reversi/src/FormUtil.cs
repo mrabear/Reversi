@@ -22,22 +22,7 @@ namespace Reversi
     /// </summary>
     public class FormUtil : ReversiWindow
     {
-        /// <summary>
-        /// Resets the form elements to prepare for a new game
-        /// </summary>
-        public static void StartNewGame()
-        {
-            // Start a new game
-            ResetCurrentGame();
 
-            // Setup the AI player
-            GetCurrentGame().GetAI().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
-            GetCurrentGame().GetAI().SetVisualizeProcess(true);
-
-            // Force a repaint of the game board and score board
-            //gGameBoardSurface.Invalidate();
-            //gScoreBoardSurface.Invalidate();
-        }
 
         /// <summary>
         /// Updates the current game and form elements with the current simulation max depth
@@ -48,22 +33,7 @@ namespace Reversi
             //gCurrentGame.GetAI().SetMaxDepth(gSimulationDepthSlider.Value - 1);
         }
 
-        /// <summary>
-        /// Responds to the MouseUp event on the board image, processes the click as a placed piece
-        /// </summary>
-        public static bool PlaceUserPiece( Point MouseClick )
-        {
-            int GridX = Convert.ToInt32((MouseClick.X + 1) / Properties.Settings.Default.GRID_SIZE);
-            int GridY = Convert.ToInt32((MouseClick.Y + 1) / Properties.Settings.Default.GRID_SIZE);
 
-            Console.WriteLine("\tGrid Coords: " + GridX + "," + GridY);
-
-            // Don't process the mouse click if there is a turn already being processed
-            if (!GetCurrentGame().GetTurnInProgress())
-                return (GetCurrentGame().ProcessTurn(GridX,GridY));
-
-            return (false);
-        }
 
         /// <summary>
         /// Thread safe delegates for setting the debug window with the new text

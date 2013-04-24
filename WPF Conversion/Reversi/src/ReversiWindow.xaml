@@ -12,7 +12,7 @@
             <GradientStop Color="White" Offset="1"/>
         </LinearGradientBrush>
     </Window.Foreground>
-    <Canvas HorizontalAlignment="Left" Height="660" VerticalAlignment="Top" Width="660" MouseDown="GameBoardSurface_MouseDown" Background="#00000000" Cursor="Hand" Margin="34,84,0,0">
+    <Canvas x:Name="ClickSurface" HorizontalAlignment="Left" Height="660" VerticalAlignment="Top" Width="660" MouseDown="GameBoardSurface_MouseDown" Background="#00000000" Cursor="Hand" Margin="30,80,0,0">
         <local:GameBoard x:Name="GameBoardSurface" Height="640" Width="640" Margin="10,10,10,10"/>
     </Canvas>
 </Window>

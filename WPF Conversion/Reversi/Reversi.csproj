@@ -60,7 +60,6 @@
     <Compile Include="src\FormUtil.cs" />
     <Compile Include="src\ui\GameBoard.cs" />
     <Compile Include="src\GraphicsUtil.cs" />
-    <Compile Include="src\SimulationNode.cs" />
     <Page Include="src\ReversiWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

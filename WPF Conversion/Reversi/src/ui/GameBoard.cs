@@ -17,17 +17,18 @@ namespace Reversi
     public class GameBoard : FrameworkElement
     {
 
-        public static ImageSource gBlackPieceImage;
-        public static ImageSource gWhitePieceImage;
-        public static ImageSource gSuggestedPieceImage;
+        private static ImageSource gBlackPieceImage;
+        private static ImageSource gWhitePieceImage;
+        private static ImageSource gSuggestedPieceImage;
 
        //private static Board MainBoard;
         private static Board LastDrawnBoard;
+        private static Board WorkBoard;
 
         //private static List<Visual> BoardPieces;
 
         // Be sure to call the base class constructor. 
-        public GameBoard()
+        public GameBoard() : base()
         {
             Initialize();
         }
@@ -38,6 +39,8 @@ namespace Reversi
 
             LastDrawnBoard = new Board();
             LastDrawnBoard.ClearBoard();
+
+            WorkBoard = new Board();
 
             gBlackPieceImage = GraphicsUtil.GenerateImageSource(Properties.Resources.BlackPiece);
             gWhitePieceImage = GraphicsUtil.GenerateImageSource(Properties.Resources.WhitePiece);
@@ -58,17 +61,44 @@ namespace Reversi
                 return null;
         }
 
-        public void Refresh(DrawingContext dc)
-        {   
-            Board MainBoard = new Board(ReversiWindow.GetCurrentGame().GetGameBoard());
+        public void DrawPieces(DrawingContext dc)
+        {
+            WorkBoard = new Board(ReversiWindow.GetCurrentGame().GetGameBoard());
 
-            for (int Y = 0; Y < MainBoard.GetBoardSize(); Y++)
-                for (int X = 0; X < MainBoard.GetBoardSize(); X++)
-                    //if ((LastDrawnBoard.ColorAt(X, Y) != MainBoard.ColorAt(X, Y)))
-                        //dc.DrawRectangle(System.Windows.Media.Brushes.LightBlue, (System.Windows.Media.Pen)null, GetBoardRect(X, Y));
-                        dc.DrawImage(GetGamePiece(MainBoard.ColorAt(X, Y)), GetBoardRect(X, Y));             
+            for (int Y = 0; Y < WorkBoard.GetBoardSize(); Y++)
+                for (int X = 0; X < WorkBoard.GetBoardSize(); X++)
+                //if ((LastDrawnBoard.ColorAt(X, Y) != MainBoard.ColorAt(X, Y)))
+                    //dc.DrawRectangle(null, new Pen(System.Windows.Media.Brushes.White, 1), GetBoardRect(X,Y));
+                    dc.DrawImage(GetGamePiece(WorkBoard.ColorAt(X, Y)), GetBoardRect(X, Y));
 
-            LastDrawnBoard = new Board(MainBoard);
+            LastDrawnBoard = new Board(WorkBoard);
+        }
+
+        /// <summary>
+        /// Marks all of the available moves for the given turn on the current game board
+        /// </summary>
+        /// <param name="Turn">The turn to use</param>
+        public void DrawAvailableMoves(DrawingContext dc)
+        {
+            DrawAvailableMoves(dc, ReversiWindow.GetCurrentGame().GetGameBoard(), ReversiWindow.GetCurrentGame().GetCurrentTurn());
+        }
+
+        /// <summary>
+        /// Marks all of the available moves for the given turn on the given game board
+        /// </summary>
+        /// <param name="SourceBoard">The game board</param>
+        /// <param name="Turn">The turn to use</param>
+        public void DrawAvailableMoves(DrawingContext dc, Board SourceBoard, int Turn)
+        {
+            if ((ReversiWindow.GetCurrentGame().GetCurrentTurn() != ReversiWindow.GetCurrentGame().GetAI().GetColor()) || (!ReversiWindow.GetCurrentGame().IsVsComputer()))
+                // Loop through all available moves and place a dot at the location
+                foreach (Point CurrentPiece in WorkBoard.AvailableMoves(ReversiWindow.GetCurrentGame().GetCurrentTurn()))
+                    dc.DrawImage(gSuggestedPieceImage, GetBoardRect(CurrentPiece));
+        }
+
+        private Rect GetBoardRect(Point SourceLocation)
+        {
+            return ( GetBoardRect( Convert.ToInt32( SourceLocation.X ), Convert.ToInt32( SourceLocation.Y ) ) );
         }
 
         private Rect GetBoardRect(int X, int Y)
@@ -79,12 +109,13 @@ namespace Reversi
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            Refresh(dc);
 
-            //Random rnd = new Random();
-            //dc.DrawRectangle(System.Windows.Media.Brushes.LightBlue, (System.Windows.Media.Pen)null, GetBoardRect(rnd.Next(7), rnd.Next(7)));
-            //dc.DrawImage(GetGamePiece(1), GetBoardRect(rnd.Next(7), rnd.Next(7)));
-            //dc.DrawImage(GetGamePiece(2), GetBoardRect(rnd.Next(7), rnd.Next(7)));
+            // Filter for the design time tool
+            if (ReversiWindow.GetCurrentGame() != null)
+            {
+                DrawPieces(dc);
+                DrawAvailableMoves(dc);
+            }
         }
     }
 }

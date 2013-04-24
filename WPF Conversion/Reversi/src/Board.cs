@@ -3,7 +3,7 @@
 /// </summary>
 
 using System;
-using System.Drawing;
+using System.Windows;
 using System.Collections.Generic;
 
 namespace Reversi
@@ -74,7 +74,7 @@ namespace Reversi
         /// <returns>True if the move is located within the game board</returns>
         public Boolean InBounds(Point SourcePoint)
         {
-            return(InBounds( SourcePoint.X, SourcePoint.Y ));
+            return(InBounds( Convert.ToInt32(SourcePoint.X), Convert.ToInt32(SourcePoint.Y )));
         }
 
         /// <summary>
@@ -167,7 +167,7 @@ namespace Reversi
         /// <returns>The color at the given point</returns>
         public int ColorAt(Point SourcePoint)
         {
-            return( ColorAt( SourcePoint.X, SourcePoint.Y ));
+            return( ColorAt( Convert.ToInt32(SourcePoint.X), Convert.ToInt32(SourcePoint.Y) ));
         }
 
         /// <summary>
@@ -182,6 +182,19 @@ namespace Reversi
                 return ReversiWindow.ERROR;
 
             return(BoardPieces[X, Y]);
+        }
+
+        /// <summary>
+        /// Attempts to process the implications of a legal move and updates the board if ProcessMove = true
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        /// <param name="color">The X value of the move</param>
+        /// <param name="ProcessMove">The Y value of the move</param>
+        /// <returns>The color at the given point</returns>
+        public Boolean MakeMove(Point SourceMove, int SourceTurn, Boolean CommitMove = true)
+        {
+            return (MakeMove(Convert.ToInt32(SourceMove.X), Convert.ToInt32(SourceMove.Y), SourceTurn, CommitMove));
         }
 
         /// <summary>
@@ -330,7 +343,7 @@ namespace Reversi
         /// <param name="Turn">The move turn</param>
         public void PutPiece(Point Move, int Turn)
         {
-            PutPiece(Move.X, Move.Y, Turn);
+            PutPiece(Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y), Turn);
         }
 
         /// <summary>
