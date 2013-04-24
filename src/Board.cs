@@ -3,7 +3,7 @@
 /// </summary>
 
 using System;
-using System.Drawing;
+using System.Windows;
 using System.Collections.Generic;
 
 namespace Reversi
@@ -18,6 +18,12 @@ namespace Reversi
 
         // The size of the board, which will always be BoardSize x BoardSize
         private int BoardSize;
+
+        // The values used to represent the colors on the board array
+        public static int WHITE = Reversi.Properties.Settings.Default.WHITE;
+        public static int BLACK = Reversi.Properties.Settings.Default.BLACK;
+        public static int EMPTY = Reversi.Properties.Settings.Default.EMPTY;
+        public static int ERROR = Reversi.Properties.Settings.Default.ERROR;
 
         /// <summary>
         /// The default constructor creates an 8x8 board
@@ -74,7 +80,7 @@ namespace Reversi
         /// <returns>True if the move is located within the game board</returns>
         public Boolean InBounds(Point SourcePoint)
         {
-            return(InBounds( SourcePoint.X, SourcePoint.Y ));
+            return(InBounds( Convert.ToInt32(SourcePoint.X), Convert.ToInt32(SourcePoint.Y )));
         }
 
         /// <summary>
@@ -167,7 +173,7 @@ namespace Reversi
         /// <returns>The color at the given point</returns>
         public int ColorAt(Point SourcePoint)
         {
-            return( ColorAt( SourcePoint.X, SourcePoint.Y ));
+            return( ColorAt( Convert.ToInt32(SourcePoint.X), Convert.ToInt32(SourcePoint.Y) ));
         }
 
         /// <summary>
@@ -179,9 +185,22 @@ namespace Reversi
         public int ColorAt(int X, int Y)
         {
             if( !InBounds( X, Y ))
-                return ReversiApplication.ERROR;
+                return Board.ERROR;
 
             return(BoardPieces[X, Y]);
+        }
+
+        /// <summary>
+        /// Attempts to process the implications of a legal move and updates the board if ProcessMove = true
+        /// </summary>
+        /// <param name="X">The X value of the move</param>
+        /// <param name="Y">The Y value of the move</param>
+        /// <param name="color">The X value of the move</param>
+        /// <param name="ProcessMove">The Y value of the move</param>
+        /// <returns>The color at the given point</returns>
+        public Boolean MakeMove(Point SourceMove, int SourceTurn, Boolean CommitMove = true)
+        {
+            return (MakeMove(Convert.ToInt32(SourceMove.X), Convert.ToInt32(SourceMove.Y), SourceTurn, CommitMove));
         }
 
         /// <summary>
@@ -197,13 +216,13 @@ namespace Reversi
             int CurrentTurn = SourceTurn;
             int NextTurn;
 
-            if (CurrentTurn == ReversiApplication.WHITE)
-                NextTurn = ReversiApplication.BLACK;
+            if (CurrentTurn == Board.WHITE)
+                NextTurn = Board.BLACK;
             else
-                NextTurn = ReversiApplication.WHITE;
+                NextTurn = Board.WHITE;
 
             // Check for already existing piece
-            if (ColorAt(MoveX, MoveY) != ReversiApplication.EMPTY)
+            if (ColorAt(MoveX, MoveY) != Board.EMPTY)
                 return false;
 
             Boolean findStatus = false;
@@ -278,7 +297,7 @@ namespace Reversi
             int foundMoves = 0;
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == ReversiApplication.EMPTY)
+                    if (ColorAt(X, Y) == Board.EMPTY)
                         if (MakeMove(X, Y, CurrentTurn, CommitMove: false))
                         {
                             Moves[foundMoves] = new Point(X, Y);
@@ -298,7 +317,7 @@ namespace Reversi
         /// <returns>True if either player can make a legal move</returns>
         public bool MovePossible()
         {
-            if ((MovePossible(ReversiApplication.BLACK)) || (MovePossible(ReversiApplication.WHITE)))
+            if ((MovePossible(Board.BLACK)) || (MovePossible(Board.WHITE)))
                 return (true);
 
             return (false);
@@ -315,7 +334,7 @@ namespace Reversi
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
                     // Simulate a move, if successful, we know that there is at least this legal move
-                    if (ColorAt(X, Y) == ReversiApplication.EMPTY)
+                    if (ColorAt(X, Y) == Board.EMPTY)
                         if (MakeMove(X, Y, Turn, CommitMove: false))
                             return true;
 
@@ -330,7 +349,7 @@ namespace Reversi
         /// <param name="Turn">The move turn</param>
         public void PutPiece(Point Move, int Turn)
         {
-            PutPiece(Move.X, Move.Y, Turn);
+            PutPiece(Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y), Turn);
         }
 
         /// <summary>
@@ -341,10 +360,10 @@ namespace Reversi
         /// <param name="Turn">The move turn</param>
         public void PutPiece(int X, int Y, int Turn)
         {
-            if ((Turn == ReversiApplication.WHITE) || (Turn == ReversiApplication.BLACK))
+            if ((Turn == Board.WHITE) || (Turn == Board.BLACK))
                 BoardPieces[X, Y] = Turn;
             else
-                BoardPieces[X, Y] = ReversiApplication.EMPTY;
+                BoardPieces[X, Y] = Board.EMPTY;
         }
 
         /// <summary>
@@ -362,24 +381,24 @@ namespace Reversi
         {
             if (BoardSize == 8)
             {
-                PutPiece(3, 3, ReversiApplication.WHITE);
-                PutPiece(4, 4, ReversiApplication.WHITE);
-                PutPiece(3, 4, ReversiApplication.BLACK);
-                PutPiece(4, 3, ReversiApplication.BLACK);
+                PutPiece(3, 3, Board.WHITE);
+                PutPiece(4, 4, Board.WHITE);
+                PutPiece(3, 4, Board.BLACK);
+                PutPiece(4, 3, Board.BLACK);
             }
             else if (BoardSize == 6)
             {
-                PutPiece(2, 2, ReversiApplication.WHITE);
-                PutPiece(3, 3, ReversiApplication.WHITE);
-                PutPiece(2, 3, ReversiApplication.BLACK);
-                PutPiece(3, 2, ReversiApplication.BLACK);
+                PutPiece(2, 2, Board.WHITE);
+                PutPiece(3, 3, Board.WHITE);
+                PutPiece(2, 3, Board.BLACK);
+                PutPiece(3, 2, Board.BLACK);
             }
             else
             {
-                PutPiece(1, 1, ReversiApplication.WHITE);
-                PutPiece(2, 2, ReversiApplication.WHITE);
-                PutPiece(1, 2, ReversiApplication.BLACK);
-                PutPiece(2, 1, ReversiApplication.BLACK);
+                PutPiece(1, 1, Board.WHITE);
+                PutPiece(2, 2, Board.WHITE);
+                PutPiece(1, 2, Board.BLACK);
+                PutPiece(2, 1, Board.BLACK);
             }
         }
 
@@ -408,22 +427,22 @@ namespace Reversi
         {
             if (!MovePossible())
             {
-                int WhiteScore = FindScore(ReversiApplication.WHITE);
-                int BlackScore = FindScore(ReversiApplication.BLACK);
+                int WhiteScore = FindScore(Board.WHITE);
+                int BlackScore = FindScore(Board.BLACK);
 
                 // Black Wins
                 if (BlackScore > WhiteScore)
-                    return (ReversiApplication.BLACK);
+                    return (Board.BLACK);
                 // White Wins
                 else if (BlackScore < WhiteScore)
-                    return (ReversiApplication.WHITE);
+                    return (Board.WHITE);
                 // Tie Game
                 else
-                    return (ReversiApplication.EMPTY);
+                    return (Board.EMPTY);
             }
 
             // No victory
-            return (ReversiApplication.ERROR);
+            return (Board.ERROR);
         }
 
         /// <summary>

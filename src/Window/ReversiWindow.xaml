@@ -14,5 +14,6 @@
     </Window.Foreground>
     <Canvas x:Name="ClickSurface" HorizontalAlignment="Left" Height="660" VerticalAlignment="Top" Width="660" MouseDown="PlaceUserPiece" Background="#00000000" Cursor="Hand" Margin="30,80,0,0">
         <local:GameBoard x:Name="GameBoardSurface" Height="640" Width="640" Margin="10,10,10,10"/>
+        <local:ScoreBoard x:Name="ScoreBoardSurface" Height="87" Canvas.Left="480" Canvas.Top="-83" Width="170"/>
     </Canvas>
 </Window>

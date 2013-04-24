@@ -3,23 +3,14 @@
 /// </summary>
 
 using System;
-using System.Management;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Reversi
 {
     /// <summary>
     /// A subclass of ReversiForm, used to manipulate the various form elements
     /// </summary>
-    public class DebugUtil
+    public static class DebugTools
     {
         /// <summary>
         /// Updates the current game and form elements with the current simulation max depth

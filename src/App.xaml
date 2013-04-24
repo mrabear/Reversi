@@ -1,7 +1,7 @@
 ﻿<Application x:Class="Reversi.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="src/ReversiWindow.xaml">
+             StartupUri="src/Window/ReversiWindow.xaml">
     <Application.Resources>
          
     </Application.Resources>

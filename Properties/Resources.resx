@@ -119,22 +119,22 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="BlackPiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\blackpiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\img\BlackPiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="DebugButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\DebugButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="GreenBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\GreenBackground.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="FormBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\FormBackground.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="NewGameButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\NewGameButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="WhitePiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\whitepiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="NewGameButton_Hover" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\NewGameButton_Hover.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="GameBoard" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\GameBoard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ScoreBoard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\ScoreBoard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ScoreBoard_BlackTurn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\ScoreBoard_BlackTurn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -145,7 +145,10 @@
   <data name="SuggestedPiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\SuggestedPiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NewGameButton_Hover" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\NewGameButton_Hover.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Title" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\Title.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="WhitePiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\WhitePiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

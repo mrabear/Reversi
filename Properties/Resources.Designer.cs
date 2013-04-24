@@ -83,19 +83,9 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap GameBoard {
+        internal static System.Drawing.Bitmap FormBackground {
             get {
-                object obj = ResourceManager.GetObject("GameBoard", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap GreenBackground {
-            get {
-                object obj = ResourceManager.GetObject("GreenBackground", resourceCulture);
+                object obj = ResourceManager.GetObject("FormBackground", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -116,6 +106,16 @@ namespace Reversi.Properties {
         internal static System.Drawing.Bitmap NewGameButton_Hover {
             get {
                 object obj = ResourceManager.GetObject("NewGameButton_Hover", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ScoreBoard {
+            get {
+                object obj = ResourceManager.GetObject("ScoreBoard", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -146,6 +146,16 @@ namespace Reversi.Properties {
         internal static System.Drawing.Bitmap SuggestedPiece {
             get {
                 object obj = ResourceManager.GetObject("SuggestedPiece", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Title {
+            get {
+                object obj = ResourceManager.GetObject("Title", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

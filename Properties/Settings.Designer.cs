@@ -52,46 +52,37 @@ namespace Reversi.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.1")]
-        public double MemoryFloor {
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int ERROR {
             get {
-                return ((double)(this["MemoryFloor"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int MaxDepth {
-            get {
-                return ((int)(this["MaxDepth"]));
+                return ((int)(this["ERROR"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("6")]
-        public int VictoryWeight {
+        public int MAX_SIM_DEPTH {
             get {
-                return ((int)(this["VictoryWeight"]));
+                return ((int)(this["MAX_SIM_DEPTH"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int VICTORY_WEIGHT {
+            get {
+                return ((int)(this["VICTORY_WEIGHT"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public int GridSize {
+        public int GRID_SIZE {
             get {
-                return ((int)(this["GridSize"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
-        public int ERROR {
-            get {
-                return ((int)(this["ERROR"]));
+                return ((int)(this["GRID_SIZE"]));
             }
         }
     }
