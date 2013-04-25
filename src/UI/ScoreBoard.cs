@@ -1,5 +1,6 @@
 /// <summary>
 /// Reversi.ScoreBoard.cs
+/// Brian A. Hebert
 /// </summary>
 
 using System;

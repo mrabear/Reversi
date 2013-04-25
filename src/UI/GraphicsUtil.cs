@@ -1,5 +1,6 @@
 /// <summary>
 /// Reversi.GraphicsTools.cs
+/// Brian A. Hebert
 /// </summary>
 
 using System;

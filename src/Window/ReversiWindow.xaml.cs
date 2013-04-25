@@ -1,5 +1,6 @@
 ﻿/// <summary>
 /// Reversi.ReversiWindow.cs
+/// Brian A. Hebert
 /// </summary>
 
 using System;

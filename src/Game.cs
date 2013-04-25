@@ -1,5 +1,6 @@
 /// <summary>
 /// Reversi.Game.cs
+/// Brian A. Hebert
 /// </summary>
 
 using System;

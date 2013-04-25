@@ -1,5 +1,6 @@
 /// <summary>
 /// Reversi.AI.cs
+/// Brian A. Hebert
 /// </summary>
 
 using System;
