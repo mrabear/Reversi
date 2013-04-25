@@ -26,10 +26,11 @@ namespace Reversi
         public ReversiWindow()
         {
             InitializeComponent();
-            StartNewGame();
 
             gGameBoardSurface = GameBoardSurface;
             gScoreBoardSurface = ScoreBoardSurface;
+
+            StartNewGame();
         }
 
         /// <summary>
@@ -44,25 +45,7 @@ namespace Reversi
 
             if (!App.GetActiveGame().GetTurnInProgress())
                 if (App.GetActiveGame().ProcessUserTurn(GridClickX, GridClickY))
-                    RefreshGameBoard();
-        }
-
-        /// <summary>
-        /// The thread safe way to refresh the game graphic elements
-        /// </summary>
-        public static void RefreshGameBoard()
-        {
-            if (gGameBoardSurface != null)
-                gGameBoardSurface.Dispatcher.Invoke(InvalidateGraphics);
-        }
-
-        /// <summary>
-        /// Thread unsafe way to refresh the game graphics
-        /// </summary>
-        private static void InvalidateGraphics()
-        {        
-            gGameBoardSurface.InvalidateVisual();
-            gScoreBoardSurface.InvalidateVisual();
+                    GameBoard.RefreshGameBoardPieces();
         }
 
         /// <summary>
@@ -74,12 +57,15 @@ namespace Reversi
             App.ResetActiveGame();
             App.GetActiveGame().SetSinglePlayerGame(SinglePlayerButtonSelected);
 
+            // Clear the display game board
+            gGameBoardSurface.Clear();
+
             // Setup the AI player
             App.GetComputerPlayer().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
             App.GetComputerPlayer().SetVisualizeProcess(true);
 
             // Force a repaint of the game board and score board
-            RefreshGameBoard();
+            GameBoard.RefreshGameBoardPieces();
         }
 
         #region Top Menu Event Handlers

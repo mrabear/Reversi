@@ -285,7 +285,7 @@ namespace Reversi
         {
             App.GetActiveGame().SetTurnInProgress(false);
             App.GetActiveGame().SwitchTurn();
-            ReversiWindow.RefreshGameBoard();
+            GameBoard.RefreshGameBoardPieces();
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace Reversi
                 if (App.GetActiveGameBoard().MovePossible(GetColor() == Board.BLACK ? Board.WHITE : Board.BLACK))
                     break;
                 else
-                    ReversiWindow.RefreshGameBoard();
+                    GameBoard.RefreshGameBoardPieces();
             }
         }
 

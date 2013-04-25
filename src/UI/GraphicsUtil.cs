@@ -27,6 +27,6 @@ namespace Reversi
                 GivenImageSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(GivenImage.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
 
             return GivenImageSource;
-        }  
+        }
     }
 }
