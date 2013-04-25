@@ -14,7 +14,7 @@ namespace Reversi
     {
         private int CurrentTurn;
         private int NextTurn;
-        private Boolean VsComputer = true;
+        private Boolean SinglePlayerGame = true;
         private Boolean IsComplete = false;
         private Boolean ProcessMoves = true;
         private Boolean TurnInProgress = false;
@@ -40,7 +40,8 @@ namespace Reversi
         /// </summary>
         public int GetCurrentTurn() { return CurrentTurn; }
 
-        public bool IsVsComputer() { return VsComputer; }
+        public bool IsSinglePlayerGame() { return SinglePlayerGame; }
+        public void SetSinglePlayerGame(bool SinglePlayerGameFlag) { SinglePlayerGame = SinglePlayerGameFlag; }
 
         /// <summary>
         /// Sets the current game turn
@@ -106,7 +107,7 @@ namespace Reversi
             if (!IsComplete)
             {
                 // As long as this isn't an AI turn, process the requested move
-                if (!((VsComputer) && (CurrentTurn == App.GetComputerPlayer().GetColor())))
+                if (!((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor())))
                 {
                     if (App.GetActiveGameBoard().MovePossible(CurrentTurn))
                     {
@@ -120,7 +121,7 @@ namespace Reversi
                     }
                 }
 
-                if ((VsComputer) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
+                if ((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
                     App.GetComputerPlayer().ProcessAITurn();
                 else
                     TurnInProgress = false;

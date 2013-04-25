@@ -93,9 +93,9 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NewGameButton {
+        internal static System.Drawing.Bitmap MultiPlayer {
             get {
-                object obj = ResourceManager.GetObject("NewGameButton", resourceCulture);
+                object obj = ResourceManager.GetObject("MultiPlayer", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,39 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap NewGameButton_Hover {
+        internal static System.Drawing.Bitmap MultiPlayer_Inactive {
             get {
-                object obj = ResourceManager.GetObject("NewGameButton_Hover", resourceCulture);
+                object obj = ResourceManager.GetObject("MultiPlayer_Inactive", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap NewGame {
+            get {
+                object obj = ResourceManager.GetObject("NewGame", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap NextMove {
+            get {
+                object obj = ResourceManager.GetObject("NextMove", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap PreviousMove {
+            get {
+                object obj = ResourceManager.GetObject("PreviousMove", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -136,6 +166,26 @@ namespace Reversi.Properties {
         internal static System.Drawing.Bitmap ScoreBoard_WhiteTurn {
             get {
                 object obj = ResourceManager.GetObject("ScoreBoard_WhiteTurn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SinglePlayer {
+            get {
+                object obj = ResourceManager.GetObject("SinglePlayer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SinglePlayer_Inactive {
+            get {
+                object obj = ResourceManager.GetObject("SinglePlayer_Inactive", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

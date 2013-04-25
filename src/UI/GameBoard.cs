@@ -71,9 +71,11 @@ namespace Reversi
         {
             for (int Y = 0; Y < BoardToDisplay.GetBoardSize(); Y++)
                 for (int X = 0; X < BoardToDisplay.GetBoardSize(); X++)
-                //if ((LastDrawnBoard.ColorAt(X, Y) != MainBoard.ColorAt(X, Y)))
-                    //dc.DrawRectangle(null, new Pen(System.Windows.Media.Brushes.White, 1), GetBoardRect(X,Y));
+                {
+                    //if ((LastDrawnBoard.ColorAt(X, Y) != MainBoard.ColorAt(X, Y)))
+                    //dc.DrawRectangle(null, new Pen(System.Windows.Media.Brushes.White, 1), GetBoardRect(X, Y));
                     dc.DrawImage(GetGamePiece(BoardToDisplay.ColorAt(X, Y)), GetBoardRect(X, Y));
+                }
 
             //LastDrawnBoard = new Board(DisplayBoard);
         }
@@ -94,7 +96,7 @@ namespace Reversi
         /// <param name="Turn">The turn to use</param>
         public void DrawAvailableMoves(DrawingContext dc, Board SourceBoard, int Turn)
         {
-            if ((App.GetActiveGame().GetCurrentTurn() != App.GetComputerPlayer().GetColor()) || (!App.GetActiveGame().IsVsComputer()))
+            if ((App.GetActiveGame().GetCurrentTurn() != App.GetComputerPlayer().GetColor()) || (!App.GetActiveGame().IsSinglePlayerGame()))
                 // Loop through all available moves and place a dot at the location
                 foreach (Point CurrentPiece in SourceBoard.AvailableMoves(App.GetActiveGame().GetCurrentTurn()))
                     dc.DrawImage(gSuggestedPieceImage, GetBoardRect(CurrentPiece));

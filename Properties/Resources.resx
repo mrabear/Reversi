@@ -127,11 +127,20 @@
   <data name="FormBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\FormBackground.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NewGameButton" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\NewGameButton.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="MultiPlayer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\MultiPlayer.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="NewGameButton_Hover" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\NewGameButton_Hover.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="MultiPlayer_Inactive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\MultiPlayer_Inactive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NewGame" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\NewGame.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NextMove" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\NextMove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PreviousMove" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\PreviousMove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ScoreBoard" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\ScoreBoard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -141,6 +150,12 @@
   </data>
   <data name="ScoreBoard_WhiteTurn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\ScoreBoard_WhiteTurn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SinglePlayer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\SinglePlayer.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SinglePlayer_Inactive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\SinglePlayer_Inactive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SuggestedPiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\SuggestedPiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

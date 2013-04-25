@@ -58,7 +58,6 @@ namespace Reversi
 
             AIBGWorker.DoWork += AIBGWorker_DoWork;
             AIBGWorker.RunWorkerCompleted += AIBGWorker_Completed;
-
         }
 
         #region Getters and Setters

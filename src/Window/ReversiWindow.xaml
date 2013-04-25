@@ -1,19 +1,53 @@
-﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Reversi" x:Name="Reversi_Window" x:Class="Reversi.ReversiWindow"
         Title="Reversi" Height="800" Width="735" ResizeMode="CanMinimize" Icon="/Reversi;component/ReversiIcon.ico" WindowStartupLocation="CenterScreen">
+
     <Window.Background>
         <ImageBrush ImageSource="/Reversi;component/img/FormBackground.png" Stretch="None"/>
     </Window.Background>
+
     <Window.Foreground>
         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
             <GradientStop Color="Black" Offset="0"/>
             <GradientStop Color="White" Offset="1"/>
         </LinearGradientBrush>
     </Window.Foreground>
-    <Canvas x:Name="ClickSurface" HorizontalAlignment="Left" Height="660" VerticalAlignment="Top" Width="660" MouseDown="PlaceUserPiece" Background="#00000000" Cursor="Hand" Margin="30,80,0,0">
-        <local:GameBoard x:Name="GameBoardSurface" Height="640" Width="640" Margin="10,10,10,10"/>
-        <local:ScoreBoard x:Name="ScoreBoardSurface" Height="87" Canvas.Left="480" Canvas.Top="-83" Width="170"/>
-    </Canvas>
+
+    <Grid HorizontalAlignment="Left" Height="772" Margin="0,0,-1,0" VerticalAlignment="Top" Width="730">
+        <Grid x:Name="GameBoardClickSurface" Background="#00000000" Cursor="Hand" HorizontalAlignment="Left" Height="660" MouseDown="PlaceUserPiece" Margin="30,80,0,0" VerticalAlignment="Top" Width="660" >
+            <local:GameBoard x:Name="GameBoardSurface" Margin="9,10,11,10"/>
+        </Grid>
+        <local:ScoreBoard x:Name="ScoreBoardSurface" Margin="513,0,43,684" Width="174" Height="88"/>
+        <Grid x:Name="MenuButtonGrid" HorizontalAlignment="Left" Height="70" Margin="283,4,0,0" VerticalAlignment="Top" Width="155" Background="#00000000" MouseEnter="MenuButtonGrid_MouseEnter" MouseLeave="MenuButtonGrid_MouseLeave">
+
+            <Ellipse x:Name="TopMenuBorder" HorizontalAlignment="Left" Height="132" Margin="0,-78,0,0" Stroke="#FF03CC17" VerticalAlignment="Top" Width="155" StrokeThickness="5" Opacity="0.1">
+                <Ellipse.Clip>
+                    <RectangleGeometry Rect="0,74,160,140"/>
+                </Ellipse.Clip>
+            </Ellipse>
+
+            <Image x:Name="PreviousMoveButton" HorizontalAlignment="Left" Height="30" Margin="26,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/PreviousMove.png" Cursor="Hand" Opacity="0.1"/>
+
+            <Image x:Name="NewGameButton" HorizontalAlignment="Left" Height="30" Margin="64,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/NewGame.png" Cursor="Hand" Opacity="0.1" MouseUp="NewGameButton_MouseUp" ToolTip="Start New Game" MouseDown="NewGameButton_MouseDown"/>
+
+            <Image x:Name="NextMoveButton" HorizontalAlignment="Left" Height="30" Margin="100,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/NextMove.png" Cursor="Hand" Opacity="0.1"/>
+
+            <Image x:Name="MultiPlayerButton" HorizontalAlignment="Left" Height="37" Margin="42,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/MultiPlayer.png" Cursor="Hand" Opacity="0.4" Stretch="None" ToolTip="Player vs. Player" MouseEnter="MultiPlayerButton_MouseEnter" MouseDown="MultiPlayerButton_MouseDown" MouseLeave="MultiPlayerButton_MouseLeave" Visibility="Hidden" MouseUp="MultiPlayerButton_MouseUp"/>
+
+            <Image x:Name="SinglePlayerButton" HorizontalAlignment="Left" Height="37" Margin="79,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/SinglePlayer.png" Cursor="Hand"  Opacity="0.4" Stretch="None" ToolTip="Single Player vs. Computer" MouseEnter="SinglePlayerButton_MouseEnter" MouseDown="SinglePlayerButton_MouseDown" MouseLeave="SinglePlayerButton_MouseLeave" MouseUp="SinglePlayerButton_MouseUp"/>
+
+            <Image x:Name="MultiPlayerButtonInactive" HorizontalAlignment="Left" Height="37" Margin="42,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/MultiPlayer_Inactive.png" Cursor="Hand" Opacity="0.35" Stretch="None" ToolTip="Player vs. Player" MouseEnter="MultiPlayerButton_MouseEnter" MouseDown="MultiPlayerButton_MouseDown" MouseLeave="MultiPlayerButton_MouseLeave">
+                <Image.Effect>
+                    <BlurEffect Radius="4"/>
+                </Image.Effect>
+            </Image>
+
+            <Image x:Name="SinglePlayerButtonInactive" HorizontalAlignment="Left" Height="37" Margin="79,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/SinglePlayer_Inactive.png" Cursor="Hand" Opacity="0.35" Stretch="None" ToolTip="Single Player vs. Computer" MouseEnter="SinglePlayerButton_MouseEnter" MouseDown="SinglePlayerButton_MouseDown" MouseLeave="SinglePlayerButton_MouseLeave" Visibility="Hidden">
+                <Image.Effect>
+                    <BlurEffect Radius="4"/>
+                </Image.Effect>
+            </Image>
+        </Grid>
+    </Grid>
 </Window>

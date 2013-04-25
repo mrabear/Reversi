@@ -17,6 +17,8 @@ namespace Reversi
         private static GameBoard gGameBoardSurface;
         private static ScoreBoard gScoreBoardSurface;
 
+        private static bool SinglePlayerButtonSelected = true;
+
         /// <summary>
         /// Creates a new instance of the main window
         /// </summary>
@@ -69,6 +71,7 @@ namespace Reversi
         {
             // Start a new game
             App.ResetActiveGame();
+            App.GetActiveGame().SetSinglePlayerGame(SinglePlayerButtonSelected);
 
             // Setup the AI player
             App.GetComputerPlayer().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
@@ -77,5 +80,114 @@ namespace Reversi
             // Force a repaint of the game board and score board
             RefreshGameBoard();
         }
+
+        #region Top Menu Event Handlers
+
+        /// <summary>
+        /// Handles the MouseEnter event for the top button menu, lights the menu
+        /// </summary>
+        private void MenuButtonGrid_MouseEnter(object sender, MouseEventArgs e)
+        {
+            NewGameButton.Opacity = 1;
+            TopMenuBorder.Opacity = 0.25;
+            SinglePlayerButtonInactive.Opacity = 0.35;
+            MultiPlayerButtonInactive.Opacity = 0.35;
+            SinglePlayerButton.Opacity = 1;
+            MultiPlayerButton.Opacity = 1;
+        }
+
+        /// <summary>
+        /// Handles the MouseLeave event for the top button menu, dims the menu
+        /// </summary>
+        private void MenuButtonGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            NewGameButton.Opacity = 0.1;
+            TopMenuBorder.Opacity = 0.1;
+            SinglePlayerButtonInactive.Opacity = 0.15;
+            MultiPlayerButtonInactive.Opacity = 0.15;
+            SinglePlayerButton.Opacity = 0.4;
+            MultiPlayerButton.Opacity = 0.4;
+        }
+        
+        /// <summary>
+        /// Handles the MouseUp event for the new game button, starts a new game
+        /// </summary>
+        private void NewGameButton_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            StartNewGame();
+            TopMenuBorder.Opacity = 0.25;
+
+        }
+
+        private void NewGameButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.5;
+        }
+
+        private void HighlightGameType(bool SinglePlayerGame)
+        {
+            if (SinglePlayerGame)
+            {
+                SinglePlayerButton.Visibility = Visibility.Visible;
+                SinglePlayerButtonInactive.Visibility = Visibility.Hidden;
+
+                MultiPlayerButton.Visibility = Visibility.Hidden;
+                MultiPlayerButtonInactive.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SinglePlayerButton.Visibility = Visibility.Hidden;
+                SinglePlayerButtonInactive.Visibility = Visibility.Visible;
+
+                MultiPlayerButton.Visibility = Visibility.Visible;
+                MultiPlayerButtonInactive.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void MultiPlayerButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            HighlightGameType(false);
+        }
+
+        private void MultiPlayerButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            HighlightGameType(SinglePlayerButtonSelected);
+        }
+
+        private void MultiPlayerButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.5;
+        }
+
+        private void MultiPlayerButton_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            SinglePlayerButtonSelected = false;
+            TopMenuBorder.Opacity = 0.25;
+            StartNewGame();
+        }
+
+        private void SinglePlayerButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            HighlightGameType(true);
+        }
+
+        private void SinglePlayerButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            HighlightGameType(SinglePlayerButtonSelected);
+        }
+
+        private void SinglePlayerButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.5;
+        }
+
+        private void SinglePlayerButton_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            SinglePlayerButtonSelected = true;
+            TopMenuBorder.Opacity = 0.25;
+            StartNewGame();
+        }
+
+        #endregion
     }
 }
