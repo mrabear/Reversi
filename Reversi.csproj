@@ -106,37 +106,27 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\BlackPiece.png">
+    <Resource Include="img\Pieces\BlackPiece.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\DebugButton.png">
+    <Resource Include="img\ScoreBoard\ScoreBoard_BlackTurn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\ScoreBoard_BlackTurn.png">
+    <Resource Include="img\ScoreBoard\ScoreBoard_WhiteTurn.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\ScoreBoard_WhiteTurn.png">
+    <Resource Include="img\Pieces\SuggestedPiece.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\SuggestedPiece.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="img\Title.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="img\WhitePiece.png">
+    <Resource Include="img\Pieces\WhitePiece.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
@@ -144,39 +134,39 @@
     <Resource Include="ReversiIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\FormBackground.png">
+    <Resource Include="img\GameBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\ScoreBoard.png">
+    <Resource Include="img\ScoreBoard\ScoreBoard.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\NewGame.png">
+    <Resource Include="img\TopMenu\NewGame.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="img\NextMove.png">
+    <Resource Include="img\TopMenu\NextMove.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="img\PreviousMove.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="img\MultiPlayer.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="img\SinglePlayer.png">
+    <Resource Include="img\TopMenu\PreviousMove.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\MultiPlayer_Inactive.png">
+    <Resource Include="img\TopMenu\MultiPlayer.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="img\SinglePlayer_Inactive.png">
+    <Resource Include="img\TopMenu\SinglePlayer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\TopMenu\MultiPlayer_Inactive.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="img\TopMenu\SinglePlayer_Inactive.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

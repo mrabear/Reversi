@@ -73,16 +73,6 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap DebugButton {
-            get {
-                object obj = ResourceManager.GetObject("DebugButton", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap FormBackground {
             get {
                 object obj = ResourceManager.GetObject("FormBackground", resourceCulture);
@@ -196,16 +186,6 @@ namespace Reversi.Properties {
         internal static System.Drawing.Bitmap SuggestedPiece {
             get {
                 object obj = ResourceManager.GetObject("SuggestedPiece", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Title {
-            get {
-                object obj = ResourceManager.GetObject("Title", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
