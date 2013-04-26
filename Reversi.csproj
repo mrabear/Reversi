@@ -77,8 +77,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\ComputerPlayer\BandedWeightRow.cs" />
-    <Compile Include="src\Board.cs" />
-    <Compile Include="src\Game.cs" />
+    <Compile Include="src\Core\Board.cs" />
+    <Compile Include="src\Core\Game.cs" />
     <Compile Include="src\Window\ReversiWindow.xaml.cs">
       <DependentUpon>ReversiWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
