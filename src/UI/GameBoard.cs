@@ -198,7 +198,8 @@ namespace Reversi
 
             using (DrawingContext dc = ComputerPlayerVizLayer.RenderOpen())
             {
-                foreach (Point CurrentPiece in App.GetComputerPlayer().GetAnalysisResults().Keys)
+                Dictionary<Point, AnalysisResultRow> PiecesToHighlight =  App.GetComputerPlayer().GetAnalysisResults();
+                foreach (Point CurrentPiece in PiecesToHighlight.Keys)
                     if (App.GetComputerPlayer().GetAnalysisResults()[CurrentPiece].AnalysisCompleted)
                         dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
                     else
