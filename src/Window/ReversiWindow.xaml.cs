@@ -45,7 +45,7 @@ namespace Reversi
 
             if (!App.GetActiveGame().GetTurnInProgress())
                 if (App.GetActiveGame().ProcessUserTurn(GridClickX, GridClickY))
-                    GameBoard.RefreshGameBoardPieces();
+                    GameBoard.Refresh();
         }
 
         /// <summary>
@@ -59,13 +59,14 @@ namespace Reversi
 
             // Clear the display game board
             gGameBoardSurface.Clear();
+            gScoreBoardSurface.Clear();
 
             // Setup the AI player
             App.GetComputerPlayer().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);
             App.GetComputerPlayer().SetVisualizeProcess(true);
 
             // Force a repaint of the game board and score board
-            GameBoard.RefreshGameBoardPieces();
+            GameBoard.Refresh();
         }
 
         #region Top Menu Event Handlers

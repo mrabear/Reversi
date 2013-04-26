@@ -20,7 +20,7 @@ namespace Reversi
         private static ImageSource gSuggestedPieceImage;
 
         // The game board last drawn onto the screen
-        private static Board LastDrawnBoard;
+        //private static Board LastDrawnBoard;
 
         private static VisualCollection GameBoardVisualLayers;
 
@@ -48,8 +48,8 @@ namespace Reversi
         /// </summary>
         public void Clear()
         {
-            LastDrawnBoard = new Board();
-            LastDrawnBoard.ClearBoard();
+            //LastDrawnBoard = new Board();
+            //LastDrawnBoard.ClearBoard();
 
             DisplayBoard = new Board();
 
@@ -63,10 +63,11 @@ namespace Reversi
         /// <summary>
         /// The thread safe way to refresh the game graphic elements
         /// </summary>
-        public static void RefreshGameBoardPieces()
+        public static void Refresh()
         {
             DrawAvailableMoves();
             DrawPieces();
+            ScoreBoard.Refresh();
         }
 
         /// <summary>
@@ -169,6 +170,8 @@ namespace Reversi
             return( new Rect(X * Properties.Settings.Default.GRID_SIZE, Y * Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE));
         }
 
+        #region Visual class linkers
+
         protected override Visual GetVisualChild(int index)
         {
             return GameBoardVisualLayers[index];
@@ -181,5 +184,7 @@ namespace Reversi
                 return GameBoardVisualLayers.Count;
             }
         }
+
+        #endregion
     }
 }
