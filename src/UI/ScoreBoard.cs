@@ -54,18 +54,19 @@ namespace Reversi
         }
 
         /// <summary>
-        /// Returns the scoreboard image appropriate for the given turn
+        /// Overrides the default renderer, draws all of the score board elements onto the screen
         /// </summary>
-        /// <param name="Turn">The currently active turn</param>
-        private static ImageSource GetScoreBoardImage(int Turn)
+        public static void Refresh()
         {
-            if (Turn == Board.BLACK)
-                return gBlackTurnImage;
-            else if (Turn == Board.WHITE)
-                return gWhiteTurnImage;
-            else
-                return gScoreBoardImage;
+            // Filter for the design time tool
+            if (App.GetActiveGame() != null)
+            {
+                DrawScoreBoard();
+                DrawPlayerScores();
+            }
         }
+
+        #region Drawing Methods
 
         /// <summary>
         /// Draws the scoreboard, highlighting the current turn
@@ -108,18 +109,25 @@ namespace Reversi
             ScoreBoardVisualLayers.Add(PlayerScoresLayer);
         }
 
+        #endregion
+
+        #region Utility Methods
+
         /// <summary>
-        /// Overrides the default renderer, draws all of the score board elements onto the screen
+        /// Returns the scoreboard image appropriate for the given turn
         /// </summary>
-        public static void Refresh()
+        /// <param name="Turn">The currently active turn</param>
+        private static ImageSource GetScoreBoardImage(int Turn)
         {
-            // Filter for the design time tool
-            if (App.GetActiveGame() != null)
-            {
-                DrawScoreBoard();
-                DrawPlayerScores();
-            }
+            if (Turn == Board.BLACK)
+                return gBlackTurnImage;
+            else if (Turn == Board.WHITE)
+                return gWhiteTurnImage;
+            else
+                return gScoreBoardImage;
         }
+
+        #endregion
 
         #region Visual class linkers
 

@@ -6,6 +6,8 @@
 using System;
 using System.Windows;
 using System.Windows.Media;
+using System.Globalization;
+using System.Collections.Generic;
 
 namespace Reversi
 {
@@ -19,17 +21,25 @@ namespace Reversi
         private static ImageSource gWhitePieceImage;
         private static ImageSource gSuggestedPieceImage;
 
-        // The game board last drawn onto the screen
-        //private static Board LastDrawnBoard;
+        // Font and colors used to display the computers player current analysis
+        private static FormattedText ProcessingMoveFont;
+        private static FormattedText CompletedMoveFont;
+        private static Color MatrixGreen = Color.FromArgb(100, 0, 255, 12);
+        private static Color Crimson = Color.FromArgb(25, 0, 255, 12);
 
+        // A list of all graphics display layers
         private static VisualCollection GameBoardVisualLayers;
 
-        // The game board that is used 
-        private static Board DisplayBoard;
-
+        // The individual graphics layers
         private static DrawingVisual GamePiecesLayer;
         private static DrawingVisual ComputerPlayerVizLayer;
         private static DrawingVisual SuggestedMovesLayer;
+
+        // The locking object used to multithread the analysis
+        private static UIElement StaticDispatcher = new UIElement();
+
+        // The game board that is used 
+        private static Board DisplayBoard;
 
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
@@ -37,6 +47,14 @@ namespace Reversi
         public GameBoard() : base()
         {
             GameBoardVisualLayers = new VisualCollection(this);
+
+            ProcessingMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(MatrixGreen));
+            ProcessingMoveFont.TextAlignment = TextAlignment.Center;
+            ProcessingMoveFont.SetFontWeight(FontWeights.Bold);
+
+            CompletedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(Crimson));
+            CompletedMoveFont.TextAlignment = TextAlignment.Center;
+            CompletedMoveFont.SetFontWeight(FontWeights.Bold);
 
             Clear();
 
@@ -69,24 +87,13 @@ namespace Reversi
         /// </summary>
         public static void Refresh()
         {
+            DrawHighlightPieces();
             DrawAvailableMoves();
             DrawPieces();
             ScoreBoard.Refresh();
         }
 
-        /// <summary>
-        /// Returns the global application game instance
-        /// </summary>
-        /// <returns>The current application game instance</returns>
-        public static ImageSource GetGamePiece(int PieceColor)
-        {
-            if (PieceColor == Board.BLACK)
-                return gBlackPieceImage;
-            else if (PieceColor == Board.WHITE)
-                return gWhitePieceImage;
-            else
-                return null;
-        }
+        #region Drawing Methods
 
         /// <summary>
         /// Draws the active game board pieces onto the screen
@@ -161,7 +168,51 @@ namespace Reversi
         /// <param name="SourceLocation">The board coordinates to use</param>
         private static Rect GetBoardRect(Point SourceLocation)
         {
-            return ( GetBoardRect( Convert.ToInt32( SourceLocation.X ), Convert.ToInt32( SourceLocation.Y ) ) );
+            return (GetBoardRect(Convert.ToInt32(SourceLocation.X), Convert.ToInt32(SourceLocation.Y)));
+        }
+
+        /// <summary>
+        /// Thread safe way to update the game board with the computer player's analysis progress
+        /// </summary>
+        public delegate void HighlightPiecesDelegate();
+        public static void HighlightPieces()
+        {
+            StaticDispatcher.Dispatcher.Invoke(new HighlightPiecesDelegate(DrawHighlightPieces));
+        }
+
+        /// <summary>
+        /// Places a highlight circle at the given locations
+        /// </summary>
+        private static void DrawHighlightPieces()
+        {
+            GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
+
+            ComputerPlayerVizLayer = new DrawingVisual();
+
+            using (DrawingContext dc = ComputerPlayerVizLayer.RenderOpen())
+            {
+                foreach (Point CurrentPiece in App.GetComputerPlayer().GetAnalysisResults().Keys)
+                    if (App.GetComputerPlayer().GetAnalysisResults()[CurrentPiece].AnalysisCompleted)
+                        dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                    else
+                        dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+            }
+
+            GameBoardVisualLayers.Add(ComputerPlayerVizLayer);
+        }
+
+        #endregion
+
+        #region Utility Methods
+
+        /// <summary>
+        /// Returns a the point at the cetner of the given board space
+        /// </summary>
+        /// <param name="X">The X board coordinate to use</param>
+        /// <param name="Y">The Y board coordinate to use</param>
+        private static Point GetSpaceCenterPoint(double X, double Y)
+        {
+            return (new Point((X * Properties.Settings.Default.GRID_SIZE) + (Properties.Settings.Default.GRID_SIZE / 2), (Y * Properties.Settings.Default.GRID_SIZE) + 12));
         }
 
         /// <summary>
@@ -171,8 +222,24 @@ namespace Reversi
         /// <param name="Y">The Y board coordinate to use</param>
         private static Rect GetBoardRect(int X, int Y)
         {
-            return( new Rect(X * Properties.Settings.Default.GRID_SIZE, Y * Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE));
+            return (new Rect(X * Properties.Settings.Default.GRID_SIZE, Y * Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE));
         }
+
+        /// <summary>
+        /// Returns the global application game instance
+        /// </summary>
+        /// <returns>The current application game instance</returns>
+        public static ImageSource GetGamePiece(int PieceColor)
+        {
+            if (PieceColor == Board.BLACK)
+                return gBlackPieceImage;
+            else if (PieceColor == Board.WHITE)
+                return gWhitePieceImage;
+            else
+                return null;
+        }
+
+        #endregion
 
         #region Visual class linkers
 

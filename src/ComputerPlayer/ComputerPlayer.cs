@@ -33,6 +33,8 @@ namespace Reversi
         // The background worker used to separate the AI crunch from the UI
         private readonly BackgroundWorker AIBGWorker = new BackgroundWorker();
 
+        private static Dictionary<Point, AnalysisResultRow> AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
+
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
@@ -80,6 +82,11 @@ namespace Reversi
         /// <param name="newVisualizeProcess">True if the AI should display the move analysis results</param>
         public void SetVisualizeProcess(bool newVisualizeProcess) { VisualizeProcess = newVisualizeProcess; }
 
+        /// <summary>
+        /// Gets the current state of the computer player's turn analysis
+        /// </summary>
+        public Dictionary<Point, AnalysisResultRow> GetAnalysisResults() { return AnalysisResults; }
+
         #endregion
 
         /// <summary>
@@ -95,9 +102,15 @@ namespace Reversi
                 Point ChosenMove = PossibleMoves[0];
                 Board SimBoard = new Board(SourceBoard);
                 Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
+                AnalysisResults = new Dictionary<Point,AnalysisResultRow>();
+
+                foreach( Point CurrentPoint in PossibleMoves )
+                {
+                    AnalysisResults.Add( CurrentPoint, new AnalysisResultRow());
+                }
 
                 if (VisualizeProcess)
-                    //****GraphicsUtil.HighlightPiece(PossibleMoves, Color.Yellow);
+                    GameBoard.HighlightPieces();
 
                 //****FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
@@ -120,8 +133,12 @@ namespace Reversi
 
                         MoveResults.Add(CurrentPoint, MoveWeight);
 
-                        if (VisualizeProcess) ;
-                            //****GraphicsUtil.HighlightPiece(CurrentPoint, Color.DarkRed, MoveWeight.ToString("0.00"));
+                        if (VisualizeProcess)
+                        {
+                            AnalysisResults[CurrentPoint].AnalysisResult = MoveWeight;
+                            AnalysisResults[CurrentPoint].AnalysisCompleted = true;
+                            GameBoard.HighlightPieces();
+                        }
 
                         //****FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
@@ -136,10 +153,10 @@ namespace Reversi
 
                 SourceBoard.MakeMove(ChosenMove, AITurn);
 
-                //****GraphicsUtil.RefreshPieces();
+                AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
 
                 if (VisualizeProcess) ;
-                    //****GraphicsUtil.HighlightPiece(ChosenMove, Color.Green, MoveResults[ChosenMove].ToString("0.00"));
+                    GameBoard.HighlightPieces();
 
                 //****FormUtil.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
