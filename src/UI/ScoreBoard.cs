@@ -35,6 +35,8 @@ namespace Reversi
         public ScoreBoard()
             : base()
         {
+            ScoreBoardVisualLayers = new VisualCollection(this);
+
             Clear();
 
             gWhiteTurnImage = GraphicsTools.GenerateImageSource(Properties.Resources.ScoreBoard_WhiteTurn);
@@ -44,7 +46,9 @@ namespace Reversi
 
         public void Clear()
         {
-            ScoreBoardVisualLayers = new VisualCollection(this);
+            ScoreBoardVisualLayers.Remove(ScoreBoardLayer);
+            ScoreBoardVisualLayers.Remove(PlayerScoresLayer);
+
             ScoreBoardLayer = new DrawingVisual();
             PlayerScoresLayer = new DrawingVisual();
         }

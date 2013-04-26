@@ -36,6 +36,8 @@ namespace Reversi
         /// </summary>
         public GameBoard() : base()
         {
+            GameBoardVisualLayers = new VisualCollection(this);
+
             Clear();
 
             gBlackPieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.BlackPiece);
@@ -51,9 +53,11 @@ namespace Reversi
             //LastDrawnBoard = new Board();
             //LastDrawnBoard.ClearBoard();
 
-            DisplayBoard = new Board();
+            GameBoardVisualLayers.Remove(GamePiecesLayer);
+            GameBoardVisualLayers.Remove(SuggestedMovesLayer);
+            GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
 
-            GameBoardVisualLayers = new VisualCollection(this);
+            DisplayBoard = new Board();
 
             GamePiecesLayer = new DrawingVisual();
             SuggestedMovesLayer = new DrawingVisual();
