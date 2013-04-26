@@ -133,6 +133,16 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ProcessingPiece {
+            get {
+                object obj = ResourceManager.GetObject("ProcessingPiece", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ScoreBoard {
             get {
                 object obj = ResourceManager.GetObject("ScoreBoard", resourceCulture);

@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Globalization;
 using System.Collections.Generic;
+using System.Windows.Media.Animation;
 
 namespace Reversi
 {
@@ -20,6 +21,7 @@ namespace Reversi
         private static ImageSource gBlackPieceImage;
         private static ImageSource gWhitePieceImage;
         private static ImageSource gSuggestedPieceImage;
+        private static ImageSource gProcessingPieceImage;
 
         // Font and colors used to display the computers player current analysis
         private static FormattedText ProcessingMoveFont;
@@ -41,12 +43,18 @@ namespace Reversi
         // The game board that is used 
         private static Board DisplayBoard;
 
+        // The rotating animation clock used for the computer processing visualizations
+        //private static AnimationClock RotationAnimationClock;
+
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
         /// </summary>
         public GameBoard() : base()
         {
+            // Reset the graphics layers
             GameBoardVisualLayers = new VisualCollection(this);
+
+            Clear();
 
             ProcessingMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(MatrixGreen));
             ProcessingMoveFont.TextAlignment = TextAlignment.Center;
@@ -56,8 +64,7 @@ namespace Reversi
             CompletedMoveFont.TextAlignment = TextAlignment.Center;
             CompletedMoveFont.SetFontWeight(FontWeights.Bold);
 
-            Clear();
-
+            gProcessingPieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.ProcessingPiece);
             gBlackPieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.BlackPiece);
             gWhitePieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.WhitePiece);
             gSuggestedPieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.SuggestedPiece);
@@ -195,7 +202,13 @@ namespace Reversi
                     if (App.GetComputerPlayer().GetAnalysisResults()[CurrentPiece].AnalysisCompleted)
                         dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
                     else
+                        //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), CreateAnimationClock(CurrentPiece));
                         dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+
+                        //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                    //else
+                        //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), RotationAnimationClock);
+                        //dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
             }
 
             GameBoardVisualLayers.Add(ComputerPlayerVizLayer);
@@ -237,6 +250,22 @@ namespace Reversi
                 return gWhitePieceImage;
             else
                 return null;
+        }
+
+        private static AnimationClock CreateAnimationClock(Point GameBoardLocation)
+        {
+            RectAnimation RotationAnimation = new RectAnimation();
+            RotationAnimation.Duration = TimeSpan.FromSeconds(2);
+            RotationAnimation.FillBehavior = FillBehavior.HoldEnd;
+
+            // Set the animation to repeat forever. 
+            RotationAnimation.RepeatBehavior = RepeatBehavior.Forever;
+
+            // Set the From and To properties of the animation.
+            RotationAnimation.From = GetBoardRect(Convert.ToInt32(GameBoardLocation.X), Convert.ToInt32(GameBoardLocation.Y));
+            RotationAnimation.To = GetBoardRect(Convert.ToInt32(GameBoardLocation.X + 5), Convert.ToInt32(GameBoardLocation.Y));
+
+            return (RotationAnimation.CreateClock());
         }
 
         #endregion
