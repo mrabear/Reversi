@@ -28,7 +28,7 @@ namespace Reversi
         private bool VisualizeProcess;
 
         // The locking object used to multithread the analysis
-        private object SpinLock;
+        private readonly object SpinLock;
 
         // The background worker used to separate the AI crunch from the UI
         private readonly BackgroundWorker AIBGWorker = new BackgroundWorker();
@@ -155,7 +155,7 @@ namespace Reversi
 
                 AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
 
-                if (VisualizeProcess) ;
+                if (VisualizeProcess)
                     GameBoard.HighlightPieces();
 
                 //****FormUtil.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");

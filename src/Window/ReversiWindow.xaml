@@ -15,11 +15,12 @@
             <GradientStop Color="White" Offset="1"/>
         </LinearGradientBrush>
     </Window.Foreground>
-
+    
     <Grid HorizontalAlignment="Left" Height="772" Margin="0,0,-1,0" VerticalAlignment="Top" Width="730">
         <Grid x:Name="GameBoardClickSurface" Background="#00000000" Cursor="Hand" HorizontalAlignment="Left" Height="660" MouseDown="PlaceUserPiece" Margin="30,80,0,0" VerticalAlignment="Top" Width="660" >
             <local:GameBoard x:Name="GameBoardSurface" Margin="9,10,11,10"/>
-            <!--<Image x:Name="ProcessingPieceImage" Height="80" Width="80" Source="/Reversi;component/img/Pieces/ProcessingPiece.png"/>-->
+            <!--<Image x:Name="ProcessingPieceImage" Height="80" Width="80" Source="/Reversi;component/img/Pieces/ProcessingPiece.png">
+            </Image>-->
         </Grid>
         <local:ScoreBoard x:Name="ScoreBoardSurface" Margin="513,0,43,684" Width="174" Height="88"/>
         <Grid x:Name="MenuButtonGrid" HorizontalAlignment="Left" Height="70" Margin="283,4,0,0" VerticalAlignment="Top" Width="155" Background="#00000000" MouseEnter="MenuButtonGrid_MouseEnter" MouseLeave="MenuButtonGrid_MouseLeave">

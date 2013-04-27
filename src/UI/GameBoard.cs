@@ -29,6 +29,9 @@ namespace Reversi
         private static Color MatrixGreen = Color.FromArgb(100, 0, 255, 12);
         private static Color Crimson = Color.FromArgb(25, 0, 255, 12);
 
+        // The locking object used to multithread the analysis
+        private static object HighLightLock = new object();
+
         // A list of all graphics display layers
         private static VisualCollection GameBoardVisualLayers;
 
@@ -192,27 +195,30 @@ namespace Reversi
         /// </summary>
         private static void DrawHighlightPieces()
         {
-            GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
-
-            ComputerPlayerVizLayer = new DrawingVisual();
-
-            using (DrawingContext dc = ComputerPlayerVizLayer.RenderOpen())
+            lock (HighLightLock)
             {
-                Dictionary<Point, AnalysisResultRow> PiecesToHighlight =  App.GetComputerPlayer().GetAnalysisResults();
-                foreach (Point CurrentPiece in PiecesToHighlight.Keys)
-                    if (App.GetComputerPlayer().GetAnalysisResults()[CurrentPiece].AnalysisCompleted)
-                        dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-                    else
-                        //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), CreateAnimationClock(CurrentPiece));
-                        dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
 
-                        //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                ComputerPlayerVizLayer = new DrawingVisual();
+
+                using (DrawingContext dc = ComputerPlayerVizLayer.RenderOpen())
+                {
+                    Dictionary<Point, AnalysisResultRow> PiecesToHighlight = App.GetComputerPlayer().GetAnalysisResults();
+                    foreach (Point CurrentPiece in PiecesToHighlight.Keys)
+                        if (App.GetComputerPlayer().GetAnalysisResults()[CurrentPiece].AnalysisCompleted)
+                            dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                        else
+                            //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), CreateAnimationClock(CurrentPiece));
+                            dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+
+                    //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
                     //else
-                        //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), RotationAnimationClock);
-                        //dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-            }
+                    //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), RotationAnimationClock);
+                    //dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                }
 
-            GameBoardVisualLayers.Add(ComputerPlayerVizLayer);
+                GameBoardVisualLayers.Add(ComputerPlayerVizLayer);
+            }
         }
 
         #endregion
