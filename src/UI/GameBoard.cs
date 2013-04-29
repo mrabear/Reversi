@@ -24,12 +24,13 @@ namespace Reversi
         private static ImageSource gProcessingPieceImage;
 
         // Font and colors used to display the computers player current analysis
+        private static FormattedText StartedMoveFont;
         private static FormattedText WorkingMoveFont;
         private static FormattedText CompletedMoveFont;
-        private static FormattedText StartedMoveFont;
+        private static Color LightGrey = Color.FromArgb(255, 200, 200, 200);
         private static Color MatrixGreen = Color.FromArgb(255, 0, 255, 12);
-        private static Color FadedMatrixGreen = Color.FromArgb(255, 0, 41, 2);
-        private static Color FadedGrey = Color.FromArgb(255, 100, 100, 100);
+        private static Color DarkGreen = Color.FromArgb(255, 0, 41, 0);
+        private static Color DarkGrey = Color.FromArgb(255, 100, 100, 100);
 
         // The locking object used to multithread the analysis
         private static object HighLightLock = new object();
@@ -61,7 +62,7 @@ namespace Reversi
 
             Clear();
 
-            StartedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(FadedGrey));
+            StartedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(LightGrey));
             StartedMoveFont.TextAlignment = TextAlignment.Center;
             StartedMoveFont.SetFontWeight(FontWeights.Bold);
 
@@ -69,7 +70,7 @@ namespace Reversi
             WorkingMoveFont.TextAlignment = TextAlignment.Center;
             WorkingMoveFont.SetFontWeight(FontWeights.Bold);
 
-            CompletedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(FadedMatrixGreen));
+            CompletedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(DarkGreen));
             CompletedMoveFont.TextAlignment = TextAlignment.Center;
             CompletedMoveFont.SetFontWeight(FontWeights.Bold);
 
@@ -198,6 +199,9 @@ namespace Reversi
             Application.Current.Dispatcher.Invoke(new StartNewVisualizationDelegate(ClearVisualizationLayer));
         }
 
+        /// <summary>
+        /// Clears all visualizations graphics,usually to start a new round of turn analysis
+        /// </summary>
         public static void ClearVisualizationLayer()
         {
             GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
@@ -214,7 +218,6 @@ namespace Reversi
         public delegate void HighlightMoveDelegate(Point Piece, String ProcessingState, String PieceLabel = "");
         public static void HighlightMove(Point Piece, String ProcessingState, String PieceLabel = "")
         {
-            //DrawHighlightPiece(Piece.X, Piece.Y, PieceLabel);
             Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState, PieceLabel);
         }
 
@@ -227,12 +230,17 @@ namespace Reversi
 
             using (DrawingContext dc = MoveVisualLayer.RenderOpen())
             {
-                    if (ProcessingState == ComputerPlayer.COMPLETE)
-                        dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(Piece));
-                    else if(ProcessingState == ComputerPlayer.STARTED)
-                        dc.DrawText(StartedMoveFont, GetSpaceCenterPoint(Piece));
-                    else if (ProcessingState == ComputerPlayer.WORKING)
-                        dc.DrawText(WorkingMoveFont, GetSpaceCenterPoint(Piece));
+                if (ProcessingState == ComputerPlayer.COMPLETE)
+                {
+                    dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(Piece));
+
+                    Geometry TextOutline = CompletedMoveFont.BuildGeometry(GetSpaceCenterPoint(Piece));
+                    dc.DrawGeometry(null, new Pen(new SolidColorBrush(DarkGrey), 2), TextOutline.GetOutlinedPathGeometry());
+                }
+                else if (ProcessingState == ComputerPlayer.STARTED)
+                    dc.DrawText(StartedMoveFont, GetSpaceCenterPoint(Piece));
+                else if (ProcessingState == ComputerPlayer.WORKING)
+                    dc.DrawText(WorkingMoveFont, GetSpaceCenterPoint(Piece));
 
                 //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
                 //else
