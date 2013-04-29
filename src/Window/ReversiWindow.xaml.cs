@@ -58,8 +58,8 @@ namespace Reversi
             App.GetActiveGame().SetSinglePlayerGame(SinglePlayerButtonSelected);
 
             // Clear the display game board
-            gGameBoardSurface.Clear();
-            gScoreBoardSurface.Clear();
+            GameBoard.Clear();
+            ScoreBoard.Clear();
 
             // Setup the AI player
             App.GetComputerPlayer().SetMaxDepth(Properties.Settings.Default.MAX_SIM_DEPTH);

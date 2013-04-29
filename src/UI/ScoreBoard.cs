@@ -44,7 +44,7 @@ namespace Reversi
             gScoreBoardImage = GraphicsTools.GenerateImageSource(Properties.Resources.ScoreBoard);
         }
 
-        public void Clear()
+        public static void Clear()
         {
             ScoreBoardVisualLayers.Remove(ScoreBoardLayer);
             ScoreBoardVisualLayers.Remove(PlayerScoresLayer);

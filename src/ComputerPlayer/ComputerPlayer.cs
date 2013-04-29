@@ -48,6 +48,11 @@ namespace Reversi
 	            {25, 5,12,12,12,12, 5,25}
             };
 
+        // Flags used to track the progress of a turn analysis
+        public static readonly String COMPLETE = "COMPLETE";
+        public static readonly String STARTED = "STARTED";
+        public static readonly String WORKING = "WORKING";
+
         /// <summary>
         /// Creates a new AI player
         /// </summary>
@@ -110,13 +115,23 @@ namespace Reversi
                 }
 
                 if (VisualizeProcess)
-                    GameBoard.HighlightPieces();
+                {
+                    GameBoard.StartNewVisualization();
+
+                    foreach( Point CurrentPoint in PossibleMoves)
+                        GameBoard.HighlightMove(CurrentPoint, STARTED);
+                }
 
                 //****FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
                 //foreach (Point CurrentPoint in PossibleMoves)
                 Parallel.ForEach(PossibleMoves, CurrentPoint =>
                 {
+                                        // Serializes the theads to make sure the update functions properly
+                    lock (SpinLock)
+                        if( VisualizeProcess )
+                            GameBoard.HighlightMove(CurrentPoint, WORKING);
+
                     double[] EvalResult = new double[MaxSimDepth];
 
                     EvaluatePotentialMove(CurrentPoint, SimBoard, AITurn, ref EvalResult);
@@ -137,7 +152,7 @@ namespace Reversi
                         {
                             AnalysisResults[CurrentPoint].AnalysisResult = MoveWeight;
                             AnalysisResults[CurrentPoint].AnalysisCompleted = true;
-                            GameBoard.HighlightPieces();
+                            GameBoard.HighlightMove(CurrentPoint, COMPLETE);
                         }
 
                         //****FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
@@ -155,8 +170,8 @@ namespace Reversi
 
                 AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
 
-                if (VisualizeProcess)
-                    GameBoard.HighlightPieces();
+                //if (VisualizeProcess)
+                //    GameBoard.HighlightPieces();
 
                 //****FormUtil.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }

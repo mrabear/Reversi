@@ -24,10 +24,12 @@ namespace Reversi
         private static ImageSource gProcessingPieceImage;
 
         // Font and colors used to display the computers player current analysis
-        private static FormattedText ProcessingMoveFont;
+        private static FormattedText WorkingMoveFont;
         private static FormattedText CompletedMoveFont;
-        private static Color MatrixGreen = Color.FromArgb(100, 0, 255, 12);
-        private static Color Crimson = Color.FromArgb(25, 0, 255, 12);
+        private static FormattedText StartedMoveFont;
+        private static Color MatrixGreen = Color.FromArgb(255, 0, 255, 12);
+        private static Color FadedMatrixGreen = Color.FromArgb(255, 0, 41, 2);
+        private static Color FadedGrey = Color.FromArgb(255, 100, 100, 100);
 
         // The locking object used to multithread the analysis
         private static object HighLightLock = new object();
@@ -59,11 +61,15 @@ namespace Reversi
 
             Clear();
 
-            ProcessingMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(MatrixGreen));
-            ProcessingMoveFont.TextAlignment = TextAlignment.Center;
-            ProcessingMoveFont.SetFontWeight(FontWeights.Bold);
+            StartedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(FadedGrey));
+            StartedMoveFont.TextAlignment = TextAlignment.Center;
+            StartedMoveFont.SetFontWeight(FontWeights.Bold);
 
-            CompletedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(Crimson));
+            WorkingMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(MatrixGreen));
+            WorkingMoveFont.TextAlignment = TextAlignment.Center;
+            WorkingMoveFont.SetFontWeight(FontWeights.Bold);
+
+            CompletedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(FadedMatrixGreen));
             CompletedMoveFont.TextAlignment = TextAlignment.Center;
             CompletedMoveFont.SetFontWeight(FontWeights.Bold);
 
@@ -76,14 +82,15 @@ namespace Reversi
         /// <summary>
         /// Clears all of the visual elements and resets the game board properties
         /// </summary>
-        public void Clear()
+        public static void Clear()
         {
             //LastDrawnBoard = new Board();
             //LastDrawnBoard.ClearBoard();
 
-            GameBoardVisualLayers.Remove(GamePiecesLayer);
-            GameBoardVisualLayers.Remove(SuggestedMovesLayer);
-            GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
+            //GameBoardVisualLayers.Remove(GamePiecesLayer);
+            //GameBoardVisualLayers.Remove(SuggestedMovesLayer);
+            //GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
+            GameBoardVisualLayers.Clear();
 
             DisplayBoard = new Board();
 
@@ -97,7 +104,8 @@ namespace Reversi
         /// </summary>
         public static void Refresh()
         {
-            DrawHighlightPieces();
+            Clear();
+            //DrawHighlightPieces();
             DrawAvailableMoves();
             DrawPieces();
             ScoreBoard.Refresh();
@@ -182,43 +190,57 @@ namespace Reversi
         }
 
         /// <summary>
-        /// Thread safe way to update the game board with the computer player's analysis progress
+        /// Resets the computer player visualization layer
         /// </summary>
-        public delegate void HighlightPiecesDelegate();
-        public static void HighlightPieces()
+        public delegate void StartNewVisualizationDelegate();
+        public static void StartNewVisualization()
         {
-            StaticDispatcher.Dispatcher.Invoke(new HighlightPiecesDelegate(DrawHighlightPieces));
+            Application.Current.Dispatcher.Invoke(new StartNewVisualizationDelegate(ClearVisualizationLayer));
+        }
+
+        public static void ClearVisualizationLayer()
+        {
+            GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
+            ComputerPlayerVizLayer.Children.Clear();
+            GameBoardVisualLayers.Add(ComputerPlayerVizLayer);
+        }
+
+        /// <summary>
+        /// Places a highlight circle at the given location
+        /// </summary>
+        /// <param name="Piece">The piece to highlight</param>
+        /// <param name="PieceColor">The highlight color</param>
+        /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
+        public delegate void HighlightMoveDelegate(Point Piece, String ProcessingState, String PieceLabel = "");
+        public static void HighlightMove(Point Piece, String ProcessingState, String PieceLabel = "")
+        {
+            //DrawHighlightPiece(Piece.X, Piece.Y, PieceLabel);
+            Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState, PieceLabel);
         }
 
         /// <summary>
         /// Places a highlight circle at the given locations
         /// </summary>
-        private static void DrawHighlightPieces()
+        private static void DrawHighlightedMove(Point Piece, String ProcessingState, String PieceLabel = "")
         {
-            lock (HighLightLock)
+            DrawingVisual MoveVisualLayer = new DrawingVisual();
+
+            using (DrawingContext dc = MoveVisualLayer.RenderOpen())
             {
-                GameBoardVisualLayers.Remove(ComputerPlayerVizLayer);
+                    if (ProcessingState == ComputerPlayer.COMPLETE)
+                        dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(Piece));
+                    else if(ProcessingState == ComputerPlayer.STARTED)
+                        dc.DrawText(StartedMoveFont, GetSpaceCenterPoint(Piece));
+                    else if (ProcessingState == ComputerPlayer.WORKING)
+                        dc.DrawText(WorkingMoveFont, GetSpaceCenterPoint(Piece));
 
-                ComputerPlayerVizLayer = new DrawingVisual();
-
-                using (DrawingContext dc = ComputerPlayerVizLayer.RenderOpen())
-                {
-                    Dictionary<Point, AnalysisResultRow> PiecesToHighlight = App.GetComputerPlayer().GetAnalysisResults();
-                    foreach (Point CurrentPiece in PiecesToHighlight.Keys)
-                        if (App.GetComputerPlayer().GetAnalysisResults()[CurrentPiece].AnalysisCompleted)
-                            dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-                        else
-                            //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), CreateAnimationClock(CurrentPiece));
-                            dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-
-                    //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-                    //else
-                    //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), RotationAnimationClock);
-                    //dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-                }
-
-                GameBoardVisualLayers.Add(ComputerPlayerVizLayer);
+                //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                //else
+                //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), RotationAnimationClock);
+                //dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
             }
+
+            ComputerPlayerVizLayer.Children.Add(MoveVisualLayer);
         }
 
         #endregion
@@ -230,9 +252,9 @@ namespace Reversi
         /// </summary>
         /// <param name="X">The X board coordinate to use</param>
         /// <param name="Y">The Y board coordinate to use</param>
-        private static Point GetSpaceCenterPoint(double X, double Y)
+        private static Point GetSpaceCenterPoint(Point PointToCheck)
         {
-            return (new Point((X * Properties.Settings.Default.GRID_SIZE) + (Properties.Settings.Default.GRID_SIZE / 2), (Y * Properties.Settings.Default.GRID_SIZE) + 12));
+            return (new Point((PointToCheck.X * Properties.Settings.Default.GRID_SIZE) + (Properties.Settings.Default.GRID_SIZE / 2), (PointToCheck.Y * Properties.Settings.Default.GRID_SIZE) + 12));
         }
 
         /// <summary>
