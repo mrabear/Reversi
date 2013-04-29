@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Reversi
 {
+    /// <summary>
+    /// Represents the status of a move being analyzed by the computer player
+    /// </summary>
     public enum AnalysisStatus : byte
     {
         QUEUED      = 1,    // Job has been queued

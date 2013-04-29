@@ -101,6 +101,9 @@ namespace Reversi
             LastDrawnBoard = new Board();
             LastDrawnBoard.ClearBoard();
 
+            // Clear the dirty spots list
+            DirtySpots = new List<Point>();
+
             // Reset the current working board
             DisplayBoard = new Board();
 

@@ -2,6 +2,9 @@
 
 namespace Reversi
 {
+    /// <summary>
+    /// A game piece / player turn
+    /// </summary>
     public enum Piece : byte
     {
         ERROR = 9,  // Should never happen, indicates an invalid state

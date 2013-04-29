@@ -84,6 +84,12 @@ namespace Reversi
             MultiPlayerButtonInactive.Opacity = 0.35;
             SinglePlayerButton.Opacity = 1;
             MultiPlayerButton.Opacity = 1;
+
+            if (App.GetActiveGame().CanAdvance())
+                NextMoveButton.Opacity = 1;
+
+            if (App.GetActiveGame().CanRewind())
+                PreviousMoveButton.Opacity = 1;
         }
 
         /// <summary>
@@ -97,6 +103,8 @@ namespace Reversi
             MultiPlayerButtonInactive.Opacity = 0.15;
             SinglePlayerButton.Opacity = 0.4;
             MultiPlayerButton.Opacity = 0.4;
+            NextMoveButton.Opacity = 0.1;
+            PreviousMoveButton.Opacity = 0.1;
         }
         
         /// <summary>
@@ -106,7 +114,6 @@ namespace Reversi
         {
             StartNewGame();
             TopMenuBorder.Opacity = 0.25;
-
         }
 
         private void NewGameButton_MouseDown(object sender, MouseButtonEventArgs e)
@@ -176,6 +183,28 @@ namespace Reversi
             SinglePlayerButtonSelected = true;
             TopMenuBorder.Opacity = 0.25;
             StartNewGame();
+        }
+
+        private void PreviousMoveButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.5;
+        }
+
+        private void NextMoveButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.5;
+        }
+
+        private void PreviousMoveButton_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.25;
+            App.GetActiveGame().RewindHistoricalState();
+        }
+
+        private void NextMoveButton_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            TopMenuBorder.Opacity = 0.25;
+            App.GetActiveGame().AdvanceHistoricalState();
         }
 
         #endregion

@@ -295,7 +295,7 @@ namespace Reversi
         /// <summary>
         /// Called when the AI monitor has no more moves to place
         /// </summary>
-        public void ProcessAITurn()
+        public void StartComputerTurnAnalysis()
         {
             AIBGWorker.RunWorkerAsync();
         }
@@ -306,6 +306,7 @@ namespace Reversi
         public void AIBGWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             App.GetActiveGame().SetTurnInProgress(false);
+            App.GetActiveGame().AddBoardToMoveHistory();
             App.GetActiveGame().SwitchTurn();
             ReversiWindow.GetGameBoardSurface().Refresh();
         }

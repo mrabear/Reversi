@@ -40,6 +40,12 @@ namespace Reversi
         public static void ResetActiveGameBoard(int BoardSize = 8) { ActiveGameBoard = new Board(BoardSize); }
 
         /// <summary>
+        /// Resets the active game board
+        /// </summary>
+        /// <param name="BoardSize">The size of the board to use in the new game</param>
+        public static void SetActiveGameBoard(Board SourceBoard) { ActiveGameBoard = new Board(SourceBoard); }
+
+        /// <summary>
         /// Gets the active computer player
         /// </summary>
         public static ComputerPlayer GetComputerPlayer() { return (ComputerPlayer); }

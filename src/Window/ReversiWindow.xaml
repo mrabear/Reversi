@@ -31,11 +31,11 @@
                 </Ellipse.Clip>
             </Ellipse>
 
-            <Image x:Name="PreviousMoveButton" HorizontalAlignment="Left" Height="30" Margin="26,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/TopMenu/PreviousMove.png" Cursor="Hand" Opacity="0.1"/>
+            <Image x:Name="PreviousMoveButton" HorizontalAlignment="Left" Height="30" Margin="26,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/TopMenu/PreviousMove.png" Cursor="Hand" Opacity="0.1" MouseDown="PreviousMoveButton_MouseDown" MouseUp="PreviousMoveButton_MouseUp"/>
 
             <Image x:Name="NewGameButton" HorizontalAlignment="Left" Height="30" Margin="64,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/TopMenu/NewGame.png" Cursor="Hand" Opacity="0.1" MouseUp="NewGameButton_MouseUp" ToolTip="Start New Game" MouseDown="NewGameButton_MouseDown"/>
 
-            <Image x:Name="NextMoveButton" HorizontalAlignment="Left" Height="30" Margin="100,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/TopMenu/NextMove.png" Cursor="Hand" Opacity="0.1"/>
+            <Image x:Name="NextMoveButton" HorizontalAlignment="Left" Height="30" Margin="100,0,0,0" VerticalAlignment="Top" Width="30" Source="/Reversi;component/img/TopMenu/NextMove.png" Cursor="Hand" Opacity="0.1" MouseDown="NextMoveButton_MouseDown" MouseUp="NextMoveButton_MouseUp"/>
 
             <Image x:Name="MultiPlayerButton" HorizontalAlignment="Left" Height="37" Margin="42,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/TopMenu/MultiPlayer.png" Cursor="Hand" Opacity="0.4" Stretch="None" ToolTip="Player vs. Player" MouseEnter="MultiPlayerButton_MouseEnter" MouseDown="MultiPlayerButton_MouseDown" MouseLeave="MultiPlayerButton_MouseLeave" Visibility="Hidden" MouseUp="MultiPlayerButton_MouseUp"/>
 

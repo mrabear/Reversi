@@ -5,6 +5,7 @@
 
 using System;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace Reversi
 {
@@ -13,6 +14,9 @@ namespace Reversi
     /// </summary>
     public class Game
     {
+        private List<Board> MoveHistory = new List<Board>();
+        private int HistoricalIndex;
+
         private Piece CurrentTurn;
         private Piece NextTurn;
         private Boolean SinglePlayerGame = true;
@@ -26,6 +30,7 @@ namespace Reversi
         /// <param name="BoardSize">The size of the game board</param>
         public Game(int BoardSize = 8)
         {
+            HistoricalIndex = 0;
             CurrentTurn = Piece.WHITE;
             NextTurn = Piece.BLACK;
             //VsComputer = ReversiForm.VsComputer();
@@ -83,6 +88,22 @@ namespace Reversi
         /// <param name="isMoveProcessing">Set to True if the game is processing a turn</param>
         public void SetTurnInProgress(Boolean isTurninProgress) { TurnInProgress = isTurninProgress; }
 
+        public bool CanAdvance() 
+        {
+            if ((HistoricalIndex < MoveHistory.Count) && ((!SinglePlayerGame) || (HistoricalIndex < MoveHistory.Count - 1)))
+                return true;
+
+            return false;
+        }
+
+        public bool CanRewind()
+        {
+            if ((HistoricalIndex > 0) && ((!SinglePlayerGame) || (HistoricalIndex > 1)))
+                return true;
+
+            return false;
+        }
+
         #endregion
 
         /// <summary>
@@ -113,8 +134,11 @@ namespace Reversi
                     if (App.GetActiveGameBoard().MovePossible(CurrentTurn))
                     {
                         MoveOutcome = App.GetActiveGameBoard().MakeMove(X, Y, CurrentTurn);
-                        if( MoveOutcome )
+                        if (MoveOutcome)
+                        {
+                            AddBoardToMoveHistory();
                             SwitchTurn();
+                        }
                     }
                     else
                     {
@@ -123,7 +147,7 @@ namespace Reversi
                 }
 
                 if ((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
-                    App.GetComputerPlayer().ProcessAITurn();
+                    App.GetComputerPlayer().StartComputerTurnAnalysis();
                 else
                     TurnInProgress = false;
             }
@@ -146,6 +170,46 @@ namespace Reversi
                 CurrentTurn = Piece.WHITE;
                 NextTurn = Piece.BLACK;
             }
+        }
+
+        public void AddBoardToMoveHistory() { AddBoardToMoveHistory(App.GetActiveGameBoard()); }
+
+        public void AddBoardToMoveHistory(Board HistoricalBoard)
+        {
+            MoveHistory.Add(HistoricalBoard);
+            HistoricalIndex = MoveHistory.Count;
+        }
+
+        public void AdvanceHistoricalState()
+        {
+            MoveHistoricalState(1);
+        }
+
+        public void RewindHistoricalState()
+        {
+            MoveHistoricalState(-1);
+        }
+
+        private void MoveHistoricalState(int Direction = -1)
+        {
+            if (SinglePlayerGame)
+            {
+                Direction = 2 * Direction;
+            }
+            else
+            {
+                SwitchTurn();
+            }
+
+            Console.Write( "Moving historical index from " + HistoricalIndex + " " );
+
+            HistoricalIndex = Math.Min(MoveHistory.Count, Math.Max(0, HistoricalIndex + Direction));
+
+            Console.WriteLine("to " + HistoricalIndex);
+
+            ReversiWindow.GetGameBoardSurface().Clear();
+            App.SetActiveGameBoard(MoveHistory[HistoricalIndex]);
+            ReversiWindow.GetGameBoardSurface().Refresh();
         }
     }
 
