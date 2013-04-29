@@ -13,8 +13,8 @@ namespace Reversi
     /// </summary>
     public class Game
     {
-        private int CurrentTurn;
-        private int NextTurn;
+        private Piece CurrentTurn;
+        private Piece NextTurn;
         private Boolean SinglePlayerGame = true;
         private Boolean IsComplete = false;
         private Boolean ProcessMoves = true;
@@ -26,12 +26,12 @@ namespace Reversi
         /// <param name="BoardSize">The size of the game board</param>
         public Game(int BoardSize = 8)
         {
-            CurrentTurn = Board.WHITE;
-            NextTurn = Board.BLACK;
+            CurrentTurn = Piece.WHITE;
+            NextTurn = Piece.BLACK;
             //VsComputer = ReversiForm.VsComputer();
             App.ResetActiveGameBoard(BoardSize);
             IsComplete = false;
-            App.ResetComputerPlayer(Board.BLACK);
+            App.ResetComputerPlayer(Piece.BLACK);
         }
 
         #region Getters and Setters
@@ -39,7 +39,7 @@ namespace Reversi
         /// <summary>
         /// Returns the current game turn
         /// </summary>
-        public int GetCurrentTurn() { return CurrentTurn; }
+        public Piece GetCurrentTurn() { return CurrentTurn; }
 
         public bool IsSinglePlayerGame() { return SinglePlayerGame; }
         public void SetSinglePlayerGame(bool SinglePlayerGameFlag) { SinglePlayerGame = SinglePlayerGameFlag; }
@@ -48,18 +48,18 @@ namespace Reversi
         /// Sets the current game turn
         /// </summary>
         /// <param name="Turn">The current turn</param>
-        public void SetCurrentTurn(int Turn) { CurrentTurn = Turn; }
+        public void SetCurrentTurn(Piece Turn) { CurrentTurn = Turn; }
 
         /// <summary>
         /// Returns the next turn
         /// </summary>
-        public int GetNextTurn() { return NextTurn; }
+        public Piece GetNextTurn() { return NextTurn; }
 
         /// <summary>
         /// Sets the next turn
         /// </summary>
         /// <param name="Turn">The next move</param>
-        public void SetNextTurn(int Turn) { NextTurn = Turn; }
+        public void SetNextTurn(Piece Turn) { NextTurn = Turn; }
 
         /// <summary>
         /// Returns True if the game is currently processing moves
@@ -136,15 +136,15 @@ namespace Reversi
         /// </summary>
         public void SwitchTurn()
         {
-            if (CurrentTurn == Board.WHITE)
+            if (CurrentTurn == Piece.WHITE)
             {
-                CurrentTurn = Board.BLACK;
-                NextTurn = Board.WHITE;
+                CurrentTurn = Piece.BLACK;
+                NextTurn = Piece.WHITE;
             }
             else
             {
-                CurrentTurn = Board.WHITE;
-                NextTurn = Board.BLACK;
+                CurrentTurn = Piece.WHITE;
+                NextTurn = Piece.BLACK;
             }
         }
     }

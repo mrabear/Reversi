@@ -63,6 +63,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="src\ComputerPlayer\AnalysisResultRow.cs" />
+    <Compile Include="src\ComputerPlayer\AnalysisStatus.cs" />
+    <Compile Include="src\Core\Piece.cs" />
     <Compile Include="src\Window\DebugUtil.cs" />
     <Compile Include="src\UI\GameBoard.cs" />
     <Compile Include="src\UI\GraphicsUtil.cs" />

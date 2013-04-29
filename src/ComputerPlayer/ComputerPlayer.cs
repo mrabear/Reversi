@@ -12,14 +12,13 @@ using System.Threading.Tasks;
 
 namespace Reversi
 {
-
     /// <summary>
     /// Stores the game simulation logic used by the AI opponent
     /// </summary>
     public class ComputerPlayer
     {
         // The turn of the computer player
-        private int AITurn;
+        private Piece AITurn;
 
         // The maximum number of turns to look ahead
         private static int MaxSimDepth;
@@ -48,16 +47,11 @@ namespace Reversi
 	            {25, 5,12,12,12,12, 5,25}
             };
 
-        // Flags used to track the progress of a turn analysis
-        public static readonly String COMPLETE = "COMPLETE";
-        public static readonly String STARTED = "STARTED";
-        public static readonly String WORKING = "WORKING";
-
         /// <summary>
         /// Creates a new AI player
         /// </summary>
         /// <param name="AIcolor">The color of the AI player</param>
-        public ComputerPlayer(int AIcolor)
+        public ComputerPlayer(Piece AIcolor)
         {
             AITurn = AIcolor;
             VisualizeProcess = false;
@@ -73,7 +67,7 @@ namespace Reversi
         /// <summary>
         /// Returns the color of the AI opponent
         /// </summary>
-        public int GetColor() { return AITurn; }
+        public Piece GetColor() { return AITurn; }
 
         /// <summary>
         /// Sets the maximum simulation depth
@@ -116,7 +110,7 @@ namespace Reversi
 
                 if (VisualizeProcess)
                     foreach( Point CurrentPoint in PossibleMoves)
-                        ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, STARTED);
+                        ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.STARTED);
 
                 //****FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
@@ -126,7 +120,7 @@ namespace Reversi
                                         // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
                         if( VisualizeProcess )
-                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, WORKING);
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.WORKING);
 
                     double[] EvalResult = new double[MaxSimDepth];
 
@@ -148,7 +142,7 @@ namespace Reversi
                         {
                             AnalysisResults[CurrentPoint].AnalysisResult = MoveWeight;
                             AnalysisResults[CurrentPoint].AnalysisCompleted = true;
-                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, COMPLETE);
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.COMPLETE);
                         }
 
                         //****FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
@@ -181,7 +175,7 @@ namespace Reversi
         /// <param name="Turn">The current simulation turn</param>
         /// <param name="BandedWeightTable">The table of values used to analyze the simulation</param>
         /// <param name="SimulationDepth">The current depth of the simulation (number of moves ahead)</param>
-        private void EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, int Turn, ref double[] BandedWeightTable, int SimulationDepth = 0)
+        private void EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, Piece Turn, ref double[] BandedWeightTable, int SimulationDepth = 0)
         {
             // Look ahead to the impact of this move
             if (SimulationDepth < MaxSimDepth - 1)
@@ -291,9 +285,9 @@ namespace Reversi
         /// </summary>
         /// <param name="turn">The turn to check</param>
         /// <returns>The turn opposite of the one given</returns>
-        public int GetOtherTurn(int turn)
+        public Piece GetOtherTurn(Piece turn)
         {
-            return (turn == Board.WHITE ? Board.BLACK : Board.WHITE);
+            return (turn == Piece.WHITE ? Piece.BLACK : Piece.WHITE);
         }
 
         #region AI Background Workers
@@ -325,7 +319,7 @@ namespace Reversi
             {
                 MakeNextMove(App.GetActiveGameBoard());
 
-                if (App.GetActiveGameBoard().MovePossible(GetColor() == Board.BLACK ? Board.WHITE : Board.BLACK))
+                if (App.GetActiveGameBoard().MovePossible(GetColor() == Piece.BLACK ? Piece.WHITE : Piece.BLACK))
                     break;
                 else
                     ReversiWindow.GetGameBoardSurface().Refresh();
@@ -333,6 +327,5 @@ namespace Reversi
         }
 
         #endregion
-
     }
 }

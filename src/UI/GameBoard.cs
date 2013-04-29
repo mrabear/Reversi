@@ -40,6 +40,8 @@ namespace Reversi
         // A list of all graphics display layers, one layer for each spot on the board
         private static ConcurrentDictionary<Point, DrawingVisual> GameBoardVisualLayers;
 
+        // A list of all spots on the board that have had non-piece graphcis drawn on them
+        // Non-Piece Graphics include: available move markers and computer player analysis visulizations
         private static List<Point> DirtySpots;
 
         // The locking object used to multithread the analysis
@@ -170,7 +172,7 @@ namespace Reversi
                 for (int X = 0; X < BoardToDisplay.GetBoardSize(); X++)
 
                     // Only draw a game piece if it is either net new or has been flipped since the last drawing pass
-                    if ((LastDrawnBoard.ColorAt(X, Y) != BoardToDisplay.ColorAt(X, Y)) || (BoardToDisplay.ColorAt(X, Y) == Board.EMPTY))
+                    if ((LastDrawnBoard.ColorAt(X, Y) != BoardToDisplay.ColorAt(X, Y)) || (BoardToDisplay.ColorAt(X, Y) == Piece.EMPTY))
                     {
                         // The current piece
                         CurrentPiece = new Point(X, Y);
@@ -206,7 +208,7 @@ namespace Reversi
         /// </summary>
         /// <param name="SourceBoard">The game board</param>
         /// <param name="Turn">The turn to use</param>
-        public void DrawAvailableMoves(Board SourceBoard, int Turn)
+        public void DrawAvailableMoves(Board SourceBoard, Piece Turn)
         {
             // A visual that will be used as a workspace, will eventually be added to the display list
             DrawingVisual WorkVisual;
@@ -250,8 +252,8 @@ namespace Reversi
         /// <param name="Piece">The piece to highlight</param>
         /// <param name="PieceColor">The highlight color</param>
         /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
-        public delegate void HighlightMoveDelegate(Point Piece, String ProcessingState, String PieceLabel = "");
-        public void HighlightMove(Point Piece, String ProcessingState, String PieceLabel = "")
+        public delegate void HighlightMoveDelegate(Point Piece, AnalysisStatus ProcessingState, String PieceLabel = "");
+        public void HighlightMove(Point Piece, AnalysisStatus ProcessingState, String PieceLabel = "")
         {
             Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState, PieceLabel);
         }
@@ -259,7 +261,7 @@ namespace Reversi
         /// <summary>
         /// Places a highlight circle at the given locations
         /// </summary>
-        private void DrawHighlightedMove(Point CurrentPiece, String ProcessingState, String PieceLabel = "")
+        private void DrawHighlightedMove(Point CurrentPiece, AnalysisStatus ProcessingState, String PieceLabel = "")
         {
             // Add this space to the dirty spots list
             DirtySpots.Add(CurrentPiece);
@@ -273,16 +275,16 @@ namespace Reversi
             // Open the working visual for rendering
             using (DrawingContext dc = WorkVisual.RenderOpen())
             {
-                if (ProcessingState == ComputerPlayer.COMPLETE)
+                if (ProcessingState == AnalysisStatus.COMPLETE)
                 {
                     dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece));
 
                     Geometry TextOutline = CompletedMoveFont.BuildGeometry(GetSpaceCenterPoint(CurrentPiece));
                     dc.DrawGeometry(null, new Pen(new SolidColorBrush(DarkGrey), 2), TextOutline.GetOutlinedPathGeometry());
                 }
-                else if (ProcessingState == ComputerPlayer.STARTED)
+                else if (ProcessingState == AnalysisStatus.STARTED)
                     dc.DrawText(StartedMoveFont, GetSpaceCenterPoint(CurrentPiece));
-                else if (ProcessingState == ComputerPlayer.WORKING)
+                else if (ProcessingState == AnalysisStatus.WORKING)
                     dc.DrawText(WorkingMoveFont, GetSpaceCenterPoint(CurrentPiece));
 
                 //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
@@ -355,11 +357,11 @@ namespace Reversi
         /// Returns the global application game instance
         /// </summary>
         /// <returns>The current application game instance</returns>
-        public static ImageSource GetGamePiece(int PieceColor)
+        public static ImageSource GetGamePiece(Piece PieceColor)
         {
-            if (PieceColor == Board.BLACK)
+            if (PieceColor == Piece.BLACK)
                 return gBlackPieceImage;
-            else if (PieceColor == Board.WHITE)
+            else if (PieceColor == Piece.WHITE)
                 return gWhitePieceImage;
             else
                 return null;

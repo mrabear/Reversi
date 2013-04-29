@@ -48,6 +48,6 @@ namespace Reversi
         /// Resets the active computer player
         /// </summary>
         /// <param name="PlayerColor">The size of the board to use in the new game</param>
-        public static void ResetComputerPlayer(int PlayerColor = 2) { ComputerPlayer = new ComputerPlayer(PlayerColor); }
+        public static void ResetComputerPlayer(Piece PlayerColor = Piece.BLACK) { ComputerPlayer = new ComputerPlayer(PlayerColor); }
     }
 }

@@ -15,16 +15,10 @@ namespace Reversi
     public class Board
     {
         // The array of pieces that represents the board state
-        private int[,] BoardPieces;
+        private Piece[,] BoardPieces;
 
         // The size of the board, which will always be BoardSize x BoardSize
         private int BoardSize;
-
-        // The values used to represent the colors on the board array
-        public static int WHITE = Reversi.Properties.Settings.Default.WHITE;
-        public static int BLACK = Reversi.Properties.Settings.Default.BLACK;
-        public static int EMPTY = Reversi.Properties.Settings.Default.EMPTY;
-        public static int ERROR = Reversi.Properties.Settings.Default.ERROR;
 
         /// <summary>
         /// The default constructor creates an 8x8 board
@@ -32,7 +26,7 @@ namespace Reversi
         public Board()
         {
             this.BoardSize = 8;
-            BoardPieces = new int[BoardSize, BoardSize];
+            BoardPieces = new Piece[BoardSize, BoardSize];
             ClearBoard();
             PlaceStartingPieces();
         }
@@ -44,7 +38,7 @@ namespace Reversi
         public Board(int SourceSize)
         {
             BoardSize = Math.Max(4, SourceSize);
-            BoardPieces = new int[BoardSize, BoardSize];
+            BoardPieces = new Piece[BoardSize, BoardSize];
             ClearBoard();
             PlaceStartingPieces();
         }
@@ -56,7 +50,7 @@ namespace Reversi
         public Board(Board SourceBoard)
         {
             BoardSize = SourceBoard.BoardSize;
-            BoardPieces = new int[BoardSize, BoardSize];
+            BoardPieces = new Piece[BoardSize, BoardSize];
             this.CopyBoard(SourceBoard);
         }
 
@@ -65,7 +59,7 @@ namespace Reversi
         /// <summary>
         /// Returns the 2d list of game pieces
         /// </summary>
-        public int[,] GetBoardPieces() { return BoardPieces; }
+        public Piece[,] GetBoardPieces() { return BoardPieces; }
 
         /// <summary>
         /// Returns the board size
@@ -102,7 +96,7 @@ namespace Reversi
         /// Copies the content of one board to another
         /// </summary>
         /// <param name="NewBoardPieces">The board array to use as a source</param>
-        public void CopyBoard(int[,] NewBoardPieces)
+        public void CopyBoard(Piece[,] NewBoardPieces)
         {
             Array.Copy(NewBoardPieces, BoardPieces, NewBoardPieces.Length);
         }
@@ -172,7 +166,7 @@ namespace Reversi
         /// </summary>
         /// <param name="SourcePoint">The point to consider</param>
         /// <returns>The color at the given point</returns>
-        public int ColorAt(Point SourcePoint)
+        public Piece ColorAt(Point SourcePoint)
         {
             return( ColorAt( Convert.ToInt32(SourcePoint.X), Convert.ToInt32(SourcePoint.Y) ));
         }
@@ -183,10 +177,10 @@ namespace Reversi
         /// <param name="X">The X value of the move</param>
         /// <param name="Y">The Y value of the move</param>
         /// <returns>The color at the given point</returns>
-        public int ColorAt(int X, int Y)
+        public Piece ColorAt(int X, int Y)
         {
             if( !InBounds( X, Y ))
-                return Board.ERROR;
+                return Piece.ERROR;
 
             return(BoardPieces[X, Y]);
         }
@@ -199,7 +193,7 @@ namespace Reversi
         /// <param name="color">The X value of the move</param>
         /// <param name="ProcessMove">The Y value of the move</param>
         /// <returns>The color at the given point</returns>
-        public Boolean MakeMove(Point SourceMove, int SourceTurn, Boolean CommitMove = true)
+        public Boolean MakeMove(Point SourceMove, Piece SourceTurn, Boolean CommitMove = true)
         {
             return (MakeMove(Convert.ToInt32(SourceMove.X), Convert.ToInt32(SourceMove.Y), SourceTurn, CommitMove));
         }
@@ -212,18 +206,18 @@ namespace Reversi
         /// <param name="color">The X value of the move</param>
         /// <param name="ProcessMove">The Y value of the move</param>
         /// <returns>The color at the given point</returns>
-        public Boolean MakeMove(int MoveX, int MoveY, int SourceTurn, Boolean CommitMove = true)
+        public Boolean MakeMove(int MoveX, int MoveY, Piece SourceTurn, Boolean CommitMove = true)
         {
-            int CurrentTurn = SourceTurn;
-            int NextTurn;
+            Piece CurrentTurn = SourceTurn;
+            Piece NextTurn;
 
-            if (CurrentTurn == Board.WHITE)
-                NextTurn = Board.BLACK;
+            if (CurrentTurn == Piece.WHITE)
+                NextTurn = Piece.BLACK;
             else
-                NextTurn = Board.WHITE;
+                NextTurn = Piece.WHITE;
 
             // Check for already existing piece
-            if (ColorAt(MoveX, MoveY) != Board.EMPTY)
+            if (ColorAt(MoveX, MoveY) != Piece.EMPTY)
                 return false;
 
             Boolean findStatus = false;
@@ -292,13 +286,13 @@ namespace Reversi
         /// </summary>
         /// <param name="CurrentTurn">The turn to consider</param>
         /// <returns>The list of all available moves for a given player</returns>
-        public Point[] AvailableMoves(int CurrentTurn)
+        public Point[] AvailableMoves(Piece CurrentTurn)
         {
             Point[] Moves = new Point[64];
             int foundMoves = 0;
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
-                    if (ColorAt(X, Y) == Board.EMPTY)
+                    if (ColorAt(X, Y) == Piece.EMPTY)
                         if (MakeMove(X, Y, CurrentTurn, CommitMove: false))
                         {
                             Moves[foundMoves] = new Point(X, Y);
@@ -318,7 +312,7 @@ namespace Reversi
         /// <returns>True if either player can make a legal move</returns>
         public bool MovePossible()
         {
-            if ((MovePossible(Board.BLACK)) || (MovePossible(Board.WHITE)))
+            if ((MovePossible(Piece.BLACK)) || (MovePossible(Piece.WHITE)))
                 return (true);
 
             return (false);
@@ -329,13 +323,13 @@ namespace Reversi
         /// </summary>
         /// <param name="Turn">The turn to consider</param>
         /// <returns>True if the given player can make a legal move</returns>
-        public bool MovePossible(int Turn)
+        public bool MovePossible(Piece Turn)
         {
             // Loop through all spots on the board
             for (int Y = 0; Y < BoardSize; Y++)
                 for (int X = 0; X < BoardSize; X++)
                     // Simulate a move, if successful, we know that there is at least this legal move
-                    if (ColorAt(X, Y) == Board.EMPTY)
+                    if (ColorAt(X, Y) == Piece.EMPTY)
                         if (MakeMove(X, Y, Turn, CommitMove: false))
                             return true;
 
@@ -348,7 +342,7 @@ namespace Reversi
         /// </summary>
         /// <param name="Move">The move to place</param>
         /// <param name="Turn">The move turn</param>
-        public void PutPiece(Point Move, int Turn)
+        public void PutPiece(Point Move, Piece Turn)
         {
             PutPiece(Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y), Turn);
         }
@@ -359,12 +353,12 @@ namespace Reversi
         /// <param name="X">The X value of the move</param>
         /// <param name="Y">The Y value of the move</param>
         /// <param name="Turn">The move turn</param>
-        public void PutPiece(int X, int Y, int Turn)
+        public void PutPiece(int X, int Y, Piece Turn)
         {
-            if ((Turn == Board.WHITE) || (Turn == Board.BLACK))
+            if ((Turn == Piece.WHITE) || (Turn == Piece.BLACK))
                 BoardPieces[X, Y] = Turn;
             else
-                BoardPieces[X, Y] = Board.EMPTY;
+                BoardPieces[X, Y] = Piece.EMPTY;
         }
 
         /// <summary>
@@ -382,24 +376,24 @@ namespace Reversi
         {
             if (BoardSize == 8)
             {
-                PutPiece(3, 3, Board.WHITE);
-                PutPiece(4, 4, Board.WHITE);
-                PutPiece(3, 4, Board.BLACK);
-                PutPiece(4, 3, Board.BLACK);
+                PutPiece(3, 3, Piece.WHITE);
+                PutPiece(4, 4, Piece.WHITE);
+                PutPiece(3, 4, Piece.BLACK);
+                PutPiece(4, 3, Piece.BLACK);
             }
             else if (BoardSize == 6)
             {
-                PutPiece(2, 2, Board.WHITE);
-                PutPiece(3, 3, Board.WHITE);
-                PutPiece(2, 3, Board.BLACK);
-                PutPiece(3, 2, Board.BLACK);
+                PutPiece(2, 2, Piece.WHITE);
+                PutPiece(3, 3, Piece.WHITE);
+                PutPiece(2, 3, Piece.BLACK);
+                PutPiece(3, 2, Piece.BLACK);
             }
             else
             {
-                PutPiece(1, 1, Board.WHITE);
-                PutPiece(2, 2, Board.WHITE);
-                PutPiece(1, 2, Board.BLACK);
-                PutPiece(2, 1, Board.BLACK);
+                PutPiece(1, 1, Piece.WHITE);
+                PutPiece(2, 2, Piece.WHITE);
+                PutPiece(1, 2, Piece.BLACK);
+                PutPiece(2, 1, Piece.BLACK);
             }
         }
 
@@ -408,7 +402,7 @@ namespace Reversi
         /// </summary>
         /// <param name="Turn">The turn to score</param>
         /// <returns>The score for the given turn</returns>
-        public int FindScore(int Turn)
+        public int FindScore(Piece Turn)
         {
             int Score = 0;
 
@@ -424,26 +418,26 @@ namespace Reversi
         /// Determines if there is a winner in the current game
         /// </summary>
         /// <returns>The color of the winning player</returns>
-        public int DetermineWinner()
+        public Piece DetermineWinner()
         {
             if (!MovePossible())
             {
-                int WhiteScore = FindScore(Board.WHITE);
-                int BlackScore = FindScore(Board.BLACK);
+                int WhiteScore = FindScore(Piece.WHITE);
+                int BlackScore = FindScore(Piece.BLACK);
 
                 // Black Wins
                 if (BlackScore > WhiteScore)
-                    return (Board.BLACK);
+                    return (Piece.BLACK);
                 // White Wins
                 else if (BlackScore < WhiteScore)
-                    return (Board.WHITE);
+                    return (Piece.WHITE);
                 // Tie Game
                 else
-                    return (Board.EMPTY);
+                    return (Piece.EMPTY);
             }
 
             // No victory
-            return (Board.ERROR);
+            return (Piece.ERROR);
         }
 
         /// <summary>

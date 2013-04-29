@@ -92,11 +92,11 @@ namespace Reversi
         {
             ScoreBoardVisualLayers.Remove(PlayerScoresLayer);
 
-            BlackScore = new FormattedText(App.GetActiveGameBoard().FindScore(Board.BLACK).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.White);
+            BlackScore = new FormattedText(App.GetActiveGameBoard().FindScore(Piece.BLACK).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.White);
             BlackScore.TextAlignment = TextAlignment.Center;
             BlackScore.SetFontWeight(FontWeights.Bold);
 
-            WhiteScore = new FormattedText(App.GetActiveGameBoard().FindScore(Board.WHITE).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.Black);
+            WhiteScore = new FormattedText(App.GetActiveGameBoard().FindScore(Piece.WHITE).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.Black);
             WhiteScore.TextAlignment = TextAlignment.Center;
             WhiteScore.SetFontWeight(FontWeights.Bold);
 
@@ -117,11 +117,11 @@ namespace Reversi
         /// Returns the scoreboard image appropriate for the given turn
         /// </summary>
         /// <param name="Turn">The currently active turn</param>
-        private static ImageSource GetScoreBoardImage(int Turn)
+        private static ImageSource GetScoreBoardImage(Piece Turn)
         {
-            if (Turn == Board.BLACK)
+            if (Turn == Piece.BLACK)
                 return gBlackTurnImage;
-            else if (Turn == Board.WHITE)
+            else if (Turn == Piece.WHITE)
                 return gWhiteTurnImage;
             else
                 return gScoreBoardImage;
