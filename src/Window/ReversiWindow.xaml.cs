@@ -20,6 +20,8 @@ namespace Reversi
 
         private static bool SinglePlayerButtonSelected = true;
 
+        public static GameBoard GetGameBoardSurface() { return gGameBoardSurface; }
+
         /// <summary>
         /// Creates a new instance of the main window
         /// </summary>
@@ -45,7 +47,7 @@ namespace Reversi
 
             if (!App.GetActiveGame().GetTurnInProgress())
                 if (App.GetActiveGame().ProcessUserTurn(GridClickX, GridClickY))
-                    GameBoard.Refresh();
+                    gGameBoardSurface.Refresh();
         }
 
         /// <summary>
@@ -58,7 +60,7 @@ namespace Reversi
             App.GetActiveGame().SetSinglePlayerGame(SinglePlayerButtonSelected);
 
             // Clear the display game board
-            GameBoard.Clear();
+            gGameBoardSurface.Clear();
             ScoreBoard.Clear();
 
             // Setup the AI player
@@ -66,7 +68,7 @@ namespace Reversi
             App.GetComputerPlayer().SetVisualizeProcess(true);
 
             // Force a repaint of the game board and score board
-            GameBoard.Refresh();
+            gGameBoardSurface.Refresh();
         }
 
         #region Top Menu Event Handlers

@@ -115,12 +115,8 @@ namespace Reversi
                 }
 
                 if (VisualizeProcess)
-                {
-                    GameBoard.StartNewVisualization();
-
                     foreach( Point CurrentPoint in PossibleMoves)
-                        GameBoard.HighlightMove(CurrentPoint, STARTED);
-                }
+                        ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, STARTED);
 
                 //****FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 
@@ -130,7 +126,7 @@ namespace Reversi
                                         // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
                         if( VisualizeProcess )
-                            GameBoard.HighlightMove(CurrentPoint, WORKING);
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, WORKING);
 
                     double[] EvalResult = new double[MaxSimDepth];
 
@@ -152,7 +148,7 @@ namespace Reversi
                         {
                             AnalysisResults[CurrentPoint].AnalysisResult = MoveWeight;
                             AnalysisResults[CurrentPoint].AnalysisCompleted = true;
-                            GameBoard.HighlightMove(CurrentPoint, COMPLETE);
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, COMPLETE);
                         }
 
                         //****FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
@@ -317,7 +313,7 @@ namespace Reversi
         {
             App.GetActiveGame().SetTurnInProgress(false);
             App.GetActiveGame().SwitchTurn();
-            GameBoard.Refresh();
+            ReversiWindow.GetGameBoardSurface().Refresh();
         }
 
         /// <summary>
@@ -332,7 +328,7 @@ namespace Reversi
                 if (App.GetActiveGameBoard().MovePossible(GetColor() == Board.BLACK ? Board.WHITE : Board.BLACK))
                     break;
                 else
-                    GameBoard.Refresh();
+                    ReversiWindow.GetGameBoardSurface().Refresh();
             }
         }
 
