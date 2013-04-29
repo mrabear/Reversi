@@ -110,7 +110,7 @@ namespace Reversi
 
                 if (VisualizeProcess)
                     foreach( Point CurrentPoint in PossibleMoves)
-                        ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.STARTED);
+                        ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.QUEUED);
 
                 //****FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
 

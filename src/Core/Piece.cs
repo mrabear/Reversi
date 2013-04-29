@@ -4,9 +4,9 @@ namespace Reversi
 {
     public enum Piece : byte
     {
-        ERROR = 9,
-        EMPTY = 0,
-        WHITE = 1,
-        BLACK = 2
+        ERROR = 9,  // Should never happen, indicates an invalid state
+        EMPTY = 0,  // An empty spot
+        WHITE = 1,  // A white turn/piece
+        BLACK = 2   // A black turn/piece
     }
 }

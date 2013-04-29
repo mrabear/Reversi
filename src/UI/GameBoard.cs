@@ -282,7 +282,7 @@ namespace Reversi
                     Geometry TextOutline = CompletedMoveFont.BuildGeometry(GetSpaceCenterPoint(CurrentPiece));
                     dc.DrawGeometry(null, new Pen(new SolidColorBrush(DarkGrey), 2), TextOutline.GetOutlinedPathGeometry());
                 }
-                else if (ProcessingState == AnalysisStatus.STARTED)
+                else if (ProcessingState == AnalysisStatus.QUEUED)
                     dc.DrawText(StartedMoveFont, GetSpaceCenterPoint(CurrentPiece));
                 else if (ProcessingState == AnalysisStatus.WORKING)
                     dc.DrawText(WorkingMoveFont, GetSpaceCenterPoint(CurrentPiece));
