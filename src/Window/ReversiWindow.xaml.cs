@@ -117,7 +117,7 @@ namespace Reversi
         /// </summary>
         private void TopMenuBorderGlow(object sender, MouseButtonEventArgs e)
         {
-            TopMenuBorder.Opacity = 0.5;
+            TopMenuBorder.Opacity = 0.6;
         }
 
         private void HighlightGameType(bool SinglePlayerGame)

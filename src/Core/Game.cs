@@ -16,14 +16,25 @@ namespace Reversi
     /// </summary>
     public class Game
     {
+        // The historical timeline of game states
         private List<GameState> MoveHistory = new List<GameState>();
+
+        // Where on the MoveHistory list the current game is
         private int HistoricalIndex;
 
+        // The player who is currently moving
         private Piece CurrentTurn;
+
+        // The player who is moving next
         private Piece NextTurn;
+
+        // True if the game is vs Computer, false if it is multiplayer
         private Boolean SinglePlayerGame = true;
+
+        // True if the game is over
         private Boolean IsComplete = false;
-        private Boolean ProcessMoves = true;
+
+        // True if a turn is currently being processed
         private Boolean TurnInProgress = false;
 
         /// <summary>
@@ -76,17 +87,6 @@ namespace Reversi
             NextTurn = Turn;
             CurrentTurn = (Turn == Piece.WHITE ? Piece.BLACK : Piece.WHITE);
         }
-
-        /// <summary>
-        /// Returns True if the game is currently processing moves
-        /// </summary>
-        public Boolean GetProcessMoves() { return ProcessMoves; }
-
-        /// <summary>
-        /// Sets to True if the game is currently processing moves
-        /// </summary>
-        /// <param name="isMoveProcessing">Set to True if the game is processing a move</param>
-        public void SetProcessMoves(Boolean isMoveProcessing) { ProcessMoves = isMoveProcessing; }
 
         /// <summary>
         /// Returns the color of the AI opponent
