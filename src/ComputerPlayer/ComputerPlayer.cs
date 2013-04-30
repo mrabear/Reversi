@@ -306,8 +306,8 @@ namespace Reversi
         public void AIBGWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             App.GetActiveGame().SetTurnInProgress(false);
-            App.GetActiveGame().AddBoardToMoveHistory();
             App.GetActiveGame().SwitchTurn();
+            App.GetActiveGame().AddBoardToMoveHistory();
             ReversiWindow.GetGameBoardSurface().Refresh();
         }
 

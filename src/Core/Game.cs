@@ -5,7 +5,9 @@
 
 using System;
 using System.Windows;
+using System.Linq;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Reversi
 {
@@ -14,7 +16,7 @@ namespace Reversi
     /// </summary>
     public class Game
     {
-        private List<Board> MoveHistory = new List<Board>();
+        private List<GameState> MoveHistory = new List<GameState>();
         private int HistoricalIndex;
 
         private Piece CurrentTurn;
@@ -30,11 +32,14 @@ namespace Reversi
         /// <param name="BoardSize">The size of the game board</param>
         public Game(int BoardSize = 8)
         {
-            HistoricalIndex = 0;
             CurrentTurn = Piece.WHITE;
             NextTurn = Piece.BLACK;
             //VsComputer = ReversiForm.VsComputer();
             App.ResetActiveGameBoard(BoardSize);
+
+            HistoricalIndex = 0;
+            AddBoardToMoveHistory();
+
             IsComplete = false;
             App.ResetComputerPlayer(Piece.BLACK);
         }
@@ -53,7 +58,10 @@ namespace Reversi
         /// Sets the current game turn
         /// </summary>
         /// <param name="Turn">The current turn</param>
-        public void SetCurrentTurn(Piece Turn) { CurrentTurn = Turn; }
+        public void SetCurrentTurn(Piece Turn) { 
+            CurrentTurn = Turn;
+            NextTurn = (Turn == Piece.WHITE ? Piece.BLACK : Piece.WHITE);
+        }
 
         /// <summary>
         /// Returns the next turn
@@ -64,7 +72,10 @@ namespace Reversi
         /// Sets the next turn
         /// </summary>
         /// <param name="Turn">The next move</param>
-        public void SetNextTurn(Piece Turn) { NextTurn = Turn; }
+        public void SetNextTurn(Piece Turn) { 
+            NextTurn = Turn;
+            CurrentTurn = (Turn == Piece.WHITE ? Piece.BLACK : Piece.WHITE);
+        }
 
         /// <summary>
         /// Returns True if the game is currently processing moves
@@ -88,17 +99,23 @@ namespace Reversi
         /// <param name="isMoveProcessing">Set to True if the game is processing a turn</param>
         public void SetTurnInProgress(Boolean isTurninProgress) { TurnInProgress = isTurninProgress; }
 
+        /// <summary>
+        /// Returns true if the game can be advanced (if there are states to move forward to)
+        /// </summary>
         public bool CanAdvance() 
         {
-            if ((HistoricalIndex < MoveHistory.Count) && ((!SinglePlayerGame) || (HistoricalIndex < MoveHistory.Count - 1)))
+            if ((HistoricalIndex < MoveHistory.Count - 1) && ((!SinglePlayerGame) || (HistoricalIndex < MoveHistory.Count - 1)))
                 return true;
 
             return false;
         }
 
+        /// <summary>
+        /// Returns true if the game can be rewound (if there are states to move back to)
+        /// </summary>
         public bool CanRewind()
         {
-            if ((HistoricalIndex > 0) && ((!SinglePlayerGame) || (HistoricalIndex > 1)))
+            if (HistoricalIndex > 0)
                 return true;
 
             return false;
@@ -136,8 +153,8 @@ namespace Reversi
                         MoveOutcome = App.GetActiveGameBoard().MakeMove(X, Y, CurrentTurn);
                         if (MoveOutcome)
                         {
-                            AddBoardToMoveHistory();
                             SwitchTurn();
+                            AddBoardToMoveHistory();
                         }
                     }
                     else
@@ -172,45 +189,69 @@ namespace Reversi
             }
         }
 
-        public void AddBoardToMoveHistory() { AddBoardToMoveHistory(App.GetActiveGameBoard()); }
+        /// <summary>
+        /// Snapshot the current game and store it in the historical timeline
+        /// </summary>
+        public void AddBoardToMoveHistory() { AddBoardToMoveHistory(App.GetActiveGameBoard(), CurrentTurn); }
 
-        public void AddBoardToMoveHistory(Board HistoricalBoard)
+        /// <summary>
+        /// Snapshot the game and store it in the historical timeline
+        /// </summary>
+        /// <param name="HistoricalBoard">The board to snapshot</param>
+        /// <param name="PlayerTurn">The player who is moving next</param>
+        public void AddBoardToMoveHistory(Board HistoricalBoard, Piece PlayerTurn)
         {
-            MoveHistory.Add(HistoricalBoard);
-            HistoricalIndex = MoveHistory.Count;
+            // If the move is happening in the past (when the user has advanced or rewound the game)
+            // erase the moves in front of it, as they belong to a completely different game timeline now
+            if (HistoricalIndex != Math.Max(0,MoveHistory.Count - 1))
+                MoveHistory.RemoveRange(Math.Max(1,HistoricalIndex), MoveHistory.Count - HistoricalIndex - 1);
+
+            // Add the current gamestate to the move history 
+            MoveHistory.Add(new GameState(HistoricalBoard, PlayerTurn));
+
+            // Make the current addition 
+            HistoricalIndex = MoveHistory.Count - 1;
         }
 
+        /// <summary>
+        /// Advances the game 1 turn into the future
+        /// </summary>
         public void AdvanceHistoricalState()
         {
             MoveHistoricalState(1);
         }
 
+        /// <summary>
+        /// Rewinds the game 1 turn into the past
+        /// </summary>
         public void RewindHistoricalState()
         {
             MoveHistoricalState(-1);
         }
 
+        /// <summary>
+        /// Alters the game state, replacing it with a previously stored historical state.
+        /// </summary>
+        /// <param name="Direction">Set to +1 to move forward, -1 to move backwards</param>
         private void MoveHistoricalState(int Direction = -1)
         {
+            // If it is a single player game, step over two turns
             if (SinglePlayerGame)
-            {
                 Direction = 2 * Direction;
-            }
-            else
-            {
-                SwitchTurn();
-            }
 
-            Console.Write( "Moving historical index from " + HistoricalIndex + " " );
+            // Move the historical index that we are looking at, forward or backwards depending on the Direction parameter
+            HistoricalIndex = Math.Min(MoveHistory.Count - 1, Math.Max(0, HistoricalIndex + Direction));
 
-            HistoricalIndex = Math.Min(MoveHistory.Count, Math.Max(0, HistoricalIndex + Direction));
+            // Overwrite the current game board with the new historical one
+            App.SetActiveGameBoard(MoveHistory[HistoricalIndex].BoardState);
 
-            Console.WriteLine("to " + HistoricalIndex);
+            // Overwrite the current game turn with the historical one
+            SetCurrentTurn(MoveHistory[HistoricalIndex].TurnState);
 
+            // Reset the graphics objects to display the new game state
+            ScoreBoard.Clear();
             ReversiWindow.GetGameBoardSurface().Clear();
-            App.SetActiveGameBoard(MoveHistory[HistoricalIndex]);
             ReversiWindow.GetGameBoardSurface().Refresh();
         }
     }
-
 }

@@ -85,11 +85,7 @@ namespace Reversi
             SinglePlayerButton.Opacity = 1;
             MultiPlayerButton.Opacity = 1;
 
-            if (App.GetActiveGame().CanAdvance())
-                NextMoveButton.Opacity = 1;
-
-            if (App.GetActiveGame().CanRewind())
-                PreviousMoveButton.Opacity = 1;
+            UpdateMoveChangeButtons();
         }
 
         /// <summary>
@@ -116,7 +112,10 @@ namespace Reversi
             TopMenuBorder.Opacity = 0.25;
         }
 
-        private void NewGameButton_MouseDown(object sender, MouseButtonEventArgs e)
+        /// <summary>
+        /// Handles the MouseDown event for the new game button, starts a new game
+        /// </summary>
+        private void TopMenuBorderGlow(object sender, MouseButtonEventArgs e)
         {
             TopMenuBorder.Opacity = 0.5;
         }
@@ -151,11 +150,6 @@ namespace Reversi
             HighlightGameType(SinglePlayerButtonSelected);
         }
 
-        private void MultiPlayerButton_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            TopMenuBorder.Opacity = 0.5;
-        }
-
         private void MultiPlayerButton_MouseUp(object sender, MouseButtonEventArgs e)
         {
             SinglePlayerButtonSelected = false;
@@ -173,11 +167,6 @@ namespace Reversi
             HighlightGameType(SinglePlayerButtonSelected);
         }
 
-        private void SinglePlayerButton_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            TopMenuBorder.Opacity = 0.5;
-        }
-
         private void SinglePlayerButton_MouseUp(object sender, MouseButtonEventArgs e)
         {
             SinglePlayerButtonSelected = true;
@@ -185,26 +174,40 @@ namespace Reversi
             StartNewGame();
         }
 
-        private void PreviousMoveButton_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            TopMenuBorder.Opacity = 0.5;
-        }
-
-        private void NextMoveButton_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            TopMenuBorder.Opacity = 0.5;
-        }
-
         private void PreviousMoveButton_MouseUp(object sender, MouseButtonEventArgs e)
         {
             TopMenuBorder.Opacity = 0.25;
-            App.GetActiveGame().RewindHistoricalState();
+
+            if (App.GetActiveGame().CanRewind())
+                App.GetActiveGame().RewindHistoricalState();
+
+            UpdateMoveChangeButtons();
         }
 
         private void NextMoveButton_MouseUp(object sender, MouseButtonEventArgs e)
         {
             TopMenuBorder.Opacity = 0.25;
-            App.GetActiveGame().AdvanceHistoricalState();
+            
+            if (App.GetActiveGame().CanAdvance())
+                App.GetActiveGame().AdvanceHistoricalState();
+            
+            UpdateMoveChangeButtons();
+        }
+
+        /// <summary>
+        /// Activates / Deactivates the game state change buttons depending on whether or not they can be activated
+        /// </summary>
+        private void UpdateMoveChangeButtons()
+        {
+            if (App.GetActiveGame().CanAdvance())
+                NextMoveButton.Opacity = 1;
+            else
+                NextMoveButton.Opacity = 0.1;
+
+            if (App.GetActiveGame().CanRewind())
+                PreviousMoveButton.Opacity = 1;
+            else
+                PreviousMoveButton.Opacity = 0.1;
         }
 
         #endregion
