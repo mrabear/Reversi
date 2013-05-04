@@ -16,7 +16,28 @@
         <Grid x:Name="GameBoardClickSurface" Background="#00000000" Cursor="Hand" HorizontalAlignment="Left" Height="660" MouseDown="PlaceUserPiece" Margin="30,80,0,0" VerticalAlignment="Top" Width="660" >
 
             <!-- The Game Board surface -->
-            <local:GameBoard x:Name="GameBoardSurface" Margin="9,10,11,10"/>
+            <local:GameBoard x:Name="GameBoardSurface" Margin="9,10,11,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+            </local:GameBoard>
             <!--<Image x:Name="ProcessingPieceImage" Height="80" Width="80" Source="/Reversi;component/img/Pieces/ProcessingPiece.png" Margin="94,176,486,404"/>-->
         </Grid>
 

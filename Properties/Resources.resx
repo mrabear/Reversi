@@ -139,8 +139,17 @@
   <data name="PreviousMove" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\TopMenu\PreviousMove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ProcessingPiece" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\img\Pieces\ProcessingPiece.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ProcessingChosen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\Pieces\ProcessingChosen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProcessingCompleted" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\Pieces\ProcessingCompleted.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProcessingQueued" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\Pieces\ProcessingQueued.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ProcessingWorking" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\img\Pieces\ProcessingWorking.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ScoreBoard" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\img\ScoreBoard\ScoreBoard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

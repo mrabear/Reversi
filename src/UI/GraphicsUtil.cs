@@ -7,7 +7,7 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-
+using System.Windows.Resources;
 
 namespace Reversi
 {
@@ -19,14 +19,15 @@ namespace Reversi
         /// <summary>
         /// Converts a Drawing.Bitmap object into Media.ImageSource 
         /// </summary>
-        public static ImageSource GenerateImageSource(System.Drawing.Bitmap GivenImage)
+        public static ImageSource GenerateImageSource(string ImagePath)
         {
-            BitmapSource GivenImageSource = null;
-            
-            if (GivenImage != null)
-                GivenImageSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(GivenImage.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            StreamResourceInfo sri = Application.GetResourceStream(new Uri("/Reversi;component/" + ImagePath, UriKind.Relative));
+            BitmapImage bmp = new BitmapImage();
+            bmp.BeginInit();
+            bmp.StreamSource = sri.Stream;
+            bmp.EndInit();
 
-            return GivenImageSource;
+            return bmp;
         }
     }
 }

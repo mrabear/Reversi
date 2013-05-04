@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Globalization;
 using System.Collections.Generic;
@@ -17,28 +18,24 @@ namespace Reversi
     /// <summary>
     /// The window component that the game board is drawn on
     /// </summary>
-    public class GameBoard : FrameworkElement
+    public class GameBoard : Grid
     {
         // Static binds to game board images
         private static ImageSource gBlackPieceImage;
         private static ImageSource gWhitePieceImage;
         private static ImageSource gAvailableMoveImage;
-        private static ImageSource gProcessingPieceImage;
 
-        // Font and colors used to display the computers player current analysis
-        private static FormattedText StartedMoveFont;
-        private static FormattedText WorkingMoveFont;
-        private static FormattedText CompletedMoveFont;
-        private static Color LightGrey = Color.FromArgb(255, 200, 200, 200);
-        private static Color MatrixGreen = Color.FromArgb(255, 0, 255, 12);
-        private static Color DarkGreen = Color.FromArgb(255, 0, 41, 0);
-        private static Color DarkGrey = Color.FromArgb(255, 100, 100, 100);
+        // Static binds to the computer player visualization images
+        private static ImageSource gProcessingWorking;
+        private static ImageSource gProcessingCompleted;
+        private static ImageSource gProcessingQueued;
+        private static ImageSource gProcessingChosen;
 
         // The locking object used to multithread the analysis
         private static object HighLightLock = new object();
 
-        // A list of all graphics display layers, one layer for each spot on the board
-        private static ConcurrentDictionary<Point, DrawingVisual> GameBoardVisualLayers;
+        // A list of all game board pieces
+        private static ConcurrentDictionary<Point, Image> GameBoardImages;
 
         // A list of all spots on the board that have had non-piece graphcis drawn on them
         // Non-Piece Graphics include: available move markers and computer player analysis visulizations
@@ -53,8 +50,15 @@ namespace Reversi
         // The game board that has last been drawn onto screen 
         private static Board LastDrawnBoard;
 
-        // The rotating animation clock used for the computer processing visualizations
-        //private static AnimationClock RotationAnimationClock;
+        // The animation timer that cycles between 0 and 360 degrees, used to spin the green "processing turn" image
+        private static DoubleAnimation AngleRotation;
+
+        // The rotation animation that applies the AngleRotation timer to the angle of the "processing turn" image
+        private static RotateTransform RotationAnimation;
+
+        // Tracks the best piece that the computer player has found so far in its analysis
+        private static double CurrentBestWeight;
+        private static Point CurrentBestPiece;
 
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
@@ -62,7 +66,7 @@ namespace Reversi
         public GameBoard() : base()
         {
             // Reset the graphics layers
-            GameBoardVisualLayers = new ConcurrentDictionary<Point, DrawingVisual>();
+            GameBoardImages = new ConcurrentDictionary<Point, Image>();
 
             // Resets the dirty spots monitor
             DirtySpots = new List<Point>();
@@ -70,26 +74,22 @@ namespace Reversi
             // Clears the game board
             Clear();
 
-            // The formatted fonts used for the "?" displayed while the AI is processing a turn: Used when a move has been queued, but has not been assigned a worker thread
-            StartedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(LightGrey));
-            StartedMoveFont.TextAlignment = TextAlignment.Center;
-            StartedMoveFont.SetFontWeight(FontWeights.Bold);
+            // Static binds to the processing visualization image sources
+            gProcessingWorking = GraphicsTools.GenerateImageSource("img/Pieces/ProcessingWorking.png");
+            gProcessingCompleted = GraphicsTools.GenerateImageSource("img/Pieces/ProcessingCompleted.png");
+            gProcessingQueued = GraphicsTools.GenerateImageSource("img/Pieces/ProcessingQueued.png");
+            gProcessingChosen = GraphicsTools.GenerateImageSource("img/Pieces/ProcessingChosen.png");
 
-            // The formatted fonts used for the "?" displayed while the AI is processing a turn: Used when a move has been assigned a worker thread
-            WorkingMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(MatrixGreen));
-            WorkingMoveFont.TextAlignment = TextAlignment.Center;
-            WorkingMoveFont.SetFontWeight(FontWeights.Bold);
+            // Static binds to the game piece image sources
+            gBlackPieceImage = GraphicsTools.GenerateImageSource("img/Pieces/BlackPiece.png");
+            gWhitePieceImage = GraphicsTools.GenerateImageSource("img/Pieces/WhitePiece.png");
+            gAvailableMoveImage = GraphicsTools.GenerateImageSource("img/Pieces/SuggestedPiece.png");
 
-            // The formatted fonts used for the "?" displayed while the AI is processing a turn: Used when a move worker thread has completed
-            CompletedMoveFont = new FormattedText("?", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 36, new SolidColorBrush(DarkGreen));
-            CompletedMoveFont.TextAlignment = TextAlignment.Center;
-            CompletedMoveFont.SetFontWeight(FontWeights.Bold);
-
-            // Static binds to the piece images
-            gProcessingPieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.ProcessingPiece);
-            gBlackPieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.BlackPiece);
-            gWhitePieceImage = GraphicsTools.GenerateImageSource(Properties.Resources.WhitePiece);
-            gAvailableMoveImage = GraphicsTools.GenerateImageSource(Properties.Resources.SuggestedPiece);
+            // Setup the angle rotation timer for the green "processing space" gear image
+            AngleRotation = new DoubleAnimation(360, 0, new Duration(TimeSpan.FromSeconds(5)));
+            RotationAnimation = new RotateTransform();
+            AngleRotation.RepeatBehavior = RepeatBehavior.Forever;
+            RotationAnimation.BeginAnimation(RotateTransform.AngleProperty, AngleRotation);
         }
 
         /// <summary>
@@ -107,12 +107,14 @@ namespace Reversi
             // Reset the current working board
             DisplayBoard = new Board();
 
+            Point CurrentPoint;
             // Rebuild the board visual layers
             for (int Y = 0; Y < LastDrawnBoard.GetBoardSize(); Y++)
                 for (int X = 0; X < LastDrawnBoard.GetBoardSize(); X++)
                 {
-                    RemoveVisual(new Point(X, Y));
-                    AddVisual(new Point(X, Y), new DrawingVisual());
+                    CurrentPoint = new Point(X, Y);
+                    ClearBoardPiece(CurrentPoint);
+                    PlaceBoardPiece(CurrentPoint, null);
                 }
         }
 
@@ -142,7 +144,7 @@ namespace Reversi
         public void WipeDirtySpots()
         {
             // Clear the dirty spots from the display stack
-            DirtySpots.ForEach(delegate(Point CurrentPoint) { RemoveVisual(CurrentPoint); });
+            DirtySpots.ForEach(delegate(Point CurrentPoint) { ClearBoardPiece(CurrentPoint); });
 
             // Rest the dirty spots list
             DirtySpots = new List<Point>();
@@ -164,9 +166,6 @@ namespace Reversi
         /// <param name="BoardToDisplay">The board to draw onto the screen</param>
         public void DrawPieces(Board BoardToDisplay)
         {
-            // A visual that will be used as a workspace, will eventually be added to the display list
-            DrawingVisual WorkVisual;
-
             // The current piece that is being considered
             Point CurrentPiece;
 
@@ -177,23 +176,16 @@ namespace Reversi
                     // Only draw a game piece if it is either net new or has been flipped since the last drawing pass
                     if ((LastDrawnBoard.ColorAt(X, Y) != BoardToDisplay.ColorAt(X, Y)) || (BoardToDisplay.ColorAt(X, Y) == Piece.EMPTY))
                     {
-                        // The current piece
                         CurrentPiece = new Point(X, Y);
 
-                        // Remove this spot from the display list
-                        RemoveVisual(CurrentPiece);
-
-                        // Reset the canvas
-                        WorkVisual = new DrawingVisual();
-
-                        // Open the canvas for rendering and draw the correct piece image
-                        using (DrawingContext dc = WorkVisual.RenderOpen())
-                            dc.DrawImage(GetGamePiece(BoardToDisplay.ColorAt(CurrentPiece)), GetBoardRect(CurrentPiece));
+                        // Clear the spot on the board
+                        ClearBoardPiece(CurrentPiece);
 
                         // Add the canvas to the display list
-                        AddVisual(CurrentPiece, WorkVisual);
+                        PlaceBoardPiece(CurrentPiece, GetGamePiece(BoardToDisplay.ColorAt(CurrentPiece)));
                     }
 
+            // Update the last drawn board with the board that was just created
             LastDrawnBoard = new Board(BoardToDisplay);
         }
 
@@ -213,9 +205,6 @@ namespace Reversi
         /// <param name="Turn">The turn to use</param>
         public void DrawAvailableMoves(Board SourceBoard, Piece Turn)
         {
-            // A visual that will be used as a workspace, will eventually be added to the display list
-            DrawingVisual WorkVisual;
-
             // Do not display the available moves during a comptuer turn
             if ((App.GetActiveGame().GetCurrentTurn() != App.GetComputerPlayer().GetColor()) || (!App.GetActiveGame().IsSinglePlayerGame()))
 
@@ -225,28 +214,12 @@ namespace Reversi
                     // Add this space to the dirty spots list
                     DirtySpots.Add(CurrentPiece);
 
-                    // Remove this spot from the display list
-                    RemoveVisual(CurrentPiece);
-
-                    // Reset the working visual
-                    WorkVisual = new DrawingVisual();
-
-                    // Open the working visual for rendering and draw the available moves image
-                    using (DrawingContext dc = WorkVisual.RenderOpen())
-                        dc.DrawImage(gAvailableMoveImage, GetBoardRect(CurrentPiece));
+                    // Clear the spot on the board
+                    ClearBoardPiece(CurrentPiece);
 
                     // Add the work visual to the display list
-                    AddVisual(CurrentPiece, WorkVisual);
+                    PlaceBoardPiece(CurrentPiece, gAvailableMoveImage);
                 }
-        }
-
-        /// <summary>
-        /// Returns a Rect that bounds the given board space
-        /// </summary>
-        /// <param name="SourceLocation">The board coordinates to use</param>
-        private Rect GetBoardRect(Point SourceLocation)
-        {
-            return (GetBoardRect(Convert.ToInt32(SourceLocation.X), Convert.ToInt32(SourceLocation.Y)));
         }
 
         /// <summary>
@@ -255,105 +228,112 @@ namespace Reversi
         /// <param name="Piece">The piece to highlight</param>
         /// <param name="PieceColor">The highlight color</param>
         /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
-        public delegate void HighlightMoveDelegate(Point Piece, AnalysisStatus ProcessingState, String PieceLabel = "");
-        public void HighlightMove(Point Piece, AnalysisStatus ProcessingState, String PieceLabel = "")
+        public delegate void HighlightMoveDelegate(Point Piece, AnalysisStatus ProcessingState, Double Weight = 0);
+        public void HighlightMove(Point Piece, AnalysisStatus ProcessingState, Double Weight = 0)
         {
-            Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState, PieceLabel);
+            Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState, Weight);
         }
 
         /// <summary>
         /// Places a highlight circle at the given locations
         /// </summary>
-        private void DrawHighlightedMove(Point CurrentPiece, AnalysisStatus ProcessingState, String PieceLabel = "")
+        private void DrawHighlightedMove(Point CurrentPiece, AnalysisStatus ProcessingState, Double Weight = 0)
         {
             // Add this space to the dirty spots list
             DirtySpots.Add(CurrentPiece);
 
-            // A visual that will be used as a workspace, will eventually be added to the display list
-            DrawingVisual WorkVisual = new DrawingVisual();
-
             // Remove this spot from the display list
-            RemoveVisual(CurrentPiece);
+            ClearBoardPiece(CurrentPiece);
 
-            // Open the working visual for rendering
-            using (DrawingContext dc = WorkVisual.RenderOpen())
+            // Place a visualization icon on the board based off of the current Processing State
+            if (ProcessingState == AnalysisStatus.QUEUED)
+                // Place a grey "queued" gear
+                PlaceBoardPiece(CurrentPiece, gProcessingQueued);
+            else if (ProcessingState == AnalysisStatus.WORKING)
             {
-                if (ProcessingState == AnalysisStatus.COMPLETE)
-                {
-                    dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece));
+                // Place a green "working" gear
+                PlaceBoardPiece(CurrentPiece, gProcessingWorking);
 
-                    Geometry TextOutline = CompletedMoveFont.BuildGeometry(GetSpaceCenterPoint(CurrentPiece));
-                    dc.DrawGeometry(null, new Pen(new SolidColorBrush(DarkGrey), 2), TextOutline.GetOutlinedPathGeometry());
-                }
-                else if (ProcessingState == AnalysisStatus.QUEUED)
-                    dc.DrawText(StartedMoveFont, GetSpaceCenterPoint(CurrentPiece));
-                else if (ProcessingState == AnalysisStatus.WORKING)
-                    dc.DrawText(WorkingMoveFont, GetSpaceCenterPoint(CurrentPiece));
+                // Dim the piece (looks nicer)
+                GameBoardImages[CurrentPiece].Opacity = 0.6;
 
-                //dc.DrawText(CompletedMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
-                //else
-                //dc.DrawImage(gProcessingPieceImage, GetBoardRect(CurrentPiece), RotationAnimationClock);
-                //dc.DrawText(ProcessingMoveFont, GetSpaceCenterPoint(CurrentPiece.X, CurrentPiece.Y));
+                // Start spinning the gear
+                GameBoardImages[CurrentPiece].RenderTransform = RotationAnimation;
+                GameBoardImages[CurrentPiece].RenderTransformOrigin = new Point(0.5, 0.5);
             }
+            else if (ProcessingState == AnalysisStatus.COMPLETE)
+            {
+                if (Weight > CurrentBestWeight)
+                {
+                    // Place a red "chosen" gear on the new best piece
+                    PlaceBoardPiece(CurrentPiece, gProcessingChosen);
 
-            // Add the work visual to the display list
-            AddVisual(CurrentPiece, WorkVisual);
+                    // Replace the old best move
+                    DrawHighlightedMove(CurrentBestPiece, AnalysisStatus.COMPLETE);
+
+                    // Update the current best piece
+                    CurrentBestWeight = Weight;
+                    CurrentBestPiece = CurrentPiece;
+                }
+                else
+                {
+                    // Place a red "completed" gear
+                    PlaceBoardPiece(CurrentPiece, gProcessingCompleted);
+                }
+
+
+            }
         }
 
         #endregion
 
         #region Utility Methods
 
-        /// <summary>
-        /// Adds the given visual layer to the  given spot on the board, typically called right before updating that spot
-        /// </summary>
-        public void AddVisual(Point CurrentPoint, DrawingVisual SourceVisual)
+        public static void StartNewAnalysis()
         {
-            // Add the given visual to the board lookup
-            GameBoardVisualLayers.AddOrUpdate(CurrentPoint, SourceVisual, (key, oldValue) => SourceVisual);
+            CurrentBestWeight = 0;
+        }
+
+        /// <summary>
+        /// Places a piece image onto the game board
+        /// </summary>
+        public void PlaceBoardPiece(Point CurrentPoint, ImageSource SourceImage)
+        {
+            // If this board spot hasn't been processed yet, add an entry for it in the dictionary
+            if (!GameBoardImages.ContainsKey(CurrentPoint))
+                GameBoardImages.AddOrUpdate(CurrentPoint, new Image(), (key, oldValue) => new Image());
+
+            // Update the board image with the given image
+            GameBoardImages[CurrentPoint].Source = SourceImage;
             
             // Add the given visual to the display list
-            this.AddVisualChild(GameBoardVisualLayers[CurrentPoint]);
+            Children.Add(GameBoardImages[CurrentPoint]);
+
+            // Set the image on the correct spot on the game board grid
+            SetRow(GameBoardImages[CurrentPoint], Convert.ToInt16(CurrentPoint.Y));
+            SetColumn(GameBoardImages[CurrentPoint], Convert.ToInt16(CurrentPoint.X));
         }
 
         /// <summary>
-        /// Removes the visual layer that represents the given spot on the board, typically called right before updating that spot
+        /// Clears the given spot on the game board, typically called right before updating that spot
         /// </summary>
-        public void RemoveVisual(Point CurrentPoint)
+        public void ClearBoardPiece(Point CurrentPoint)
         {
             // Only attempt if this spot has been registered
-            if (GameBoardVisualLayers.ContainsKey(CurrentPoint))
+            if (GameBoardImages.ContainsKey(CurrentPoint))
             {
-                // Remove the given spot from the display list
-                this.RemoveVisualChild(GameBoardVisualLayers[CurrentPoint]);
+                Children.Remove(GameBoardImages[CurrentPoint]);
+
+                // Clear the board image
+                GameBoardImages[CurrentPoint].Source = null;
 
                 // The out parameter used in TryRemove
-                DrawingVisual OutBuffer;
+                Image OutBuffer;
 
                 // Remove the given spot from the board lookup
-                if (!GameBoardVisualLayers.TryRemove(CurrentPoint, out OutBuffer))
+                if (!GameBoardImages.TryRemove(CurrentPoint, out OutBuffer))
                     Console.WriteLine("Could not remove " + CurrentPoint.X + "," + CurrentPoint.Y);
             }
-        }
-
-        /// <summary>
-        /// Returns a the point at the cetner of the given board space
-        /// </summary>
-        /// <param name="X">The X board coordinate to use</param>
-        /// <param name="Y">The Y board coordinate to use</param>
-        private static Point GetSpaceCenterPoint(Point PointToCheck)
-        {
-            return (new Point((PointToCheck.X * Properties.Settings.Default.GRID_SIZE) + (Properties.Settings.Default.GRID_SIZE / 2), (PointToCheck.Y * Properties.Settings.Default.GRID_SIZE) + 12));
-        }
-
-        /// <summary>
-        /// Returns a Rect that bounds the given board space
-        /// </summary>
-        /// <param name="X">The X board coordinate to use</param>
-        /// <param name="Y">The Y board coordinate to use</param>
-        private static Rect GetBoardRect(int X, int Y)
-        {
-            return (new Rect(X * Properties.Settings.Default.GRID_SIZE, Y * Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE, Properties.Settings.Default.GRID_SIZE));
         }
 
         /// <summary>
@@ -368,45 +348,6 @@ namespace Reversi
                 return gWhitePieceImage;
             else
                 return null;
-        }
-
-        private static AnimationClock CreateAnimationClock(Point GameBoardLocation)
-        {
-            RectAnimation RotationAnimation = new RectAnimation();
-            RotationAnimation.Duration = TimeSpan.FromSeconds(2);
-            RotationAnimation.FillBehavior = FillBehavior.HoldEnd;
-
-            // Set the animation to repeat forever. 
-            RotationAnimation.RepeatBehavior = RepeatBehavior.Forever;
-
-            // Set the From and To properties of the animation.
-            RotationAnimation.From = GetBoardRect(Convert.ToInt32(GameBoardLocation.X), Convert.ToInt32(GameBoardLocation.Y));
-            RotationAnimation.To = GetBoardRect(Convert.ToInt32(GameBoardLocation.X + 5), Convert.ToInt32(GameBoardLocation.Y));
-
-            return (RotationAnimation.CreateClock());
-        }
-
-        #endregion
-
-        #region Visual class linkers
-
-        /// <summary>
-        /// Overrides the default GetVisualChild and instructs the WPF renderer to use the visuals stored in GameBoardVisualLayers
-        /// </summary>
-        protected override Visual GetVisualChild(int index)
-        {
-            return (GameBoardVisualLayers.Values.ElementAt<DrawingVisual>(index));
-        }
-
-        /// <summary>
-        /// Overrides the default VisualChildrenCount and instructs WPF to count the visuals stored in GameBoardVisualLayers
-        /// </summary>
-        protected override int VisualChildrenCount
-        {
-            get
-            {
-                return GameBoardVisualLayers.Values.Count;
-            }
         }
 
         #endregion

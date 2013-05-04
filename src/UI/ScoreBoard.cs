@@ -39,9 +39,9 @@ namespace Reversi
 
             Clear();
 
-            gWhiteTurnImage = GraphicsTools.GenerateImageSource(Properties.Resources.ScoreBoard_WhiteTurn);
-            gBlackTurnImage = GraphicsTools.GenerateImageSource(Properties.Resources.ScoreBoard_BlackTurn);
-            gScoreBoardImage = GraphicsTools.GenerateImageSource(Properties.Resources.ScoreBoard);
+            gWhiteTurnImage = GraphicsTools.GenerateImageSource("img/ScoreBoard/ScoreBoard_WhiteTurn.png");
+            gBlackTurnImage = GraphicsTools.GenerateImageSource("img/ScoreBoard/ScoreBoard_BlackTurn.png");
+            gScoreBoardImage = GraphicsTools.GenerateImageSource("img/ScoreBoard/ScoreBoard.png");
         }
 
         public static void Clear()

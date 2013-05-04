@@ -133,9 +133,39 @@ namespace Reversi.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ProcessingPiece {
+        internal static System.Drawing.Bitmap ProcessingChosen {
             get {
-                object obj = ResourceManager.GetObject("ProcessingPiece", resourceCulture);
+                object obj = ResourceManager.GetObject("ProcessingChosen", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProcessingCompleted {
+            get {
+                object obj = ResourceManager.GetObject("ProcessingCompleted", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProcessingQueued {
+            get {
+                object obj = ResourceManager.GetObject("ProcessingQueued", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ProcessingWorking {
+            get {
+                object obj = ResourceManager.GetObject("ProcessingWorking", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
