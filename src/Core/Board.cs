@@ -143,25 +143,6 @@ namespace Reversi
         }
 
         /// <summary>
-        /// Returns a unique identifier for a specific board state and turn
-        /// </summary>
-        /// <param name="CurrentTurn">The turn that this game state represents</param>
-        /// <returns>The string unique identifier for a specific board state and turn</returns>
-        public String GetID(int CurrentTurn)
-        {
-            return (CurrentTurn + this.GetID());
-        }
-
-        /// <summary>
-        /// Returns a unique identifier for a specific board state irrespective of turn
-        /// </summary>
-        /// <returns>The string unique identifier for a specific board state irrespective of turn</returns>
-        public String GetID()
-        {
-            return (BuildBoardString(true));
-        }
-
-        /// <summary>
         /// Returns the color at a given point
         /// </summary>
         /// <param name="SourcePoint">The point to consider</param>
@@ -186,26 +167,25 @@ namespace Reversi
         }
 
         /// <summary>
-        /// Attempts to process the implications of a legal move and updates the board if ProcessMove = true
+        /// Attempts to process the implications of a legal move and updates the board if CommitMove = true
         /// </summary>
-        /// <param name="X">The X value of the move</param>
-        /// <param name="Y">The Y value of the move</param>
-        /// <param name="color">The X value of the move</param>
-        /// <param name="ProcessMove">The Y value of the move</param>
-        /// <returns>The color at the given point</returns>
+        /// <param name="SourceMove">The move to make</param>
+        /// <param name="SourceTurn">The turn to use</param>
+        /// <param name="CommitMove">True if the move should be committed to the board, false if this is just to see if a move is possible</param>
+        /// <returns>True if a move is possible/was made, false if a move is not possible/was not made</returns>
         public Boolean MakeMove(Point SourceMove, Piece SourceTurn, Boolean CommitMove = true)
         {
             return (MakeMove(Convert.ToInt32(SourceMove.X), Convert.ToInt32(SourceMove.Y), SourceTurn, CommitMove));
         }
 
         /// <summary>
-        /// Attempts to process the implications of a legal move and updates the board if ProcessMove = true
+        /// Attempts to process the implications of a legal move and updates the board if CommitMove = true
         /// </summary>
         /// <param name="X">The X value of the move</param>
         /// <param name="Y">The Y value of the move</param>
-        /// <param name="color">The X value of the move</param>
-        /// <param name="ProcessMove">The Y value of the move</param>
-        /// <returns>The color at the given point</returns>
+        /// <param name="SourceTurn">The turn to use</param>
+        /// <param name="CommitMove">True if the move should be committed to the board, false if this is just to see if a move is possible</param>
+        /// <returns>True if a move is possible/was made, false if a move is not possible/was not made</returns>
         public Boolean MakeMove(int MoveX, int MoveY, Piece SourceTurn, Boolean CommitMove = true)
         {
             Piece CurrentTurn = SourceTurn;
