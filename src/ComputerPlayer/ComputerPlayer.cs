@@ -37,8 +37,8 @@ namespace Reversi
         // This is an attempt to rate the value of each spot on the board
         private int[,] BoardValueMask = new int[,]
             {
-	            {25,12,12,12,12,12,12,25},
-   	            { 5, 0, 0, 0, 0, 0, 0,12},
+	            {25,5,12,12,12,12,5,25},
+   	            { 5, 0, 0, 0, 0, 0, 0,5},
    	            {12, 0, 6, 3, 3, 6, 0,12},
    	            {12, 0, 3, 0, 0, 3, 0,12},
    	            {12, 0, 2, 0, 0, 3, 0,12},
@@ -270,13 +270,11 @@ namespace Reversi
         private double ScoreMove(Board CurrentBoard, int SourceX, int SourceY)
         {
             double score = 0;
-
-            /*
-            foreach (Point CurrentPoint in CurrentBoard.MovesAround(Move))
-                if ((BoardValueMask[CurrentPoint.X, CurrentPoint.Y] > score) && (CurrentBoard.ColorAt(CurrentPoint) == ReversiWindow.EMPTY))
-                    score = BoardValueMask[CurrentPoint.X, CurrentPoint.Y];
-            */
-
+        
+            foreach (Point CurrentPoint in CurrentBoard.MovesAround(new Point(SourceX, SourceY)))
+                if ((BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)] > score) && (CurrentBoard.ColorAt(CurrentPoint) == Piece.EMPTY))
+                    score = BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)];
+            
             return (score * -1 + BoardValueMask[SourceX, SourceY]);
         }
 

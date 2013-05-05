@@ -38,7 +38,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
             </local:GameBoard>
-            <!--<Image x:Name="ProcessingPieceImage" Height="80" Width="80" Source="/Reversi;component/img/Pieces/ProcessingPiece.png" Margin="94,176,486,404"/>-->
+            
         </Grid>
 
         <!-- The Score Board -->
