@@ -56,10 +56,6 @@ namespace Reversi
         // The rotation animation that applies the AngleRotation timer to the angle of the "processing turn" image
         private static RotateTransform RotationAnimation;
 
-        // Tracks the best piece that the computer player has found so far in its analysis
-        private static double CurrentBestWeight;
-        private static Point CurrentBestPiece;
-
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
         /// </summary>
@@ -228,16 +224,16 @@ namespace Reversi
         /// <param name="Piece">The piece to highlight</param>
         /// <param name="PieceColor">The highlight color</param>
         /// <param name="PieceLabel">(optional) Text to place in the center of the spot</param>
-        public delegate void HighlightMoveDelegate(Point Piece, AnalysisStatus ProcessingState, Double Weight = 0);
-        public void HighlightMove(Point Piece, AnalysisStatus ProcessingState, Double Weight = 0)
+        public delegate void HighlightMoveDelegate(Point Piece, AnalysisStatus ProcessingState);
+        public void HighlightMove(Point Piece, AnalysisStatus ProcessingState)
         {
-            Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState, Weight);
+            Application.Current.Dispatcher.Invoke(new HighlightMoveDelegate(DrawHighlightedMove), Piece, ProcessingState);
         }
 
         /// <summary>
         /// Places a highlight circle at the given locations
         /// </summary>
-        private void DrawHighlightedMove(Point CurrentPiece, AnalysisStatus ProcessingState, Double Weight = 0)
+        private void DrawHighlightedMove(Point CurrentPiece, AnalysisStatus ProcessingState)
         {
             // Add this space to the dirty spots list
             DirtySpots.Add(CurrentPiece);
@@ -263,36 +259,13 @@ namespace Reversi
             }
             else if (ProcessingState == AnalysisStatus.COMPLETE)
             {
-                if (Weight > CurrentBestWeight)
-                {
-                    // Place a red "chosen" gear on the new best piece
-                    PlaceBoardPiece(CurrentPiece, gProcessingChosen);
-
-                    // Replace the old best move
-                    DrawHighlightedMove(CurrentBestPiece, AnalysisStatus.COMPLETE);
-
-                    // Update the current best piece
-                    CurrentBestWeight = Weight;
-                    CurrentBestPiece = CurrentPiece;
-                }
-                else
-                {
-                    // Place a red "completed" gear
-                    PlaceBoardPiece(CurrentPiece, gProcessingCompleted);
-                }
-
-
+                PlaceBoardPiece(CurrentPiece, gProcessingCompleted);
             }
         }
 
         #endregion
 
         #region Utility Methods
-
-        public static void StartNewAnalysis()
-        {
-            CurrentBestWeight = 0;
-        }
 
         /// <summary>
         /// Places a piece image onto the game board

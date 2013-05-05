@@ -98,8 +98,6 @@ namespace Reversi
 
             if (PossibleMoves.Length > 0)
             {
-                GameBoard.StartNewAnalysis();
-
                 Point ChosenMove = PossibleMoves[0];
                 Board SimBoard = new Board(SourceBoard);
                 Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
@@ -144,7 +142,7 @@ namespace Reversi
                         {
                             AnalysisResults[CurrentPoint].AnalysisResult = MoveWeight;
                             AnalysisResults[CurrentPoint].AnalysisCompleted = true;
-                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.COMPLETE, MoveWeight);
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.COMPLETE);
                         }
 
                         //****FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
