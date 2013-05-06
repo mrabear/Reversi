@@ -70,16 +70,16 @@
             <Image x:Name="SinglePlayerButton" HorizontalAlignment="Left" Height="37" Margin="79,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/TopMenu/SinglePlayer.png" Cursor="Hand" Stretch="None" ToolTip="Single Player vs. Computer" MouseEnter="SinglePlayerButton_MouseEnter" MouseDown="TopMenuBorderGlow" MouseLeave="SinglePlayerButton_MouseLeave" MouseUp="SinglePlayerButton_MouseUp"/>
 
             <!-- Displayed a disabled multiplayer button when single player is the current active game mode -->
-            <Image x:Name="MultiPlayerButtonInactive" HorizontalAlignment="Left" Height="37" Margin="42,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/TopMenu/MultiPlayer_Inactive.png" Cursor="Hand" Opacity="0.35" Stretch="None" ToolTip="Player vs. Player" MouseEnter="MultiPlayerButton_MouseEnter" MouseDown="TopMenuBorderGlow" MouseLeave="MultiPlayerButton_MouseLeave">
+            <Image x:Name="MultiPlayerButtonInactive" HorizontalAlignment="Left" Height="37" Margin="42,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/TopMenu/MultiPlayer_Inactive.png" Cursor="Hand" Opacity="1" Stretch="None" ToolTip="Player vs. Player" MouseEnter="MultiPlayerButton_MouseEnter" MouseDown="TopMenuBorderGlow" MouseLeave="MultiPlayerButton_MouseLeave">
                 <Image.Effect>
-                    <BlurEffect Radius="4"/>
+                    <BlurEffect Radius="6"/>
                 </Image.Effect>
             </Image>
 
             <!-- Displayed a disabled single player button when multi player is the current active game mode -->
-            <Image x:Name="SinglePlayerButtonInactive" HorizontalAlignment="Left" Height="37" Margin="79,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/TopMenu/SinglePlayer_Inactive.png" Cursor="Hand" Opacity="0.35" Stretch="None" ToolTip="Single Player vs. Computer" MouseEnter="SinglePlayerButton_MouseEnter" MouseDown="TopMenuBorderGlow" MouseLeave="SinglePlayerButton_MouseLeave" Visibility="Hidden">
+            <Image x:Name="SinglePlayerButtonInactive" HorizontalAlignment="Left" Height="37" Margin="79,30,0,0" VerticalAlignment="Top" Width="34" Source="/Reversi;component/img/TopMenu/SinglePlayer_Inactive.png" Cursor="Hand" Opacity="1" Stretch="None" ToolTip="Single Player vs. Computer" MouseEnter="SinglePlayerButton_MouseEnter" MouseDown="TopMenuBorderGlow" MouseLeave="SinglePlayerButton_MouseLeave" Visibility="Hidden">
                 <Image.Effect>
-                    <BlurEffect Radius="4"/>
+                    <BlurEffect Radius="6"/>
                 </Image.Effect>
             </Image>
 
