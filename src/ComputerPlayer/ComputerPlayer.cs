@@ -34,19 +34,6 @@ namespace Reversi
 
         private static Dictionary<Point, AnalysisResultRow> AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
 
-        // This is an attempt to rate the value of each spot on the board
-        private int[,] BoardValueMask = new int[,]
-            {
-	            {25,5,12,12,12,12,5,25},
-   	            { 5, 0, 0, 0, 0, 0, 0,5},
-   	            {12, 0, 6, 3, 3, 6, 0,12},
-   	            {12, 0, 3, 0, 0, 3, 0,12},
-   	            {12, 0, 2, 0, 0, 3, 0,12},
-   	            {12, 0, 6, 3, 3, 6, 0,12},
-   	            { 5, 0, 0, 0, 0, 0, 0,5 },
-	            {25, 5,12,12,12,12, 5,25}
-            };
-
         /// <summary>
         /// Creates a new AI player
         /// </summary>
@@ -208,9 +195,9 @@ namespace Reversi
                 else
                 {
                     if (SimulationBoard.FindScore(AITurn) > SimulationBoard.FindScore(GetOtherTurn(Turn)))
-                        BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VICTORY_WEIGHT;
+                        BandedWeightTable[SimulationDepth] = AnalysisConfiguration.VictoryWeight;
                     else
-                        BandedWeightTable[SimulationDepth] = Properties.Settings.Default.VICTORY_WEIGHT * -1;
+                        BandedWeightTable[SimulationDepth] = AnalysisConfiguration.VictoryWeight * -1;
                 }
             }
         }
@@ -272,10 +259,10 @@ namespace Reversi
             double score = 0;
         
             foreach (Point CurrentPoint in CurrentBoard.MovesAround(new Point(SourceX, SourceY)))
-                if ((BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)] > score) && (CurrentBoard.ColorAt(CurrentPoint) == Piece.EMPTY))
-                    score = BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)];
-            
-            return (score * -1 + BoardValueMask[SourceX, SourceY]);
+                if ((AnalysisConfiguration.BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)] > score) && (CurrentBoard.ColorAt(CurrentPoint) == Piece.EMPTY))
+                    score = AnalysisConfiguration.BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)];
+
+            return (score * -1 + AnalysisConfiguration.BoardValueMask[SourceX, SourceY]);
         }
 
         /// <summary>
