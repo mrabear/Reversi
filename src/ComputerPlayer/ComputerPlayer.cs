@@ -109,9 +109,9 @@ namespace Reversi
                         if( VisualizeProcess )
                             ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.WORKING);
 
-                    double[] EvalResult = new double[MaxSimDepth];
+                    //double[] EvalResult = new double[MaxSimDepth];
 
-                    EvaluatePotentialMove(CurrentPoint, SimBoard, AITurn, ref EvalResult);
+                    double MoveWeight = EvaluatePotentialMove(CurrentPoint, SimBoard, AITurn, 0);
 
                     // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
@@ -119,7 +119,7 @@ namespace Reversi
                         //****FormUtil.ReportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
                         //****FormUtil.ReportDebugMessage("|------------------------------------------|");
 
-                        double MoveWeight = AnalyzeWeightTable(EvalResult);
+                        //double MoveWeight = AnalyzeWeightTable(EvalResult);
 
                         //****FormUtil.ReportDebugMessage("|------------------------------------------|");
 
@@ -162,107 +162,49 @@ namespace Reversi
         /// <param name="Turn">The current simulation turn</param>
         /// <param name="BandedWeightTable">The table of values used to analyze the simulation</param>
         /// <param name="SimulationDepth">The current depth of the simulation (number of moves ahead)</param>
-        private void EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, Piece Turn, ref double[] BandedWeightTable, int SimulationDepth = 0)
+        private double EvaluatePotentialMove(Point SourceMove, Board CurrentBoard, Piece Turn, double CurrentWeight, int SimulationDepth = 0)
         {
             // Look ahead to the impact of this move
             if (SimulationDepth < MaxSimDepth - 1)
             {
                 // Capture the moves available prior to making this change (we'll ignore them later)
-                HashSet<Point> IgnoreList = new HashSet<Point>(CurrentBoard.AvailableMoves(GetOtherTurn(Turn)));
+                //HashSet<Point> IgnoreList = new HashSet<Point>(CurrentBoard.AvailableMoves(GetOtherTurn(Turn)));
                 Board SimulationBoard = new Board(CurrentBoard);
 
                 // Perform the requested move
                 SimulationBoard.PutPiece(SourceMove, Turn);
 
                 // Score the result
-                if (ScoreMove(SimulationBoard, SourceMove) > BandedWeightTable[SimulationDepth])
-                    BandedWeightTable[SimulationDepth] = ScoreMove(SimulationBoard, SourceMove);
+                CurrentWeight += TurnAnalysis.ScoreMove(CurrentBoard, SimulationBoard, SourceMove, Turn);
 
                 // If there are still moves left for the current player, start a new simulation for each of them
                 if (SimulationBoard.MovePossible(Turn))
                 {
+                    double MaxWeight = 0;
+
                     // Start a simulation for the next player with the updated board
                     foreach( Point CurrentMove in SimulationBoard.AvailableMoves(Turn) )
                         //if (!IgnoreList.Contains(CurrentMove))
-                        EvaluatePotentialMove(CurrentMove, SimulationBoard, GetOtherTurn(Turn), ref BandedWeightTable, SimulationDepth + 1);
+                        MaxWeight = Math.Max( EvaluatePotentialMove(CurrentMove, SimulationBoard, GetOtherTurn(Turn), CurrentWeight, SimulationDepth + 1), MaxWeight);
+
+                    return (MaxWeight);
                 }
                 // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
                 else if (SimulationBoard.MovePossible(GetOtherTurn(Turn)))
                 {
-                    EvaluatePotentialMove(SourceMove, SimulationBoard, GetOtherTurn(Turn), ref BandedWeightTable, SimulationDepth + 1);
+                    return( EvaluatePotentialMove(SourceMove, SimulationBoard, GetOtherTurn(Turn), CurrentWeight, SimulationDepth + 1));
                 }
                 // If there are no moves left in the game, collapse the simulation
                 else
                 {
-                    if (SimulationBoard.FindScore(AITurn) > SimulationBoard.FindScore(GetOtherTurn(Turn)))
-                        BandedWeightTable[SimulationDepth] = AnalysisConfiguration.VictoryWeight;
+                    if (SimulationBoard.CalculateScore(AITurn) > SimulationBoard.CalculateScore(GetOtherTurn(Turn)))
+                        return (CurrentWeight + TurnAnalysis.VictoryWeight);
                     else
-                        BandedWeightTable[SimulationDepth] = AnalysisConfiguration.VictoryWeight * -1;
+                        return (CurrentWeight - TurnAnalysis.VictoryWeight);
                 }
             }
-        }
 
-        /// <summary>
-        /// Analyzes a list of banded rows and produces a single digit representing the value of the tree
-        /// </summary>
-        /// <param name="BandedWeightTable">The table of values to analyze</param>
-        /// <returns>A number representing the net value of the given BandedWeightTable</returns>
-        private double AnalyzeWeightTable(double[] BandedWeightTable)
-        {
-            double CurrentStep, MaxStep = Math.Floor((double)MaxSimDepth / 2);
-            double Penalty, SubTotal, WeightedTotal = 0;
-            int Sign;
-
-            for (int SimDepth = 0; SimDepth < BandedWeightTable.Length ; SimDepth++)
-            {
-                // Current weighted tier 
-                CurrentStep = Math.Floor((double)SimDepth / 2);
-
-                // The penalty to assign to this simulation depth
-                // 0.5*e^(-1*x)
-                Penalty = ( CurrentStep == 0 ) ? 1 : 0.5 * Math.Exp(-1 * CurrentStep);
-
-                // The sign to apply to this analysis (+ for beneficial moves, - for opponent moves)
-                Sign = (SimDepth % 2 == 0 ? 1 : -1);
-
-                // The average of all of the values for the current simulation depth
-                SubTotal = Sign * BandedWeightTable[SimDepth] * Penalty;
-
-                // The end calculation
-                WeightedTotal += SubTotal;
-
-                //***FormUtil.ReportDebugMessage(String.Format("|  " + (SimDepth + 1).ToString().PadLeft(2) + " | " + Sign.ToString().PadLeft(3) + "  *" + BandedWeightTable[SimDepth].ToString().PadLeft(4) + "   *" + Penalty.ToString("0.00000").PadLeft(9) + " =" + SubTotal.ToString("0.00000").PadLeft(9)) + " |");
-            }
-
-            return (WeightedTotal);
-        }
-
-        /// <summary>
-        /// Returns the value of a single spot on the board
-        /// </summary>
-        /// <param name="CurrentBoard">The game board to use</param>
-        /// <param name="Move">The move to consider</param>
-        /// <returns>The net value of a single spot on the board</returns>
-        private double ScoreMove(Board CurrentBoard, Point Move)
-        {
-            return (ScoreMove(CurrentBoard, Convert.ToInt32(Move.X), Convert.ToInt32(Move.Y)));
-        }
-
-        /// <summary>
-        /// Returns the value of a single spot on the board
-        /// </summary>
-        /// <param name="CurrentBoard">The game board to use</param>
-        /// <param name="Move">The move to consider</param>
-        /// <returns>The net value of a single spot on the board</returns>
-        private double ScoreMove(Board CurrentBoard, int SourceX, int SourceY)
-        {
-            double score = 0;
-        
-            foreach (Point CurrentPoint in CurrentBoard.MovesAround(new Point(SourceX, SourceY)))
-                if ((AnalysisConfiguration.BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)] > score) && (CurrentBoard.ColorAt(CurrentPoint) == Piece.EMPTY))
-                    score = AnalysisConfiguration.BoardValueMask[Convert.ToInt16(CurrentPoint.X), Convert.ToInt16(CurrentPoint.Y)];
-
-            return (score * -1 + AnalysisConfiguration.BoardValueMask[SourceX, SourceY]);
+            return (CurrentWeight);
         }
 
         /// <summary>

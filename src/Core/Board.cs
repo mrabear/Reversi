@@ -382,7 +382,7 @@ namespace Reversi
         /// </summary>
         /// <param name="Turn">The turn to score</param>
         /// <returns>The score for the given turn</returns>
-        public int FindScore(Piece Turn)
+        public int CalculateScore(Piece Turn)
         {
             int Score = 0;
 
@@ -402,8 +402,8 @@ namespace Reversi
         {
             if (!MovePossible())
             {
-                int WhiteScore = FindScore(Piece.WHITE);
-                int BlackScore = FindScore(Piece.BLACK);
+                int WhiteScore = CalculateScore(Piece.WHITE);
+                int BlackScore = CalculateScore(Piece.BLACK);
 
                 // Black Wins
                 if (BlackScore > WhiteScore)

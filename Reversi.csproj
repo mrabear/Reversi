@@ -62,7 +62,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="src\ComputerPlayer\AnalysisConfiguration.cs" />
+    <Compile Include="src\ComputerPlayer\TurnAnalysis.cs" />
     <Compile Include="src\ComputerPlayer\AnalysisResultRow.cs" />
     <Compile Include="src\ComputerPlayer\AnalysisStatus.cs" />
     <Compile Include="src\Core\GameState.cs" />
@@ -80,7 +80,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\ComputerPlayer\BandedWeightRow.cs" />
     <Compile Include="src\Core\Board.cs" />
     <Compile Include="src\Core\Game.cs" />
     <Compile Include="src\Window\ReversiWindow.xaml.cs">

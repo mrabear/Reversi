@@ -92,11 +92,11 @@ namespace Reversi
         {
             ScoreBoardVisualLayers.Remove(PlayerScoresLayer);
 
-            BlackScore = new FormattedText(App.GetActiveGameBoard().FindScore(Piece.BLACK).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.White);
+            BlackScore = new FormattedText(App.GetActiveGameBoard().CalculateScore(Piece.BLACK).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.White);
             BlackScore.TextAlignment = TextAlignment.Center;
             BlackScore.SetFontWeight(FontWeights.Bold);
 
-            WhiteScore = new FormattedText(App.GetActiveGameBoard().FindScore(Piece.WHITE).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.Black);
+            WhiteScore = new FormattedText(App.GetActiveGameBoard().CalculateScore(Piece.WHITE).ToString("00"), CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Segoe UI"), 28, Brushes.Black);
             WhiteScore.TextAlignment = TextAlignment.Center;
             WhiteScore.SetFontWeight(FontWeights.Bold);
 
