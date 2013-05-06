@@ -32,8 +32,6 @@ namespace Reversi
         // The background worker used to separate the AI crunch from the UI
         private readonly BackgroundWorker AIBGWorker = new BackgroundWorker();
 
-        private static Dictionary<Point, AnalysisResultRow> AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
-
         /// <summary>
         /// Creates a new AI player
         /// </summary>
@@ -68,11 +66,6 @@ namespace Reversi
         /// <param name="newVisualizeProcess">True if the AI should display the move analysis results</param>
         public void SetVisualizeProcess(bool newVisualizeProcess) { VisualizeProcess = newVisualizeProcess; }
 
-        /// <summary>
-        /// Gets the current state of the computer player's turn analysis
-        /// </summary>
-        public Dictionary<Point, AnalysisResultRow> GetAnalysisResults() { return AnalysisResults; }
-
         #endregion
 
         /// <summary>
@@ -86,71 +79,74 @@ namespace Reversi
             if (PossibleMoves.Length > 0)
             {
                 Point ChosenMove = PossibleMoves[0];
+                double BestWeight = 0;
                 Board SimBoard = new Board(SourceBoard);
-                Dictionary<Point, double> MoveResults = new Dictionary<Point, double>();
-                AnalysisResults = new Dictionary<Point,AnalysisResultRow>();
+                Dictionary<Point, double> AnalysisResults = new Dictionary<Point, double>();
 
-                foreach( Point CurrentPoint in PossibleMoves )
-                {
-                    AnalysisResults.Add( CurrentPoint, new AnalysisResultRow());
-                }
-
+                // Puts the initial grey 'disabled' gear icons up
                 if (VisualizeProcess)
                     foreach( Point CurrentPoint in PossibleMoves)
                         ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.QUEUED);
 
-                //****FormUtil.ReportDebugMessage("#### New Turn Analysis ####\n", overwrite: true);
+                //****Console.WriteLine("#### New Turn Analysis ####\n", overwrite: true);
 
+                // Loops through each possible move, analyzing the value of each
                 //foreach (Point CurrentPoint in PossibleMoves)
-                Parallel.ForEach(PossibleMoves, CurrentPoint =>
+                Parallel.ForEach(PossibleMoves, CurrentMove =>
                 {
-                                        // Serializes the theads to make sure the update functions properly
+                    // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
                         if( VisualizeProcess )
-                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.WORKING);
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.WORKING);
 
-                    //double[] EvalResult = new double[MaxSimDepth];
-
-                    double MoveWeight = EvaluatePotentialMove(CurrentPoint, SimBoard, AITurn, 0);
+                    // Starts the analysis for this move
+                    double MoveWeight = EvaluatePotentialMove(CurrentMove, SimBoard, AITurn, 0);
 
                     // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
                     {
-                        //****FormUtil.ReportDebugMessage(" Depth| Sign * Value *  Weight  =  Score");
-                        //****FormUtil.ReportDebugMessage("|------------------------------------------|");
+                        //****Console.WriteLine(" Depth| Sign * Value *  Weight  =  Score");
+                        //****Console.WriteLine("|------------------------------------------|");
+                        //****Console.WriteLine("|------------------------------------------|");
 
-                        //double MoveWeight = AnalyzeWeightTable(EvalResult);
+                        // Add the current batch of analysis to the analysis results
+                        AnalysisResults.Add(CurrentMove, MoveWeight);
 
-                        //****FormUtil.ReportDebugMessage("|------------------------------------------|");
-
-                        MoveResults.Add(CurrentPoint, MoveWeight);
-
+                        // Updates the on screen visualizations of this analysis
                         if (VisualizeProcess)
                         {
-                            AnalysisResults[CurrentPoint].AnalysisResult = MoveWeight;
-                            AnalysisResults[CurrentPoint].AnalysisCompleted = true;
-                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.COMPLETE);
+                            // If this is the best move so far, mark it as the current chosen selection
+                            if (MoveWeight > BestWeight)
+                            {
+                                ReversiWindow.GetGameBoardSurface().HighlightMove(ChosenMove, AnalysisStatus.COMPLETE);
+
+                                ChosenMove = CurrentMove;
+                                BestWeight = MoveWeight;
+
+                                ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.CHOSEN);
+                            }
+                            // If this is not the best move, mark it as completed
+                            else
+                            {
+                                ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.COMPLETE);
+                            }
                         }
 
-                        //****FormUtil.ReportDebugMessage("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
+                        //****Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
                 });
                 //}
 
-                foreach (Point ResultMove in MoveResults.Keys)
+                // Determine the best selection from the analysis table
+                foreach (Point ResultMove in AnalysisResults.Keys)
                 {
-                    if (MoveResults[ResultMove] > MoveResults[ChosenMove])
+                    if (AnalysisResults[ResultMove] > AnalysisResults[ChosenMove])
                         ChosenMove = ResultMove;
                 }
 
                 SourceBoard.MakeMove(ChosenMove, AITurn);
 
-                AnalysisResults = new Dictionary<Point, AnalysisResultRow>();
-
-                //if (VisualizeProcess)
-                //    GameBoard.HighlightPieces();
-
-                //****FormUtil.ReportDebugMessage("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
+                //****Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
         }
 

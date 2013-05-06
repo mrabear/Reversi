@@ -63,7 +63,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="src\ComputerPlayer\TurnAnalysis.cs" />
-    <Compile Include="src\ComputerPlayer\AnalysisResultRow.cs" />
     <Compile Include="src\ComputerPlayer\AnalysisStatus.cs" />
     <Compile Include="src\Core\GameState.cs" />
     <Compile Include="src\Core\Piece.cs" />

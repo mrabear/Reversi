@@ -32,7 +32,7 @@ namespace Reversi
         private static ImageSource gProcessingChosen;
 
         // The locking object used to multithread the analysis
-        private static object HighLightLock = new object();
+        //private static object HighLightLock = new object();
 
         // A list of all game board pieces
         private static ConcurrentDictionary<Point, Image> GameBoardImages;
@@ -52,7 +52,7 @@ namespace Reversi
 
         // The animation timer that cycles between 0 and 360 degrees, used to spin the green "processing turn" image
         private static DoubleAnimation AngleRotation;
-
+      
         // The rotation animation that applies the AngleRotation timer to the angle of the "processing turn" image
         private static RotateTransform RotationAnimation;
 
@@ -93,6 +93,10 @@ namespace Reversi
         /// </summary>
         public void Clear()
         {
+            // Do not start clearing the game board until the current turn has finished
+            if( App.GetActiveGame() != null )
+                while (App.GetActiveGame().GetTurnInProgress()) ;
+
             // Reset the last drawn board
             LastDrawnBoard = new Board();
             LastDrawnBoard.ClearBoard();
@@ -238,28 +242,40 @@ namespace Reversi
             // Add this space to the dirty spots list
             DirtySpots.Add(CurrentPiece);
 
-            // Remove this spot from the display list
-            ClearBoardPiece(CurrentPiece);
-
-            // Place a visualization icon on the board based off of the current Processing State
-            if (ProcessingState == AnalysisStatus.QUEUED)
-                // Place a grey "queued" gear
-                PlaceBoardPiece(CurrentPiece, gProcessingQueued);
-            else if (ProcessingState == AnalysisStatus.WORKING)
+            if (ProcessingState == AnalysisStatus.COMPLETE)
             {
-                // Place a green "working" gear
-                PlaceBoardPiece(CurrentPiece, gProcessingWorking);
-
-                // Dim the piece (looks nicer)
-                GameBoardImages[CurrentPiece].Opacity = 0.6;
-
-                // Start spinning the gear
-                GameBoardImages[CurrentPiece].RenderTransform = RotationAnimation;
-                GameBoardImages[CurrentPiece].RenderTransformOrigin = new Point(0.5, 0.5);
+                DoubleAnimation OpacityFader = new DoubleAnimation(0.6, 0, new Duration(TimeSpan.FromSeconds(0.15)));
+                GameBoardImages[CurrentPiece].BeginAnimation(Image.OpacityProperty, OpacityFader);
             }
-            else if (ProcessingState == AnalysisStatus.COMPLETE)
+            else
             {
-                PlaceBoardPiece(CurrentPiece, gProcessingCompleted);
+                // Remove this spot from the display list
+                ClearBoardPiece(CurrentPiece);
+
+                // Place a visualization icon on the board based off of the current Processing State
+                if (ProcessingState == AnalysisStatus.QUEUED)
+                {
+                    // Place a grey "queued" gear
+                    PlaceBoardPiece(CurrentPiece, gProcessingQueued);
+                }
+                else if (ProcessingState == AnalysisStatus.CHOSEN)
+                {
+                    // Place a glowing "chosen" gear
+                    PlaceBoardPiece(CurrentPiece, gProcessingChosen);
+                    GameBoardImages[CurrentPiece].Opacity = 0.5;
+                }
+                else if (ProcessingState == AnalysisStatus.WORKING)
+                {
+                    // Place a green "working" gear
+                    PlaceBoardPiece(CurrentPiece, gProcessingWorking);
+
+                    // Dim the piece (looks nicer)
+                    GameBoardImages[CurrentPiece].Opacity = 0.6;
+
+                    // Start spinning the gear
+                    GameBoardImages[CurrentPiece].RenderTransform = RotationAnimation;
+                    GameBoardImages[CurrentPiece].RenderTransformOrigin = new Point(0.5, 0.5);
+                }
             }
         }
 
