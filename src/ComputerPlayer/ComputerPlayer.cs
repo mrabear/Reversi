@@ -114,23 +114,7 @@ namespace Reversi
 
                         // Updates the on screen visualizations of this analysis
                         if (VisualizeProcess)
-                        {
-                            // If this is the best move so far, mark it as the current chosen selection
-                            if (MoveWeight > BestWeight)
-                            {
-                                ReversiWindow.GetGameBoardSurface().HighlightMove(ChosenMove, AnalysisStatus.COMPLETE);
-
-                                ChosenMove = CurrentMove;
-                                BestWeight = MoveWeight;
-
-                                ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.CHOSEN);
-                            }
-                            // If this is not the best move, mark it as completed
-                            else
-                            {
-                                ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.COMPLETE);
-                            }
-                        }
+                            ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.COMPLETE);
 
                         //****Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }

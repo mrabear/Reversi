@@ -12,6 +12,8 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Windows.Media.Animation;
 using System.Collections.Concurrent;
+using System.Threading;
+using System.Timers;
 
 namespace Reversi
 {
@@ -56,11 +58,16 @@ namespace Reversi
         // The rotation animation that applies the AngleRotation timer to the angle of the "processing turn" image
         private static RotateTransform RotationAnimation;
 
+        // Timer that is activated when an animation is running
+        private static System.Timers.Timer AnimationActiveTimer = new System.Timers.Timer();
+
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
         /// </summary>
         public GameBoard() : base()
         {
+            AnimationActiveTimer.Elapsed += new ElapsedEventHandler(AnimationCompleted);
+
             // Reset the graphics layers
             GameBoardImages = new ConcurrentDictionary<Point, Image>();
 
@@ -93,10 +100,6 @@ namespace Reversi
         /// </summary>
         public void Clear()
         {
-            // Do not start clearing the game board until the current turn has finished
-            if( App.GetActiveGame() != null )
-                while (App.GetActiveGame().GetTurnInProgress()) ;
-
             // Reset the last drawn board
             LastDrawnBoard = new Board();
             LastDrawnBoard.ClearBoard();
@@ -108,7 +111,7 @@ namespace Reversi
             DisplayBoard = new Board();
 
             Point CurrentPoint;
-            // Rebuild the board visual layers
+            // Rebuild the board images
             for (int Y = 0; Y < LastDrawnBoard.GetBoardSize(); Y++)
                 for (int X = 0; X < LastDrawnBoard.GetBoardSize(); X++)
                 {
@@ -123,6 +126,9 @@ namespace Reversi
         /// </summary>
         public void Refresh()
         {
+            // Do not start clearing the game board until the animations from the current turn are finished
+            while (AnimationActiveTimer.Enabled) ;
+
             // Clean all non-piece graphics from the board
             WipeDirtySpots();
             
@@ -240,12 +246,13 @@ namespace Reversi
         private void DrawHighlightedMove(Point CurrentPiece, AnalysisStatus ProcessingState)
         {
             // Add this space to the dirty spots list
-            DirtySpots.Add(CurrentPiece);
+            //DirtySpots.Add(CurrentPiece);
 
             if (ProcessingState == AnalysisStatus.COMPLETE)
             {
                 DoubleAnimation OpacityFader = new DoubleAnimation(0.6, 0, new Duration(TimeSpan.FromSeconds(0.15)));
                 GameBoardImages[CurrentPiece].BeginAnimation(Image.OpacityProperty, OpacityFader);
+                AddToAnimationClock(150);
             }
             else
             {
@@ -337,6 +344,17 @@ namespace Reversi
                 return gWhitePieceImage;
             else
                 return null;
+        }
+
+        public static void AddToAnimationClock(int AnimationTime)
+        {
+            AnimationActiveTimer.Interval = AnimationTime;
+            AnimationActiveTimer.Start();
+        }
+
+        public static void AnimationCompleted(object sender, ElapsedEventArgs e)
+        {
+            AnimationActiveTimer.Stop();
         }
 
         #endregion
