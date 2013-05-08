@@ -59,12 +59,12 @@ namespace Reversi
         /// 
 
         public delegate void RefreshDelegate();
-        public static void Refresh()
+        public void Refresh()
         {
             Application.Current.Dispatcher.Invoke(new RefreshDelegate(RedrawScoreBoard));
         }
 
-        public static void RedrawScoreBoard()
+        public void RedrawScoreBoard()
         {
             // Filter for the design time tool
             if (App.GetActiveGame() != null)
@@ -80,7 +80,7 @@ namespace Reversi
         /// Draws the scoreboard, highlighting the current turn
         /// </summary>
         /// <param name="dc">The drawing context to paint onto</param>
-        private static void DrawScoreBoard()
+        private void DrawScoreBoard()
         {
             ScoreBoardVisualLayers.Remove(ScoreBoardLayer);
 
@@ -96,7 +96,7 @@ namespace Reversi
         /// Draws the score of both players onto the scoreboard
         /// </summary>
         /// <param name="dc">The drawing context to paint onto</param>
-        private static void DrawPlayerScores()
+        private void DrawPlayerScores()
         {
             ScoreBoardVisualLayers.Remove(PlayerScoresLayer);
 

@@ -22,13 +22,13 @@ namespace Reversi
             Color = SourceColor;
         }
 
-        public void CompleteAnimation(object sender, EventArgs args)
+        public void FlipPieceBack(object sender, EventArgs args)
         {
 
             var AnimationTimer = sender as AnimationClock;
             if (AnimationTimer != null)
             {
-                AnimationTimer.Completed -= CompleteAnimation;
+                AnimationTimer.Completed -= FlipPieceBack;
             }
 
             ReversiWindow.GetGameBoardSurface().FlipPiece(AnimationPoint, Color, RemovePiece: false);

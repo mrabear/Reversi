@@ -60,38 +60,24 @@ namespace Reversi
         private static RotateTransform RotationAnimation;
 
         // Timer that is activated when an animation is running
-        private static System.Timers.Timer AnimationActiveTimer = new System.Timers.Timer();
-        private static bool AnimationActive = false;
+        private static int ActiveAnimations = 0;
 
-        // The background worker used to separate the AI crunch from the UI
-        private readonly BackgroundWorker PieceFlipBGWorker = new BackgroundWorker();
-
-        private static List<AnimationPackage> ActiveAnimations = new List<AnimationPackage>();
-
-        private class AnimationPackage
-        {
-            public ScaleTransform Transform;
-            public DoubleAnimation Animation;
-
-            public AnimationPackage(ScaleTransform SourceTransform, DoubleAnimation SourceAnimation)
-            {
-                Transform = SourceTransform;
-                Animation = SourceAnimation;
-            }
-        }
+        // The locking object used to multithread the analysis
+        private readonly object SpinLock;
 
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
         /// </summary>
         public GameBoard() : base()
         {
-            AnimationActiveTimer.Elapsed += new ElapsedEventHandler(AnimationCompleted);
-
             // Reset the graphics layers
             GameBoardImages = new ConcurrentDictionary<Point, Image>();
 
             // Resets the dirty spots monitor
             DirtySpots = new List<Point>();
+
+            // A lock to keep the AnimationsActive parameter thread safe
+            SpinLock = new Object();
 
             // Static binds to the processing visualization image sources
             gProcessingWorking = GraphicsTools.GenerateImageSource("img/Pieces/ProcessingWorking.png");
@@ -119,24 +105,26 @@ namespace Reversi
         /// </summary>
         public void Clear()
         {
-            // Reset the last drawn board
-            LastDrawnBoard = new Board();
-
             // Clear the dirty spots list
             DirtySpots = new List<Point>();
 
-            // Reset the current working board
-            DisplayBoard = new Board();
+            ActiveAnimations = 0;
 
             Point CurrentPoint;
 
             // Rebuild the board images
-            for (int Y = 0; Y < DisplayBoard.GetBoardSize(); Y++)
-                for (int X = 0; X < DisplayBoard.GetBoardSize(); X++)
-                {
-                    CurrentPoint = new Point(X, Y);
-                    UpdateBoardPiece(CurrentPoint, GetGamePiece(DisplayBoard.ColorAt(X,Y)));
-                }
+            if (App.GetActiveGameBoard() != null)
+            {
+                for (int Y = 0; Y < App.GetActiveGameBoard().GetBoardSize(); Y++)
+                    for (int X = 0; X < App.GetActiveGameBoard().GetBoardSize(); X++)
+                    {
+                        CurrentPoint = new Point(X, Y);
+                        UpdateBoardPiece(CurrentPoint, GetGamePiece(App.GetActiveGameBoard().ColorAt(X, Y)));
+                    }
+
+                // Reset the last drawn board
+                LastDrawnBoard = new Board(App.GetActiveGameBoard());
+            }
         }
 
         public delegate void RefreshDelegate(bool FullRefresh = true);
@@ -150,6 +138,9 @@ namespace Reversi
         /// </summary>
         public void RefreshGameBoard(bool FullRefresh = true)
         {
+            if (FullRefresh)
+                Clear();
+
             // Clean all non-piece graphics from the board
             WipeDirtySpots();
             
@@ -157,7 +148,7 @@ namespace Reversi
             DrawAvailableMoves();
 
             // Refresh the scoreboard
-            ScoreBoard.Refresh();
+            ReversiWindow.GetScoreBoardSurface().Refresh();
 
             // Draw the net new pieces
             if( FullRefresh )
@@ -172,7 +163,10 @@ namespace Reversi
         public void WipeDirtySpots()
         {
             // Clear the dirty spots from the display stack
-            DirtySpots.ForEach(delegate(Point CurrentPoint) { ClearBoardPiece(CurrentPoint); });
+            DirtySpots.ForEach(delegate(Point CurrentPoint) {
+                if( App.GetActiveGameBoard().ColorAt(CurrentPoint) == Piece.EMPTY )
+                    ClearBoardPiece(CurrentPoint); 
+            });
 
             // Rest the dirty spots list
             DirtySpots = new List<Point>();
@@ -209,6 +203,9 @@ namespace Reversi
                         // Add the canvas to the display list
                         UpdateBoardPiece(CurrentPiece, GetGamePiece(BoardToDisplay.ColorAt(CurrentPiece)));
                     }
+
+            // Update the last drawn board with the board that was just created
+            //LastDrawnBoard = new Board(App.GetActiveGameBoard());
         }
 
         public delegate void FlipCapturedPiecesDelegate(Point SourceMove);
@@ -219,8 +216,6 @@ namespace Reversi
 
         public void FlipCapturedPieces_Invoke(Point SourceMove)
         {
-            ResetAnimationClock(2000);
-
             int MoveX = Convert.ToInt16(SourceMove.X);
             int MoveY = Convert.ToInt16(SourceMove.Y);
 
@@ -230,7 +225,10 @@ namespace Reversi
             for (int Y = 0; Y < App.GetActiveGameBoard().GetBoardSize(); Y++)
                 for (int X = 0; X < App.GetActiveGameBoard().GetBoardSize(); X++)
                     if ((App.GetActiveGameBoard().ColorAt(X, Y) != LastDrawnBoard.ColorAt(X, Y)) && (new Point(X, Y) != SourceMove))
+                    {
+                        AddAnimation();
                         AnimateFlippedPiece(new Point(X, Y), LastDrawnBoard.ColorAt(X, Y), RemovePiece: true);
+                    }
 
             // Update the last drawn board with the board that was just created
             LastDrawnBoard = new Board(App.GetActiveGameBoard());
@@ -253,15 +251,15 @@ namespace Reversi
             GameBoardImages[PieceToFlip].RenderTransform = FlipTransformation;
             GameBoardImages[PieceToFlip].RenderTransformOrigin = new Point(0.5, 0.5);
             FlipTransformation.BeginAnimation(ScaleTransform.ScaleXProperty, FlipAnimation);
-
-            //ActiveAnimations.Add(new AnimationPackage(FlipTransformation, FlipAnimation));
-
-            ResetAnimationClock(350);
+            AnimationClock FlipTimer = FlipAnimation.CreateClock();
 
             if (RemovePiece)
             {
-                AnimationClock FlipTimer = FlipAnimation.CreateClock();
-                FlipTimer.Completed += new AnimationEventArg(PieceToFlip, Game.GetOtherTurn(PieceColor)).CompleteAnimation;
+                FlipTimer.Completed += new AnimationEventArg(PieceToFlip, Game.GetOtherTurn(PieceColor)).FlipPieceBack;
+            }
+            else
+            {
+                FlipTimer.Completed += AnimationCompleted;
             }
         }
 
@@ -319,7 +317,10 @@ namespace Reversi
             {
                 DoubleAnimation OpacityFader = new DoubleAnimation(0.6, 0, new Duration(TimeSpan.FromSeconds(0.15)));
                 GameBoardImages[CurrentPiece].BeginAnimation(Image.OpacityProperty, OpacityFader);
-                ResetAnimationClock(150);
+
+                //AddAnimation();
+                //AnimationClock OpacityTimer = OpacityFader.CreateClock();
+                //OpacityTimer.Completed += AnimationCompleted;
             }
             else
             {
@@ -423,23 +424,24 @@ namespace Reversi
                 return null;
         }
 
-        public void ResetAnimationClock(int AnimationTime = 1000)
+        public void AddAnimation()
         {
-            AnimationActive = true;
-            AnimationActiveTimer.Interval = AnimationTime;
-            AnimationActiveTimer.Start();
+            lock(SpinLock)
+                ActiveAnimations++;
         }
 
-        public void AnimationCompleted(object sender, ElapsedEventArgs e)
+        public void AnimationCompleted(object sender, EventArgs e)
         {
-            AnimationActiveTimer.Stop();
-            App.GetActiveGame().CompleteTurn();
-            AnimationActive = false;
+            RemoveAnimation();
         }
 
-        public bool AnimationsAreActive()
+        public void RemoveAnimation()
         {
-            return (AnimationActive);
+            lock (SpinLock)
+                ActiveAnimations--;
+
+            if( ActiveAnimations == 0 )
+                App.GetActiveGame().CompleteTurn();
         }
 
         #endregion

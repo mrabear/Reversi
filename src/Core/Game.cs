@@ -170,16 +170,12 @@ namespace Reversi
 
         public void CompleteTurn()
         {
+            ReversiWindow.GetGameBoardSurface().Refresh(FullRefresh: false);
+
             if ((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
-            {
-                ReversiWindow.GetGameBoardSurface().Refresh(FullRefresh: false);
                 App.GetComputerPlayer().StartComputerTurnAnalysis();
-            }
             else
-            {
                 TurnInProgress = false;
-                ReversiWindow.GetGameBoardSurface().Refresh(FullRefresh: false);
-            }
         }
 
         /// <summary>
@@ -255,13 +251,13 @@ namespace Reversi
             // Overwrite the current game board with the new historical one
             App.SetActiveGameBoard(MoveHistory[HistoricalIndex].BoardState);
 
+            // Reset the graphics objects to display the new game state
+            ReversiWindow.GetGameBoardSurface().Refresh();
+
             // Overwrite the current game turn with the historical one
             SetCurrentTurn(MoveHistory[HistoricalIndex].TurnState);
 
-            // Reset the graphics objects to display the new game state
-            ScoreBoard.Clear();
-            ReversiWindow.GetGameBoardSurface().Clear();
-            ReversiWindow.GetGameBoardSurface().Refresh();
+            TurnInProgress = false;
         }
 
         /// <summary>
