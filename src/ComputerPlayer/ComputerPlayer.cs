@@ -32,6 +32,7 @@ namespace Reversi
         // The background worker used to separate the AI crunch from the UI
         private readonly BackgroundWorker AIBGWorker = new BackgroundWorker();
 
+        // The move currently chosen by the computer player
         private Point ChosenMove;
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace Reversi
         public ComputerPlayer(Piece AIcolor)
         {
             AITurn = AIcolor;
-            VisualizeProcess = false;
+            VisualizeProcess = true;
             MaxSimDepth = Properties.Settings.Default.MAX_SIM_DEPTH;
             SpinLock = new object();
 
@@ -50,11 +51,6 @@ namespace Reversi
         }
 
         #region Getters and Setters
-
-        public bool AnalysisInProgress()
-        {
-            return(AIBGWorker.IsBusy);
-        }
 
         /// <summary>
         /// Returns the color of the AI opponent

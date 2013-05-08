@@ -143,14 +143,19 @@ namespace Reversi
 
             TurnInProgress = true;
 
+            // If the game is active
             if (!IsComplete)
             {
                 // As long as this isn't an AI turn, process the requested move
                 if (!((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor())))
                 {
+                    // If there are move availables
                     if (App.GetActiveGameBoard().MovePossible(CurrentTurn))
                     {
+                        // Attempt to make the move requested
                         MoveOutcome = App.GetActiveGameBoard().MakeMove(X, Y, CurrentTurn);
+
+                        // If the move was successful, update the game board
                         if (MoveOutcome)
                         {
                             ReversiWindow.GetGameBoardSurface().FlipCapturedPieces(new Point(X, Y));
@@ -158,6 +163,7 @@ namespace Reversi
                             AddBoardToMoveHistory();
                         }
                     }
+                    // If there are no moves possible, just switch the turn
                     else
                     {
                         SwitchTurn();
@@ -168,6 +174,9 @@ namespace Reversi
             return (MoveOutcome);
         }
 
+        /// <summary>
+        /// Called when all of the animations and game processing for a particular turn are completed, decides what to do next
+        /// </summary>
         public void CompleteTurn()
         {
             ReversiWindow.GetGameBoardSurface().Refresh(FullRefresh: false);

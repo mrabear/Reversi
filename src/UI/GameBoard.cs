@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Windows.Media.Animation;
@@ -47,9 +48,6 @@ namespace Reversi
         // The locking object used to multithread the analysis
         private static UIElement StaticDispatcher = new UIElement();
 
-        // The game board that is used 
-        private static Board DisplayBoard;
-
         // The game board that has last been drawn onto screen 
         private static Board LastDrawnBoard;
 
@@ -59,11 +57,16 @@ namespace Reversi
         // The rotation animation that applies the AngleRotation timer to the angle of the "processing turn" image
         private static RotateTransform RotationAnimation;
 
-        // Timer that is activated when an animation is running
-        private static int ActiveAnimations = 0;
-
         // The locking object used to multithread the analysis
         private readonly object SpinLock;
+
+        // The storyboard used to coordinate the piece flipping, this will house each piece animation
+        private static Storyboard FlipStoryboard;
+
+        // The list of pieces that were just flipped (used to track which ones need to be flipped back)
+        private static List<Point> FlippedPieces;
+
+        private static Rectangle NewMoveNotification;
 
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
@@ -72,6 +75,11 @@ namespace Reversi
         {
             // Reset the graphics layers
             GameBoardImages = new ConcurrentDictionary<Point, Image>();
+
+            NewMoveNotification = new Rectangle();
+            NewMoveNotification.Height = 80;
+            NewMoveNotification.Width = 80;
+            NewMoveNotification.Fill = System.Windows.Media.Brushes.YellowGreen;
 
             // Resets the dirty spots monitor
             DirtySpots = new List<Point>();
@@ -108,11 +116,11 @@ namespace Reversi
             // Clear the dirty spots list
             DirtySpots = new List<Point>();
 
-            ActiveAnimations = 0;
-
-            Point CurrentPoint;
+            // Reset the list of flipped pieces
+            FlippedPieces = new List<Point>();
 
             // Rebuild the board images
+            Point CurrentPoint;
             if (App.GetActiveGameBoard() != null)
             {
                 for (int Y = 0; Y < App.GetActiveGameBoard().GetBoardSize(); Y++)
@@ -122,11 +130,14 @@ namespace Reversi
                         UpdateBoardPiece(CurrentPoint, GetGamePiece(App.GetActiveGameBoard().ColorAt(X, Y)));
                     }
 
-                // Reset the last drawn board
+                // Resync the last drawn board
                 LastDrawnBoard = new Board(App.GetActiveGameBoard());
             }
         }
 
+        /// <summary>
+        /// The thread safe way to refresh the game graphic elements
+        /// </summary>
         public delegate void RefreshDelegate(bool FullRefresh = true);
         public void Refresh( bool FullRefresh = true )
         {
@@ -134,10 +145,11 @@ namespace Reversi
         }
 
         /// <summary>
-        /// The thread safe way to refresh the game graphic elements
+        /// Refresh the game board graphics
         /// </summary>
         public void RefreshGameBoard(bool FullRefresh = true)
         {
+            // If a full refresh is requested, wipe the board clean
             if (FullRefresh)
                 Clear();
 
@@ -150,7 +162,7 @@ namespace Reversi
             // Refresh the scoreboard
             ReversiWindow.GetScoreBoardSurface().Refresh();
 
-            // Draw the net new pieces
+            // If a full refresh is requested, redraw all of the pieces on the board
             if( FullRefresh )
                 DrawPieces();
         }
@@ -203,64 +215,125 @@ namespace Reversi
                         // Add the canvas to the display list
                         UpdateBoardPiece(CurrentPiece, GetGamePiece(BoardToDisplay.ColorAt(CurrentPiece)));
                     }
-
-            // Update the last drawn board with the board that was just created
-            //LastDrawnBoard = new Board(App.GetActiveGameBoard());
         }
 
+        /// <summary>
+        /// Thread safe way to flip all of the pieces on the board
+        /// </summary>
+        /// <param name="SourceMove">The move that was just placed</param>
         public delegate void FlipCapturedPiecesDelegate(Point SourceMove);
+
+        /// <summary>
+        /// Thread safe way to flip all of the pieces on the board
+        /// </summary>
+        /// <param name="SourceMove">The move that was just placed</param>
+        public void FlipCapturedPieces(object sender, EventArgs e) 
+        {
+            // If the FlippedPieces list is consumed, the back half of the animation is complete and the next turn can continue
+            if (FlippedPieces.Count == 0)
+                // Start the next turn
+                App.GetActiveGame().CompleteTurn();
+            else
+                // Unflip the board pieces
+                FlipCapturedPieces(new Point(1000,1000));
+        }
+
+        /// <summary>
+        /// Thread safe way to flip all of the pieces on the board
+        /// </summary>
+        /// <param name="SourceMove">The move that was just placed</param>
         public void FlipCapturedPieces(Point SourceMove)
         {
             Application.Current.Dispatcher.Invoke(new FlipCapturedPiecesDelegate(FlipCapturedPieces_Invoke), SourceMove);
         }
 
+        /// <summary>
+        /// Flip all of the pieces on the board (not thread safe)
+        /// </summary>
+        /// <param name="SourceMove">The move that was just placed</param>
         public void FlipCapturedPieces_Invoke(Point SourceMove)
         {
-            int MoveX = Convert.ToInt16(SourceMove.X);
-            int MoveY = Convert.ToInt16(SourceMove.Y);
+            // Create a new Flipping storyboard
+            FlipStoryboard = new Storyboard();
+            FlipStoryboard.Completed += FlipCapturedPieces;
 
-            // Add the current move
-            UpdateBoardPiece(SourceMove, GetGamePiece(App.GetActiveGameBoard().ColorAt(SourceMove)));
+            // If there are no FlippedPieces, this is the front half of the animation and we need to discover which pieces need to be flipped
+            if(FlippedPieces.Count == 0)
+            {
+                if (App.GetActiveGameBoard().ColorAt(SourceMove) == App.GetComputerPlayer().GetColor())
+                {
+                    // Update the move notification box
+                    Children.Remove(NewMoveNotification);
+                    Children.Add(NewMoveNotification);
 
-            for (int Y = 0; Y < App.GetActiveGameBoard().GetBoardSize(); Y++)
-                for (int X = 0; X < App.GetActiveGameBoard().GetBoardSize(); X++)
-                    if ((App.GetActiveGameBoard().ColorAt(X, Y) != LastDrawnBoard.ColorAt(X, Y)) && (new Point(X, Y) != SourceMove))
+                    // Set the image on the correct spot on the game board grid
+                    SetRow(NewMoveNotification, Convert.ToInt16(SourceMove.Y));
+                    SetColumn(NewMoveNotification, Convert.ToInt16(SourceMove.X));
+
+                    // Start fading the new move notification
+                    DoubleAnimation OpacityFader = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(0.3)));
+                    NewMoveNotification.BeginAnimation(Image.OpacityProperty, OpacityFader);
+                }
+
+                // Add the current move to the game board
+                UpdateBoardPiece(SourceMove, GetGamePiece(App.GetActiveGameBoard().ColorAt(SourceMove)));
+
+                // Loop through the game board and check for changed pieces
+                for (int Y = 0; Y < App.GetActiveGameBoard().GetBoardSize(); Y++)
+                {
+                    for (int X = 0; X < App.GetActiveGameBoard().GetBoardSize(); X++)
                     {
-                        AddAnimation();
-                        AnimateFlippedPiece(new Point(X, Y), LastDrawnBoard.ColorAt(X, Y), RemovePiece: true);
+                        // If a piece has changed, flip it
+                        if ((App.GetActiveGameBoard().ColorAt(X, Y) != LastDrawnBoard.ColorAt(X, Y)) && (new Point(X, Y) != SourceMove))
+                        {
+                            AnimateFlippedPiece(new Point(X, Y), LastDrawnBoard.ColorAt(X, Y), RemovePiece: true);
+                            FlippedPieces.Add(new Point(X, Y));
+                        }
                     }
+                }
+            }
+            // If there are pieces mid-flip, unflip and replace them with the current piece
+            else
+            {
+                // Loop through all mid-flip pieces and unflip them
+                foreach (Point CurrentPiece in FlippedPieces)
+                    AnimateFlippedPiece(CurrentPiece, App.GetActiveGameBoard().ColorAt(CurrentPiece), RemovePiece: false);
+ 
+                // Reset the list of flipped pieces
+                FlippedPieces = new List<Point>();
+            }
+
+            // Start the flipping animation
+            FlipStoryboard.Begin(this);
 
             // Update the last drawn board with the board that was just created
             LastDrawnBoard = new Board(App.GetActiveGameBoard());
         }
 
-        public delegate void AnimateFlippedPieceDelegate(Point PieceToFlip, Piece PieceColor, bool RemovePiece = true);
-        public void FlipPiece(Point PieceToFlip, Piece PieceColor, bool RemovePiece = true)
-        {
-            Application.Current.Dispatcher.Invoke(new AnimateFlippedPieceDelegate(AnimateFlippedPiece), PieceToFlip, PieceColor, RemovePiece);
-        }
 
+        /// <summary>
+        /// Adds a flipping animation for the given piece to the flipping storyboard
+        /// </summary>
+        /// <param name="PieceToFlip">The piece to flip</param>
+        /// <param name="PieceColor">The color to convert the piece to</param>
+        /// <param name="RemovePiece">True if the piece is being removed (meaning this is the front half of the animation) false if the piece is being added (meaning this is the back half of the animation)</param>
         protected void AnimateFlippedPiece(Point PieceToFlip, Piece PieceColor, bool RemovePiece = true)
         {
             // Add the canvas to the display list
             UpdateBoardPiece(PieceToFlip, GetGamePiece(PieceColor));
 
+            // The animation parameters
             ScaleTransform FlipTransformation = new ScaleTransform();
             DoubleAnimation FlipAnimation = new DoubleAnimation(RemovePiece ? 1 : 0, RemovePiece ? 0 : 1, new Duration(TimeSpan.FromSeconds(0.35)));
 
+            // Register the animation with the board image
             GameBoardImages[PieceToFlip].RenderTransform = FlipTransformation;
             GameBoardImages[PieceToFlip].RenderTransformOrigin = new Point(0.5, 0.5);
-            FlipTransformation.BeginAnimation(ScaleTransform.ScaleXProperty, FlipAnimation);
-            AnimationClock FlipTimer = FlipAnimation.CreateClock();
 
-            if (RemovePiece)
-            {
-                FlipTimer.Completed += new AnimationEventArg(PieceToFlip, Game.GetOtherTurn(PieceColor)).FlipPieceBack;
-            }
-            else
-            {
-                FlipTimer.Completed += AnimationCompleted;
-            }
+            // Add the animation to the flip storyboard
+            FlipStoryboard.Children.Add(FlipAnimation);
+            Storyboard.SetTargetProperty(FlipAnimation, new PropertyPath("RenderTransform.ScaleX"));
+            Storyboard.SetTarget(FlipAnimation, GameBoardImages[PieceToFlip]);
         }
 
         /// <summary>
@@ -317,10 +390,6 @@ namespace Reversi
             {
                 DoubleAnimation OpacityFader = new DoubleAnimation(0.6, 0, new Duration(TimeSpan.FromSeconds(0.15)));
                 GameBoardImages[CurrentPiece].BeginAnimation(Image.OpacityProperty, OpacityFader);
-
-                //AddAnimation();
-                //AnimationClock OpacityTimer = OpacityFader.CreateClock();
-                //OpacityTimer.Completed += AnimationCompleted;
             }
             else
             {
@@ -422,26 +491,6 @@ namespace Reversi
                 return gWhitePieceImage;
             else
                 return null;
-        }
-
-        public void AddAnimation()
-        {
-            lock(SpinLock)
-                ActiveAnimations++;
-        }
-
-        public void AnimationCompleted(object sender, EventArgs e)
-        {
-            RemoveAnimation();
-        }
-
-        public void RemoveAnimation()
-        {
-            lock (SpinLock)
-                ActiveAnimations--;
-
-            if( ActiveAnimations == 0 )
-                App.GetActiveGame().CompleteTurn();
         }
 
         #endregion
