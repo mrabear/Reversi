@@ -32,6 +32,8 @@ namespace Reversi
         // The background worker used to separate the AI crunch from the UI
         private readonly BackgroundWorker AIBGWorker = new BackgroundWorker();
 
+        private Point ChosenMove;
+
         /// <summary>
         /// Creates a new AI player
         /// </summary>
@@ -48,6 +50,11 @@ namespace Reversi
         }
 
         #region Getters and Setters
+
+        public bool AnalysisInProgress()
+        {
+            return(AIBGWorker.IsBusy);
+        }
 
         /// <summary>
         /// Returns the color of the AI opponent
@@ -78,8 +85,7 @@ namespace Reversi
 
             if (PossibleMoves.Length > 0)
             {
-                Point ChosenMove = PossibleMoves[0];
-                double BestWeight = 0;
+                ChosenMove = PossibleMoves[0];
                 Board SimBoard = new Board(SourceBoard);
                 Dictionary<Point, double> AnalysisResults = new Dictionary<Point, double>();
 
@@ -88,9 +94,8 @@ namespace Reversi
                     foreach( Point CurrentPoint in PossibleMoves)
                         ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentPoint, AnalysisStatus.QUEUED);
 
-                //****Console.WriteLine("#### New Turn Analysis ####\n", overwrite: true);
-
                 // Loops through each possible move, analyzing the value of each
+                // Uncomment the foreach loop and comment out the parallel.foreach loop to single thread the turn analyis
                 //foreach (Point CurrentPoint in PossibleMoves)
                 Parallel.ForEach(PossibleMoves, CurrentMove =>
                 {
@@ -105,32 +110,22 @@ namespace Reversi
                     // Serializes the theads to make sure the update functions properly
                     lock (SpinLock)
                     {
-                        //****Console.WriteLine(" Depth| Sign * Value *  Weight  =  Score");
-                        //****Console.WriteLine("|------------------------------------------|");
-                        //****Console.WriteLine("|------------------------------------------|");
-
                         // Add the current batch of analysis to the analysis results
                         AnalysisResults.Add(CurrentMove, MoveWeight);
 
                         // Updates the on screen visualizations of this analysis
                         if (VisualizeProcess)
                             ReversiWindow.GetGameBoardSurface().HighlightMove(CurrentMove, AnalysisStatus.COMPLETE);
-
-                        //****Console.WriteLine("Point (" + CurrentPoint.X + "," + CurrentPoint.Y + ") score=" + MoveWeight + "\n");
                     }
                 });
                 //}
 
                 // Determine the best selection from the analysis table
                 foreach (Point ResultMove in AnalysisResults.Keys)
-                {
                     if (AnalysisResults[ResultMove] > AnalysisResults[ChosenMove])
                         ChosenMove = ResultMove;
-                }
 
                 SourceBoard.MakeMove(ChosenMove, AITurn);
-
-                //****Console.WriteLine("Point (" + ChosenMove.X + "," + ChosenMove.Y + ") Chosen\n");
             }
         }
 
@@ -165,19 +160,19 @@ namespace Reversi
                     // Start a simulation for the next player with the updated board
                     foreach( Point CurrentMove in SimulationBoard.AvailableMoves(Turn) )
                         //if (!IgnoreList.Contains(CurrentMove))
-                        MaxWeight = Math.Max( EvaluatePotentialMove(CurrentMove, SimulationBoard, GetOtherTurn(Turn), CurrentWeight, SimulationDepth + 1), MaxWeight);
+                        MaxWeight = Math.Max(EvaluatePotentialMove(CurrentMove, SimulationBoard, Game.GetOtherTurn(Turn), CurrentWeight, SimulationDepth + 1), MaxWeight);
 
                     return (MaxWeight);
                 }
                 // If there are no more moves for the current player, but the game is not over, start a new simulation for the other player
-                else if (SimulationBoard.MovePossible(GetOtherTurn(Turn)))
+                else if (SimulationBoard.MovePossible(Game.GetOtherTurn(Turn)))
                 {
-                    return( EvaluatePotentialMove(SourceMove, SimulationBoard, GetOtherTurn(Turn), CurrentWeight, SimulationDepth + 1));
+                    return (EvaluatePotentialMove(SourceMove, SimulationBoard, Game.GetOtherTurn(Turn), CurrentWeight, SimulationDepth + 1));
                 }
                 // If there are no moves left in the game, collapse the simulation
                 else
                 {
-                    if (SimulationBoard.CalculateScore(AITurn) > SimulationBoard.CalculateScore(GetOtherTurn(Turn)))
+                    if (SimulationBoard.CalculateScore(AITurn) > SimulationBoard.CalculateScore(Game.GetOtherTurn(Turn)))
                         return (CurrentWeight + TurnAnalysis.VictoryWeight);
                     else
                         return (CurrentWeight - TurnAnalysis.VictoryWeight);
@@ -187,16 +182,6 @@ namespace Reversi
             return (CurrentWeight);
         }
 
-        /// <summary>
-        /// Returns the turn opposite to the one given
-        /// </summary>
-        /// <param name="turn">The turn to check</param>
-        /// <returns>The turn opposite of the one given</returns>
-        public Piece GetOtherTurn(Piece turn)
-        {
-            return (turn == Piece.WHITE ? Piece.BLACK : Piece.WHITE);
-        }
-
         #region AI Background Workers
 
         /// <summary>
@@ -204,7 +189,8 @@ namespace Reversi
         /// </summary>
         public void StartComputerTurnAnalysis()
         {
-            AIBGWorker.RunWorkerAsync();
+            if( !AIBGWorker.IsBusy )
+                AIBGWorker.RunWorkerAsync();
         }
 
         /// <summary>
@@ -212,10 +198,9 @@ namespace Reversi
         /// </summary>
         public void AIBGWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
-            App.GetActiveGame().SetTurnInProgress(false);
             App.GetActiveGame().SwitchTurn();
             App.GetActiveGame().AddBoardToMoveHistory();
-            ReversiWindow.GetGameBoardSurface().Refresh();
+            ReversiWindow.GetGameBoardSurface().FlipCapturedPieces(ChosenMove);
         }
 
         /// <summary>
@@ -230,7 +215,7 @@ namespace Reversi
                 if (App.GetActiveGameBoard().MovePossible(GetColor() == Piece.BLACK ? Piece.WHITE : Piece.BLACK))
                     break;
                 else
-                    ReversiWindow.GetGameBoardSurface().Refresh();
+                    ReversiWindow.GetGameBoardSurface().FlipCapturedPieces(ChosenMove);
             }
         }
 

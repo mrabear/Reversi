@@ -55,8 +55,7 @@ namespace Reversi
 
             // If there isn't a turn in progress, attempt to execute the given move
             if (!App.GetActiveGame().GetTurnInProgress())
-                if (App.GetActiveGame().ProcessUserTurn(GridClickX, GridClickY))
-                    gGameBoardSurface.Refresh();
+                App.GetActiveGame().ProcessUserTurn(GridClickX, GridClickY);
 
             // Reset the next/previous button states
             UpdateMoveChangeButtons();

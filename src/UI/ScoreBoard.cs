@@ -56,7 +56,15 @@ namespace Reversi
         /// <summary>
         /// Overrides the default renderer, draws all of the score board elements onto the screen
         /// </summary>
+        /// 
+
+        public delegate void RefreshDelegate();
         public static void Refresh()
+        {
+            Application.Current.Dispatcher.Invoke(new RefreshDelegate(RedrawScoreBoard));
+        }
+
+        public static void RedrawScoreBoard()
         {
             // Filter for the design time tool
             if (App.GetActiveGame() != null)

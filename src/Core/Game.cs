@@ -153,6 +153,7 @@ namespace Reversi
                         MoveOutcome = App.GetActiveGameBoard().MakeMove(X, Y, CurrentTurn);
                         if (MoveOutcome)
                         {
+                            ReversiWindow.GetGameBoardSurface().FlipCapturedPieces(new Point(X, Y));
                             SwitchTurn();
                             AddBoardToMoveHistory();
                         }
@@ -162,14 +163,23 @@ namespace Reversi
                         SwitchTurn();
                     }
                 }
-
-                if ((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
-                    App.GetComputerPlayer().StartComputerTurnAnalysis();
-                else
-                    TurnInProgress = false;
             }
 
             return (MoveOutcome);
+        }
+
+        public void CompleteTurn()
+        {
+            if ((SinglePlayerGame) && (CurrentTurn == App.GetComputerPlayer().GetColor()))
+            {
+                ReversiWindow.GetGameBoardSurface().Refresh(FullRefresh: false);
+                App.GetComputerPlayer().StartComputerTurnAnalysis();
+            }
+            else
+            {
+                TurnInProgress = false;
+                ReversiWindow.GetGameBoardSurface().Refresh(FullRefresh: false);
+            }
         }
 
         /// <summary>
@@ -252,6 +262,16 @@ namespace Reversi
             ScoreBoard.Clear();
             ReversiWindow.GetGameBoardSurface().Clear();
             ReversiWindow.GetGameBoardSurface().Refresh();
+        }
+
+        /// <summary>
+        /// Returns the turn opposite to the one given
+        /// </summary>
+        /// <param name="turn">The turn to check</param>
+        /// <returns>The turn opposite of the one given</returns>
+        public static Piece GetOtherTurn(Piece turn)
+        {
+            return (turn == Piece.WHITE ? Piece.BLACK : Piece.WHITE);
         }
     }
 }

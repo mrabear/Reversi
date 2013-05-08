@@ -14,6 +14,7 @@ using System.Windows.Media.Animation;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Timers;
+using System.ComponentModel;
 
 namespace Reversi
 {
@@ -23,8 +24,8 @@ namespace Reversi
     public class GameBoard : Grid
     {
         // Static binds to game board images
-        private static ImageSource gBlackPieceImage;
-        private static ImageSource gWhitePieceImage;
+        protected static ImageSource gBlackPieceImage;
+        protected static ImageSource gWhitePieceImage;
         private static ImageSource gAvailableMoveImage;
 
         // Static binds to the computer player visualization images
@@ -37,7 +38,7 @@ namespace Reversi
         //private static object HighLightLock = new object();
 
         // A list of all game board pieces
-        private static ConcurrentDictionary<Point, Image> GameBoardImages;
+        protected static ConcurrentDictionary<Point, Image> GameBoardImages;
 
         // A list of all spots on the board that have had non-piece graphcis drawn on them
         // Non-Piece Graphics include: available move markers and computer player analysis visulizations
@@ -60,6 +61,24 @@ namespace Reversi
 
         // Timer that is activated when an animation is running
         private static System.Timers.Timer AnimationActiveTimer = new System.Timers.Timer();
+        private static bool AnimationActive = false;
+
+        // The background worker used to separate the AI crunch from the UI
+        private readonly BackgroundWorker PieceFlipBGWorker = new BackgroundWorker();
+
+        private static List<AnimationPackage> ActiveAnimations = new List<AnimationPackage>();
+
+        private class AnimationPackage
+        {
+            public ScaleTransform Transform;
+            public DoubleAnimation Animation;
+
+            public AnimationPackage(ScaleTransform SourceTransform, DoubleAnimation SourceAnimation)
+            {
+                Transform = SourceTransform;
+                Animation = SourceAnimation;
+            }
+        }
 
         /// <summary>
         /// Creates an instance of GameBoard, loading image assets and setting up properties
@@ -73,9 +92,6 @@ namespace Reversi
 
             // Resets the dirty spots monitor
             DirtySpots = new List<Point>();
-
-            // Clears the game board
-            Clear();
 
             // Static binds to the processing visualization image sources
             gProcessingWorking = GraphicsTools.GenerateImageSource("img/Pieces/ProcessingWorking.png");
@@ -93,6 +109,9 @@ namespace Reversi
             RotationAnimation = new RotateTransform();
             AngleRotation.RepeatBehavior = RepeatBehavior.Forever;
             RotationAnimation.BeginAnimation(RotateTransform.AngleProperty, AngleRotation);
+
+            // Clears the game board
+            Clear();
         }
 
         /// <summary>
@@ -102,7 +121,6 @@ namespace Reversi
         {
             // Reset the last drawn board
             LastDrawnBoard = new Board();
-            LastDrawnBoard.ClearBoard();
 
             // Clear the dirty spots list
             DirtySpots = new List<Point>();
@@ -111,35 +129,39 @@ namespace Reversi
             DisplayBoard = new Board();
 
             Point CurrentPoint;
+
             // Rebuild the board images
-            for (int Y = 0; Y < LastDrawnBoard.GetBoardSize(); Y++)
-                for (int X = 0; X < LastDrawnBoard.GetBoardSize(); X++)
+            for (int Y = 0; Y < DisplayBoard.GetBoardSize(); Y++)
+                for (int X = 0; X < DisplayBoard.GetBoardSize(); X++)
                 {
                     CurrentPoint = new Point(X, Y);
-                    ClearBoardPiece(CurrentPoint);
-                    PlaceBoardPiece(CurrentPoint, null);
+                    UpdateBoardPiece(CurrentPoint, GetGamePiece(DisplayBoard.ColorAt(X,Y)));
                 }
+        }
+
+        public delegate void RefreshDelegate(bool FullRefresh = true);
+        public void Refresh( bool FullRefresh = true )
+        {
+            Application.Current.Dispatcher.Invoke(new RefreshDelegate(RefreshGameBoard), FullRefresh);
         }
 
         /// <summary>
         /// The thread safe way to refresh the game graphic elements
         /// </summary>
-        public void Refresh()
+        public void RefreshGameBoard(bool FullRefresh = true)
         {
-            // Do not start clearing the game board until the animations from the current turn are finished
-            while (AnimationActiveTimer.Enabled) ;
-
             // Clean all non-piece graphics from the board
             WipeDirtySpots();
             
-            // Draw the net new pieces
-            DrawPieces();
-
             // Draw the available moves for the current turn
             DrawAvailableMoves();
 
             // Refresh the scoreboard
             ScoreBoard.Refresh();
+
+            // Draw the net new pieces
+            if( FullRefresh )
+                DrawPieces();
         }
 
         #region Drawing Methods
@@ -180,19 +202,67 @@ namespace Reversi
                 for (int X = 0; X < BoardToDisplay.GetBoardSize(); X++)
 
                     // Only draw a game piece if it is either net new or has been flipped since the last drawing pass
-                    if ((LastDrawnBoard.ColorAt(X, Y) != BoardToDisplay.ColorAt(X, Y)) || (BoardToDisplay.ColorAt(X, Y) == Piece.EMPTY))
+                    if (BoardToDisplay.ColorAt(X, Y) != Piece.EMPTY)
                     {
                         CurrentPiece = new Point(X, Y);
 
-                        // Clear the spot on the board
-                        ClearBoardPiece(CurrentPiece);
-
                         // Add the canvas to the display list
-                        PlaceBoardPiece(CurrentPiece, GetGamePiece(BoardToDisplay.ColorAt(CurrentPiece)));
+                        UpdateBoardPiece(CurrentPiece, GetGamePiece(BoardToDisplay.ColorAt(CurrentPiece)));
                     }
+        }
+
+        public delegate void FlipCapturedPiecesDelegate(Point SourceMove);
+        public void FlipCapturedPieces(Point SourceMove)
+        {
+            Application.Current.Dispatcher.Invoke(new FlipCapturedPiecesDelegate(FlipCapturedPieces_Invoke), SourceMove);
+        }
+
+        public void FlipCapturedPieces_Invoke(Point SourceMove)
+        {
+            ResetAnimationClock(2000);
+
+            int MoveX = Convert.ToInt16(SourceMove.X);
+            int MoveY = Convert.ToInt16(SourceMove.Y);
+
+            // Add the current move
+            UpdateBoardPiece(SourceMove, GetGamePiece(App.GetActiveGameBoard().ColorAt(SourceMove)));
+
+            for (int Y = 0; Y < App.GetActiveGameBoard().GetBoardSize(); Y++)
+                for (int X = 0; X < App.GetActiveGameBoard().GetBoardSize(); X++)
+                    if ((App.GetActiveGameBoard().ColorAt(X, Y) != LastDrawnBoard.ColorAt(X, Y)) && (new Point(X, Y) != SourceMove))
+                        AnimateFlippedPiece(new Point(X, Y), LastDrawnBoard.ColorAt(X, Y), RemovePiece: true);
 
             // Update the last drawn board with the board that was just created
-            LastDrawnBoard = new Board(BoardToDisplay);
+            LastDrawnBoard = new Board(App.GetActiveGameBoard());
+        }
+
+        public delegate void AnimateFlippedPieceDelegate(Point PieceToFlip, Piece PieceColor, bool RemovePiece = true);
+        public void FlipPiece(Point PieceToFlip, Piece PieceColor, bool RemovePiece = true)
+        {
+            Application.Current.Dispatcher.Invoke(new AnimateFlippedPieceDelegate(AnimateFlippedPiece), PieceToFlip, PieceColor, RemovePiece);
+        }
+
+        protected void AnimateFlippedPiece(Point PieceToFlip, Piece PieceColor, bool RemovePiece = true)
+        {
+            // Add the canvas to the display list
+            UpdateBoardPiece(PieceToFlip, GetGamePiece(PieceColor));
+
+            ScaleTransform FlipTransformation = new ScaleTransform();
+            DoubleAnimation FlipAnimation = new DoubleAnimation(RemovePiece ? 1 : 0, RemovePiece ? 0 : 1, new Duration(TimeSpan.FromSeconds(0.35)));
+
+            GameBoardImages[PieceToFlip].RenderTransform = FlipTransformation;
+            GameBoardImages[PieceToFlip].RenderTransformOrigin = new Point(0.5, 0.5);
+            FlipTransformation.BeginAnimation(ScaleTransform.ScaleXProperty, FlipAnimation);
+
+            //ActiveAnimations.Add(new AnimationPackage(FlipTransformation, FlipAnimation));
+
+            ResetAnimationClock(350);
+
+            if (RemovePiece)
+            {
+                AnimationClock FlipTimer = FlipAnimation.CreateClock();
+                FlipTimer.Completed += new AnimationEventArg(PieceToFlip, Game.GetOtherTurn(PieceColor)).CompleteAnimation;
+            }
         }
 
         /// <summary>
@@ -220,11 +290,8 @@ namespace Reversi
                     // Add this space to the dirty spots list
                     DirtySpots.Add(CurrentPiece);
 
-                    // Clear the spot on the board
-                    ClearBoardPiece(CurrentPiece);
-
                     // Add the work visual to the display list
-                    PlaceBoardPiece(CurrentPiece, gAvailableMoveImage);
+                    UpdateBoardPiece(CurrentPiece, gAvailableMoveImage);
                 }
         }
 
@@ -252,7 +319,7 @@ namespace Reversi
             {
                 DoubleAnimation OpacityFader = new DoubleAnimation(0.6, 0, new Duration(TimeSpan.FromSeconds(0.15)));
                 GameBoardImages[CurrentPiece].BeginAnimation(Image.OpacityProperty, OpacityFader);
-                AddToAnimationClock(150);
+                ResetAnimationClock(150);
             }
             else
             {
@@ -263,18 +330,18 @@ namespace Reversi
                 if (ProcessingState == AnalysisStatus.QUEUED)
                 {
                     // Place a grey "queued" gear
-                    PlaceBoardPiece(CurrentPiece, gProcessingQueued);
+                    AddBoardPiece(CurrentPiece, gProcessingQueued);
                 }
                 else if (ProcessingState == AnalysisStatus.CHOSEN)
                 {
                     // Place a glowing "chosen" gear
-                    PlaceBoardPiece(CurrentPiece, gProcessingChosen);
+                    AddBoardPiece(CurrentPiece, gProcessingChosen);
                     GameBoardImages[CurrentPiece].Opacity = 0.5;
                 }
                 else if (ProcessingState == AnalysisStatus.WORKING)
                 {
                     // Place a green "working" gear
-                    PlaceBoardPiece(CurrentPiece, gProcessingWorking);
+                    AddBoardPiece(CurrentPiece, gProcessingWorking);
 
                     // Dim the piece (looks nicer)
                     GameBoardImages[CurrentPiece].Opacity = 0.6;
@@ -290,10 +357,20 @@ namespace Reversi
 
         #region Utility Methods
 
+
         /// <summary>
-        /// Places a piece image onto the game board
+        /// Updates an existing game board piece (removes then adds it)
         /// </summary>
-        public void PlaceBoardPiece(Point CurrentPoint, ImageSource SourceImage)
+        public void UpdateBoardPiece(Point CurrentPoint, ImageSource SourceImage)
+        {
+            ClearBoardPiece(CurrentPoint);
+            AddBoardPiece(CurrentPoint, SourceImage);
+        }
+
+        /// <summary>
+        /// Adds a piece image onto the game board
+        /// </summary>
+        public void AddBoardPiece(Point CurrentPoint, ImageSource SourceImage)
         {
             // If this board spot hasn't been processed yet, add an entry for it in the dictionary
             if (!GameBoardImages.ContainsKey(CurrentPoint))
@@ -346,15 +423,23 @@ namespace Reversi
                 return null;
         }
 
-        public static void AddToAnimationClock(int AnimationTime)
+        public void ResetAnimationClock(int AnimationTime = 1000)
         {
+            AnimationActive = true;
             AnimationActiveTimer.Interval = AnimationTime;
             AnimationActiveTimer.Start();
         }
 
-        public static void AnimationCompleted(object sender, ElapsedEventArgs e)
+        public void AnimationCompleted(object sender, ElapsedEventArgs e)
         {
             AnimationActiveTimer.Stop();
+            App.GetActiveGame().CompleteTurn();
+            AnimationActive = false;
+        }
+
+        public bool AnimationsAreActive()
+        {
+            return (AnimationActive);
         }
 
         #endregion

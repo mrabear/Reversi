@@ -131,9 +131,7 @@ namespace Reversi
             for (int Y = 0; Y < BoardSize; Y++)
             {
                 for (int X = 0; X < BoardSize; X++)
-                {
-                    boardString += ColorAt(X, Y);
-                }
+                    boardString += Convert.ToInt16(ColorAt(X, Y));
 
                 if (!SingleLine)
                     boardString += "\n";
