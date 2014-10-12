@@ -5,7 +5,7 @@ Reversi
 C# Reversi game.  
 
 The compiled executable can be downloaded at:
-https://www.dropbox.com/s/ukt8w6b5mb5lpiy/Reversi.exe
+https://dl.dropboxusercontent.com/u/73352718/Game%20Projects/Reversi/Reversi.exe
 
 A short video of the game in action can be found at:
 http://www.youtube.com/watch?v=4868C2qgD2A
